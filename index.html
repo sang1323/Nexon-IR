@@ -2151,28 +2151,25 @@ window.addEventListener('load',function(){
 
 </script>
 <script>
-  // 1. 발급받으신 API 키를 큰따옴표 안에 넣어주세요.
-  const DART_API_KEY = 	"5dc27d8d420eaa1f4d21d013454d2850741fee9e";
+  // 기업 고유번호 (예: 엔씨소프트 00126131)
   const CORP_CODE = "00126131"; 
 
-  // 2. DART 요청 주소
-  const DART_URL = `https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=${DART_API_KEY}&corp_code=${CORP_CODE}&bsns_year=2023&reprt_code=11011`;
-  
-  // ⭐️ 3. 여기가 핵심입니다! 막힌 길 대신 더 튼튼한 우회 도로(allorigins)를 사용합니다.
-  const FETCH_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(DART_URL)}`;
-
-  fetch(FETCH_URL)
+  // 내가 방금 만든 전용 도로(/dart)로 요청합니다! (막힐 일 없음)
+  fetch(`/dart?corp_code=${CORP_CODE}`)
     .then(response => response.json())
     .then(data => {
       if(data.status === "000") {
-        alert("✅ DART 데이터 불러오기 대성공!");
+        alert("✅ DART 데이터 불러오기 완벽하게 성공!");
+        console.log("데이터 확인:", data.list);
       } else {
-        alert("❌ DART에서 응답은 왔지만 실패함. 이유: " + data.message);
+        alert("❌ DART 응답 실패: " + data.message);
       }
     })
     .catch(error => {
-      alert("❌ 아예 인터넷 통신이 막혔습니다. (우회 서버 오류)");
+      alert("❌ 통신 에러: " + error);
     });
+</script>
+
 </script>
 
 </body>
