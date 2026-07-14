@@ -111,17 +111,18 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
 .rk-name{min-width:72px;max-width:72px;font-size:10px;font-weight:500;color:var(--tx);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .rk-row.nx .rk-name{font-weight:800;color:var(--accent2);}
-.rk-track{flex:1;height:10px;background:rgba(255,255,255,.05);border-radius:5px;overflow:hidden;}
-.rk-fill{height:100%;border-radius:5px;width:0;background:var(--rk-grad);
+.rk-track{flex:1;height:10px;background:rgba(255,255,255,.05);border-radius:5px;overflow:hidden;position:relative;}
+.rk-fill{position:absolute;top:0;height:100%;border-radius:5px;width:0;left:var(--rk-left,0%);background:var(--rk-grad);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
   animation:rkFill .7s cubic-bezier(.22,.61,.36,1) forwards;animation-delay:var(--rk-delay,0s);}
 @keyframes rkFill{from{width:0;}to{width:var(--rk-w);}}
+.rk-zero{position:absolute;top:-1px;bottom:-1px;width:1px;background:rgba(255,255,255,.28);z-index:1;}
 .rk-val{min-width:44px;text-align:right;font-size:10px;font-weight:400;color:var(--tx2);}
 .rk-row.nx .rk-val{font-weight:700;color:var(--accent2);}
 </style>
 </head>
 <body>
-<div id="build-banner" style="position:fixed;top:0;right:0;z-index:99999;background:#6366f1;color:#fff;font-size:10px;padding:2px 8px;border-radius:0 0 0 6px;font-family:monospace;opacity:0.85;">BUILD-0714-1530</div>
+<div id="build-banner" style="position:fixed;top:0;right:0;z-index:99999;background:#6366f1;color:#fff;font-size:10px;padding:2px 8px;border-radius:0 0 0 6px;font-family:monospace;opacity:0.85;">BUILD-0714-2130</div>
 <div class="wrap">
 <div class="hd"><div class="hd-inner">
   <div class="hd-left">
@@ -699,10 +700,10 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
   <span class="lbl" style="margin-left:8px;">지표:</span>
   <span class="pill on" onclick="setMet('mktcap',this)">시가총액</span>
   <span class="pill" onclick="setMet('rev',this)">매출</span>
-  <span class="pill" onclick="setMet('opm',this)">영업이익률</span>
-  <span class="pill" onclick="setMet('per',this)">주가수익비율</span>
-  <span class="pill" onclick="setMet('pbr',this)">주가순자산비율</span>
-  <span class="pill" onclick="setMet('roe',this)">자기자본이익률</span>
+  <span class="pill" onclick="setMet('opm',this)">영업이익률(OPM)</span>
+  <span class="pill" onclick="setMet('per',this)">주가수익비율(PER)</span>
+  <span class="pill" onclick="setMet('pbr',this)">주가순자산비율(PBR)</span>
+  <span class="pill" onclick="setMet('roe',this)">자기자본이익률(ROE)</span>
 </div>
 
 <!-- 랭킹 카드 2개 나란히 -->
@@ -833,6 +834,7 @@ const CO={
 const CK=Object.keys(CO);
 const QD={
   shiftup:{
+    '2024Q3':{r:.0580,o:.0356,m:61.0},
     '2025Q1':{r:.0422,o:.0263,m:62.3},'2025Q2':{r:.1124,o:.0682,m:60.7},'2025Q3':{r:.0755,o:.0495,m:65.6},'2025Q4':{r:.0641,o:.0371,m:57.9},
     '2026Q1':{r:.0473,o:.0215,m:45.5}
   },
@@ -843,7 +845,8 @@ const QD={
     '2025Q4':{r:.0499,o:.0070,m:14.0},'2026Q1':{r:.0393,o:.0053,m:13.5}
   },
   neowiz:{
-    '2025Q1':{r:.0890,o:.0103,m:11.6},'2025Q4':{r:.1063,o:.0047,m:4.4},'2026Q1':{r:.1014,o:.0070,m:6.9}
+    '2024Q3':{r:.0931,o:.0064,m:6.9},'2024Q4':{r:.0897,o:.0072,m:8.0},
+    '2025Q1':{r:.0890,o:.0103,m:11.6},'2025Q2':{r:.1100,o:.0186,m:16.9},'2025Q3':{r:.1274,o:.0265,m:20.8},'2025Q4':{r:.1063,o:.0047,m:4.4},'2026Q1':{r:.1014,o:.0070,m:6.9}
   },
 
   nexon:{
@@ -969,14 +972,14 @@ const QD={
     '2023Q1':{r:2.58,o:.52,m:20.2},'2023Q4':{r:2.64,o:.55,m:20.8},
     '2024Q1':{r:2.68,o:.56,m:20.9},'2025Q1':{r:2.70,o:.58,m:21.5},'2026Q1':{r:2.72,o:.585,m:21.5}},
   wemade:{
-    '2023Q1':{r:.195,o:-.012,m:-6.2},'2024Q1':{r:.215,o:-.010,m:-4.7},
-    '2025Q1':{r:.225,o:-.011,m:-4.9},'2026Q1':{r:.228,o:-.012,m:-5.2}},
+    '2023Q1':{r:.195,o:-.012,m:-6.2},'2024Q1':{r:.215,o:-.010,m:-4.7},'2024Q3':{r:.2144,o:.0518,m:24.2},'2024Q4':{r:.1650,o:.0181,m:11.0},
+    '2025Q1':{r:.1418,o:-.0113,m:-8.0},'2025Q2':{r:.1168,o:-.0285,m:-24.4},'2025Q3':{r:.1636,o:.0263,m:16.1},'2025Q4':{r:.1917,o:.0243,m:12.7},'2026Q1':{r:.1533,o:.0085,m:5.5}},
   com2us:{
     '2023Q1':{r:.058,o:-.003,m:-5.2},'2024Q1':{r:.060,o:-.003,m:-5.0},
     '2025Q1':{r:.061,o:-.003,m:-4.9},'2026Q1':{r:.0625,o:-.0028,m:-4.5}},
   webzen:{
-    '2023Q1':{r:.048,o:.011,m:22.9},'2024Q1':{r:.050,o:.011,m:22.0},
-    '2025Q1':{r:.050,o:.011,m:22.0},'2026Q1':{r:.0512,o:.0115,m:22.5}},
+    '2023Q1':{r:.048,o:.011,m:22.9},'2024Q1':{r:.0614,o:.0179,m:29.2},'2024Q2':{r:.0480,o:.0118,m:24.6},'2024Q3':{r:.0491,o:.0096,m:19.6},'2024Q4':{r:.0560,o:.0151,m:27.0},
+    '2025Q1':{r:.0416,o:.0090,m:21.6},'2025Q2':{r:.0391,o:.0061,m:15.6},'2025Q3':{r:.0438,o:.0076,m:17.4},'2025Q4':{r:.0499,o:.0070,m:14.0},'2026Q1':{r:.0393,o:.0053,m:13.5}},
   devsisters:{
     '2023Q1':{r:.032,o:-.004,m:-12.5},'2024Q1':{r:.034,o:-.004,m:-11.8},
     '2025Q1':{r:.035,o:-.004,m:-11.4},'2026Q1':{r:.0358,o:-.0045,m:-12.5}}
@@ -1960,7 +1963,7 @@ function getV(co,qk,met){
 }
 function buildS1(){
   var qk=document.getElementById('s1q').value;
-  var metLabels={mktcap:'시가총액 (십억$)',rev:'매출 (백만$)',opm:'영업이익률 (%)',per:'주가수익비율 (배)',pbr:'주가순자산비율 (배)',roe:'자기자본이익률 (%)'};
+  var metLabels={mktcap:'시가총액 (십억$)',rev:'매출 (백만$)',opm:'영업이익률 OPM (%)',per:'주가수익비율 PER (배)',pbr:'주가순자산비율 PBR (배)',roe:'자기자본이익률 ROE (%)'};
   var isLower=false; // 모든 지표 높은 순 정렬 (PER/PBR 포함)
   var unitLbl=metLabels[rMet]||rMet;
   var gu=document.getElementById('s1g-unit');
@@ -2002,24 +2005,37 @@ function buildS1(){
       return isLower?a.v-b.v:b.v-a.v;
     });
     var validVals=data.filter(function(d){return!d.na;});
-    var maxV=validVals.length?Math.abs(validVals[0].v):1;
+    var vals=validVals.map(function(d){return d.v;});
+    var hi=Math.max.apply(null,[0].concat(vals));
+    var lo=Math.min.apply(null,[0].concat(vals));
+    var range=(hi-lo)||1;
+    var zeroPct=(0-lo)/range*100;      // 0 기준선 위치(음수 없으면 0%)
+    var hasNeg=lo<0;
     el.innerHTML=data.map(function(d,i){
       var rank=i+1;
       var isNx=CO[d.co]&&CO[d.co].nx;
       var col=(CO[d.co]&&CO[d.co].col)||'#6366f1';
       var rgb=rkHex2rgb(col);
-      var grad='linear-gradient(90deg,rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',.45),rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+'))';
-      var barW=d.na?0:Math.max(4,Math.round(Math.abs(d.v)/maxV*100));
+      var neg=(!d.na)&&d.v<0;
+      var grad=neg
+        ? 'linear-gradient(90deg,rgba(224,82,82,.55),rgba(224,82,82,.95))'
+        : 'linear-gradient(90deg,rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',.45),rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+'))';
+      var barW=d.na?0:Math.max(2,Math.abs(d.v)/range*100);
+      var leftPct=d.na?0:(d.v>=0?zeroPct:Math.max(0,zeroPct-barW));
       var dispV=d.na?'N/A':(Math.abs(d.v)>=100?Math.round(d.v):Math.round(d.v*10)/10);
       var badgeCls=rank===1?'g1':rank===2?'g2':rank===3?'g3':'gx';
       var rowCls='rk-row'+(isNx?' nx':'')+(d.na?' na':'');
       var delay=(i*0.045).toFixed(3)+'s';
       var name=(isNx?'\u2605 ':'')+((CO[d.co]&&CO[d.co].n)||d.co);
+      var valCol=neg?'color:#e05252;':'';
       return '<div class="'+rowCls+'">'
         +'<div class="rk-badge '+badgeCls+'">'+rank+'</div>'
         +'<div class="rk-name">'+name+'</div>'
-        +'<div class="rk-track"><div class="rk-fill" style="--rk-w:'+barW+'%;--rk-grad:'+grad+';--rk-delay:'+delay+';"></div></div>'
-        +'<div class="rk-val">'+dispV+'</div>'
+        +'<div class="rk-track">'
+          +(hasNeg?'<div class="rk-zero" style="left:'+zeroPct+'%;"></div>':'')
+          +'<div class="rk-fill" style="--rk-w:'+barW+'%;--rk-left:'+leftPct+'%;--rk-grad:'+grad+';--rk-delay:'+delay+';"></div>'
+        +'</div>'
+        +'<div class="rk-val" style="'+valCol+'">'+dispV+'</div>'
       +'</div>';
     }).join('');
   }
