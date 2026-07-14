@@ -2150,37 +2150,28 @@ window.addEventListener('load',function(){
 });
 
 </script>
-  <script>
-  // 1. 발급받으신 DART API 키를 여기에 넣으세요 (따옴표 안에 넣으셔야 합니다)
-  const DART_API_KEY = 5dc27d8d420eaa1f4d21d013454d2850741fee9e;
-  
-  // 2. 검색할 기업의 고유번호 (예: 넷마블은 00126380, 엔씨소프트는 00126131 입니다)
-  const CORP_CODE = "00126131"; // 엔씨소프트 예시
+<script>
+  // 1. 발급받으신 API 키를 큰따옴표 안에 넣어주세요.
+  const DART_API_KEY = 	5dc27d8d420eaa1f4d21d013454d2850741fee9e;
+  const CORP_CODE = "00126131"; 
 
-  // 3. 브라우저에서 직접 DART로 요청하면 막히기 때문에, 우회하는 마법의 주소(corsproxy)를 앞에 붙여줍니다.
+  // 2. DART 요청 주소
   const DART_URL = `https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=${DART_API_KEY}&corp_code=${CORP_CODE}&bsns_year=2023&reprt_code=11011`;
-  const FETCH_URL = `https://corsproxy.io/?${encodeURIComponent(DART_URL)}`;
+  
+  // ⭐️ 3. 여기가 핵심입니다! 막힌 길 대신 더 튼튼한 우회 도로(allorigins)를 사용합니다.
+  const FETCH_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(DART_URL)}`;
 
-  // 4. 데이터 가져오기 실행
   fetch(FETCH_URL)
     .then(response => response.json())
     .then(data => {
       if(data.status === "000") {
-        console.log("✅ DART 데이터 불러오기 성공!", data.list);
-        alert("DART 데이터를 성공적으로 불러왔습니다. 키보드 F12를 눌러 콘솔창을 확인해보세요.");
-        
-        // --- 이 부분에 차트(Chart.js)의 숫자를 바꿔주는 코드를 나중에 추가하면 됩니다 ---
-        // 예: 매출액 찾기
-        // const revenue = data.list.find(item => item.account_nm === "수익(매출액)");
-        // -------------------------------------------------------------------------
-        
+        alert("✅ DART 데이터 불러오기 대성공!");
       } else {
-        console.error("❌ DART 데이터 불러오기 실패:", data.message);
-        alert("데이터를 불러오지 못했습니다: " + data.message);
+        alert("❌ DART에서 응답은 왔지만 실패함. 이유: " + data.message);
       }
     })
     .catch(error => {
-      console.error("인터넷 연결 문제 또는 프록시 에러:", error);
+      alert("❌ 아예 인터넷 통신이 막혔습니다. (우회 서버 오류)");
     });
 </script>
 
