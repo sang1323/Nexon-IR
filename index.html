@@ -122,7 +122,7 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
 </style>
 </head>
 <body>
-<div id="build-banner" style="position:fixed;top:0;right:0;z-index:99999;background:#6366f1;color:#fff;font-size:10px;padding:2px 8px;border-radius:0 0 0 6px;font-family:monospace;opacity:0.85;">BUILD-0714-2130</div>
+<div id="build-banner" style="position:fixed;top:0;right:0;z-index:99999;background:#6366f1;color:#fff;font-size:10px;padding:2px 8px;border-radius:0 0 0 6px;font-family:monospace;opacity:0.85;">BUILD-0714-2359</div>
 <div class="wrap">
 <div class="hd"><div class="hd-inner">
   <div class="hd-left">
@@ -694,8 +694,7 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
     <option value="2025Q3">2025 Q3</option><option value="2025Q2">2025 Q2</option>
     <option value="2025Q1">2025 Q1</option><option value="2024Q4">2024 Q4</option>
     <option value="2024Q3">2024 Q3</option><option value="2024Q2">2024 Q2</option>
-    <option value="2024Q1">2024 Q1</option><option value="2023Q4">2023 Q4</option>
-    <option value="2023Q1">2023 Q1</option>
+    <option value="2024Q1">2024 Q1</option>
   </select>
   <span class="lbl" style="margin-left:8px;">지표:</span>
   <span class="pill on" onclick="setMet('mktcap',this)">시가총액</span>
@@ -834,7 +833,7 @@ const CO={
 const CK=Object.keys(CO);
 const QD={
   shiftup:{
-    '2024Q3':{r:.0580,o:.0356,m:61.0},
+    '2024Q1':{r:.0373,o:.0258,m:69.2},'2024Q2':{r:.0652,o:.0451,m:69.1},'2024Q3':{r:.0580,o:.0356,m:61.0},'2024Q4':{r:.0593,o:.0421,m:71.0},
     '2025Q1':{r:.0422,o:.0263,m:62.3},'2025Q2':{r:.1124,o:.0682,m:60.7},'2025Q3':{r:.0755,o:.0495,m:65.6},'2025Q4':{r:.0641,o:.0371,m:57.9},
     '2026Q1':{r:.0473,o:.0215,m:45.5}
   },
@@ -845,7 +844,7 @@ const QD={
     '2025Q4':{r:.0499,o:.0070,m:14.0},'2026Q1':{r:.0393,o:.0053,m:13.5}
   },
   neowiz:{
-    '2024Q3':{r:.0931,o:.0064,m:6.9},'2024Q4':{r:.0897,o:.0072,m:8.0},
+    '2024Q1':{r:.0971,o:.0148,m:15.2},'2024Q2':{r:.0871,o:.0049,m:5.6},'2024Q3':{r:.0931,o:.0064,m:6.9},'2024Q4':{r:.0897,o:.0072,m:8.0},
     '2025Q1':{r:.0890,o:.0103,m:11.6},'2025Q2':{r:.1100,o:.0186,m:16.9},'2025Q3':{r:.1274,o:.0265,m:20.8},'2025Q4':{r:.1063,o:.0047,m:4.4},'2026Q1':{r:.1014,o:.0070,m:6.9}
   },
 
@@ -972,7 +971,7 @@ const QD={
     '2023Q1':{r:2.58,o:.52,m:20.2},'2023Q4':{r:2.64,o:.55,m:20.8},
     '2024Q1':{r:2.68,o:.56,m:20.9},'2025Q1':{r:2.70,o:.58,m:21.5},'2026Q1':{r:2.72,o:.585,m:21.5}},
   wemade:{
-    '2023Q1':{r:.195,o:-.012,m:-6.2},'2024Q1':{r:.215,o:-.010,m:-4.7},'2024Q3':{r:.2144,o:.0518,m:24.2},'2024Q4':{r:.1650,o:.0181,m:11.0},
+    '2023Q1':{r:.195,o:-.012,m:-6.2},'2024Q1':{r:.1613,o:-.0376,m:-23.3},'2024Q2':{r:.1713,o:-.0242,m:-14.1},'2024Q3':{r:.2144,o:.0518,m:24.2},'2024Q4':{r:.1650,o:.0181,m:11.0},
     '2025Q1':{r:.1418,o:-.0113,m:-8.0},'2025Q2':{r:.1168,o:-.0285,m:-24.4},'2025Q3':{r:.1636,o:.0263,m:16.1},'2025Q4':{r:.1917,o:.0243,m:12.7},'2026Q1':{r:.1533,o:.0085,m:5.5}},
   com2us:{
     '2023Q1':{r:.058,o:-.003,m:-5.2},'2024Q1':{r:.060,o:-.003,m:-5.0},
