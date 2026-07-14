@@ -121,7 +121,7 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
 </style>
 </head>
 <body>
-<div id="build-banner" style="position:fixed;top:0;right:0;z-index:99999;background:#6366f1;color:#fff;font-size:10px;padding:2px 8px;border-radius:0 0 0 6px;font-family:monospace;opacity:0.85;">BUILD-0714-0930</div>
+<div id="build-banner" style="position:fixed;top:0;right:0;z-index:99999;background:#6366f1;color:#fff;font-size:10px;padding:2px 8px;border-radius:0 0 0 6px;font-family:monospace;opacity:0.85;">BUILD-0714-1530</div>
 <div class="wrap">
 <div class="hd"><div class="hd-inner">
   <div class="hd-left">
@@ -673,42 +673,12 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
   <div class="mc"><div class="mc-l">HR Costs 인건비총액</div><div class="mc-v">¥13,892M</div><div class="mc-s">Q/Q -11%</div></div>
   <div class="mc"><div class="mc-l">1인당 평균 인건비</div><div class="mc-v" style="color:var(--accent2);">¥138.6만</div><div class="mc-s">HR Costs ÷ 임직원수</div></div>
 </div>
-<div class="card" style="margin-bottom:12px;">
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
-    <div class="card-title" style="margin:0;">분기별 임직원 수 추이 + HR Costs — IR 공시 기준</div>
-    <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
-      <span style="font-size:10px;color:var(--tx3);">지역:</span>
-      <span class="pill on" id="s5r-all" onclick="setS5R('all',this)">전체</span>
-      <span class="pill" id="s5r-kr" onclick="setS5R('kr',this)">한국</span>
-      <span class="pill" id="s5r-jp" onclick="setS5R('jp',this)">일본</span>
-      <span class="pill" id="s5r-na" onclick="setS5R('na',this)">북미</span>
-      <span class="pill" id="s5r-cn" onclick="setS5R('cn',this)">중국</span>
-      <span class="pill" id="s5r-etc" onclick="setS5R('etc',this)">기타</span>
-    </div>
-  </div>
-  <div style="height:280px;position:relative;"><canvas id="s5-emp-chart"></canvas></div>
-</div>
-<div class="g2" style="margin-bottom:12px;">
+<div style="margin-bottom:12px;">
   <div class="card">
-    <div class="card-title">지역별 구성 — 2026Q1</div>
-    <div style="height:200px;position:relative;"><canvas id="s5-region-chart"></canvas></div>
-    <div id="s5-region-lgd" style="display:flex;flex-direction:column;gap:4px;margin-top:10px;"></div>
-  </div>
-  <div class="card">
-    <div class="card-title">분기별 임직원 수 상세 — Full-time 기준 (IR 공시)</div>
-    <div class="tw"><table class="t" style="min-width:380px;font-size:10.5px;">
-      <thead><tr><th style="text-align:left;">분기</th><th>한국</th><th>일본</th><th>북미</th><th>중국</th><th>기타</th><th style="color:var(--accent2);">합계</th></tr></thead>
-      <tbody>
-        <tr><td style="font-weight:600;">2024Q1</td><td>7,526</td><td>258</td><td>311</td><td>190</td><td>683</td><td style="font-weight:700;">8,968</td></tr>
-        <tr><td style="font-weight:600;">2024Q2</td><td>7,524</td><td>251</td><td>236</td><td>192</td><td>679</td><td style="font-weight:700;">8,882</td></tr>
-        <tr><td style="font-weight:600;">2024Q3</td><td>7,762</td><td>243</td><td>196</td><td>192</td><td>737</td><td style="font-weight:700;">9,130</td></tr>
-        <tr><td style="font-weight:600;">2024Q4</td><td>7,962</td><td>238</td><td>186</td><td>186</td><td>757</td><td style="font-weight:700;">9,329</td></tr>
-        <tr><td style="font-weight:600;">2025Q1</td><td>8,083</td><td>239</td><td>180</td><td>189</td><td>810</td><td style="font-weight:700;">9,501</td></tr>
-        <tr><td style="font-weight:600;">2025Q2</td><td>8,111</td><td>237</td><td>179</td><td>187</td><td>842</td><td style="font-weight:700;">9,556</td></tr>
-        <tr><td style="font-weight:600;">2025Q3</td><td>8,338</td><td>233</td><td>184</td><td>184</td><td>847</td><td style="font-weight:700;">9,786</td></tr>
-        <tr><td style="font-weight:600;">2025Q4</td><td>8,342</td><td>233</td><td>187</td><td>184</td><td>888</td><td style="font-weight:700;">9,834</td></tr>
-        <tr class="nx"><td style="font-weight:700;color:var(--accent2);">2026Q1</td><td style="font-weight:700;">8,473</td><td style="font-weight:700;">244</td><td style="font-weight:700;">188</td><td style="font-weight:700;">169</td><td style="font-weight:700;">949</td><td style="font-weight:700;color:var(--accent2);">10,023</td></tr>
-      </tbody>
+    <div class="card-title">분기별 임직원 수 상세 · HR Costs — Full-time 기준 (IR 공시)</div>
+    <div class="tw"><table class="t" style="min-width:560px;font-size:10.5px;">
+      <thead><tr><th style="text-align:left;">분기</th><th>한국</th><th>일본</th><th>북미</th><th>중국</th><th>기타</th><th style="color:var(--accent2);">합계</th><th>전분기比</th><th>HR Costs<br>(¥M)</th><th>1인당<br>(¥만)</th></tr></thead>
+      <tbody id="s5-detail-tbl"></tbody>
     </table></div>
   </div>
 </div>
@@ -1927,8 +1897,6 @@ function buildS4(){
   })();
 }
 
-var s5R='all';
-function setS5R(r,el){s5R=r;document.querySelectorAll('#s5r-all,#s5r-kr,#s5r-jp,#s5r-na,#s5r-cn,#s5r-etc').forEach(function(e){e.classList.remove('on');});el.classList.add('on');buildS5();}
 function buildS5(){
   var ql=['24Q1','24Q2','24Q3','24Q4','25Q1','25Q2','25Q3','25Q4','26Q1'];
   var eK=[7526,7524,7762,7962,8083,8111,8338,8342,8473];
@@ -1939,49 +1907,24 @@ function buildS5(){
   var hr=[14529,11378,11862,9476,11206,11862,10617,15650,13892];
   var tot=[8968,8882,9130,9329,9501,9556,9786,9834,10023];
   var pe=hr.map(function(h,i){return Math.round(h*1e6/tot[i]/1e4*10)/10;});
-  var el=document.getElementById('s5-emp-chart');
-  if(el){kc('s5-emp-chart');
-    var aDS=[
-      {label:'한국',data:eK,backgroundColor:'rgba(59,130,246,.75)',stack:'s',borderRadius:0,_r:'kr'},
-      {label:'일본',data:eJ,backgroundColor:'rgba(99,102,241,.75)',stack:'s',borderRadius:0,_r:'jp'},
-      {label:'북미',data:eN,backgroundColor:'rgba(24,169,116,.75)',stack:'s',borderRadius:0,_r:'na'},
-      {label:'중국',data:eC,backgroundColor:'rgba(245,158,11,.75)',stack:'s',borderRadius:0,_r:'cn'},
-      {label:'기타',data:eO,backgroundColor:'rgba(100,116,139,.6)',stack:'s',borderRadius:2,_r:'etc'},
-      {label:'HR Costs(¥M)',data:hr,type:'line',yAxisID:'y2',borderColor:'#e05252',backgroundColor:'transparent',pointRadius:4,pointBackgroundColor:'#e05252',pointBorderColor:'var(--bg)',pointBorderWidth:1.5,borderWidth:2,tension:.2},
-      {label:'1인당(¥만)',data:pe,type:'line',yAxisID:'y3',borderColor:'#8b5cf6',backgroundColor:'transparent',pointRadius:4,pointBackgroundColor:'#8b5cf6',pointBorderColor:'var(--bg)',pointBorderWidth:1.5,borderWidth:2,tension:.2,borderDash:[4,3]}
-    ];
-    var fDS=s5R==='all'?aDS:aDS.filter(function(d){return d._r===s5R||!d._r;});
-    new Chart(el,{type:'bar',data:{labels:ql,datasets:fDS},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:true,position:'top',labels:{font:{size:9},boxWidth:10,padding:6,color:'rgba(160,160,180,.8)'}},
-          tooltip:{mode:'index',intersect:false,backgroundColor:'rgba(10,10,20,.92)',
-            callbacks:{label:function(ctx){
-              if(ctx.dataset.label==='HR Costs(¥M)')return 'HR Costs: ¥'+ctx.parsed.y.toLocaleString()+'M';
-              if(ctx.dataset.label==='1인당(¥만)')return '1인당: ¥'+ctx.parsed.y+'만';
-              return ctx.dataset.label+': '+ctx.parsed.y.toLocaleString()+'명';}}}},
-        scales:{x:{ticks:{font:{size:9},color:'rgba(160,160,180,.7)'},stacked:true,grid:{color:'rgba(255,255,255,.04)'}},
-          y:{stacked:true,ticks:{font:{size:9},callback:function(v){return v.toLocaleString();},color:'rgba(160,160,180,.7)'},grid:{color:'rgba(255,255,255,.04)'}},
-          y2:{position:'right',ticks:{font:{size:9},callback:function(v){return '¥'+v.toLocaleString();},color:'#e05252'},grid:{display:false},min:0},
-          y3:{position:'right',offset:true,ticks:{font:{size:9},callback:function(v){return '¥'+v+'만';},color:'#8b5cf6'},grid:{display:false},min:80,max:200}}
-      }});
-  }
-  var er=document.getElementById('s5-region-chart');
-  if(er){kc('s5-region-chart');
-    var rd=[{label:'한국',val:8473,col:'rgba(59,130,246,.85)'},{label:'기타',val:949,col:'rgba(100,116,139,.75)'},
-            {label:'일본',val:244,col:'rgba(99,102,241,.85)'},{label:'북미',val:188,col:'rgba(24,169,116,.85)'},{label:'중국',val:169,col:'rgba(245,158,11,.85)'}];
-    var lgd=document.getElementById('s5-region-lgd');
-    if(lgd) lgd.innerHTML=rd.map(function(d){
-      return '<div style="display:flex;align-items:center;gap:6px;">'
-        +'<div style="width:10px;height:10px;border-radius:2px;background:'+d.col+';flex-shrink:0;"></div>'
-        +'<span style="font-size:10px;color:var(--tx2);">'+d.label+'</span>'
-        +'<span style="font-size:10px;font-weight:700;color:var(--tx);">'+d.val.toLocaleString()+'명 ('+(d.val/10023*100).toFixed(1)+'%)</span></div>';
-    }).join('');
-    new Chart(er,{type:'doughnut',data:{labels:rd.map(function(d){return d.label;}),datasets:[{
-      data:rd.map(function(d){return d.val;}),backgroundColor:rd.map(function(d){return d.col;}),borderColor:'var(--bg2)',borderWidth:2,hoverOffset:6}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.label+': '+ctx.parsed.toLocaleString()+'명 ('+(ctx.parsed/10023*100).toFixed(1)+'%)';}}}}
-    }});
-  }
+  var dtb=document.getElementById('s5-detail-tbl');
+  if(dtb) dtb.innerHTML=ql.map(function(q,i){
+    var last=i===ql.length-1;
+    function c(v){return '<td'+(last?' style="font-weight:700;"':'')+'>'+v+'</td>';}
+    var qoq='<td style="color:var(--tx3);">–</td>';
+    if(i>0){
+      var g=Math.round((tot[i]/tot[i-1]-1)*1000)/10;
+      var col=g>0?'#18a974':(g<0?'#e05252':'var(--tx3)');
+      qoq='<td style="font-weight:'+(last?'700':'600')+';color:'+col+';">'+(g>0?'+':'')+g.toFixed(1)+'%</td>';
+    }
+    return '<tr'+(last?' class="nx"':'')+'>'
+      +'<td style="font-weight:'+(last?'700':'600')+';'+(last?'color:var(--accent2);':'')+'">20'+q+'</td>'
+      +c(eK[i].toLocaleString())+c(eJ[i])+c(eN[i])+c(eC[i])+c(eO[i])
+      +'<td style="font-weight:700;'+(last?'color:var(--accent2);':'')+'">'+tot[i].toLocaleString()+'</td>'
+      +qoq
+      +c('¥'+hr[i].toLocaleString())+c('¥'+pe[i]+'만')
+    +'</tr>';
+  }).join('');
 }
 
 // ── S1 게임사 비교 ─────────────────────────────────────────────────────
