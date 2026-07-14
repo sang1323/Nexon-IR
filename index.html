@@ -2149,27 +2149,29 @@ window.addEventListener('load',function(){
   // s1탭 초기 빌드는 탭 클릭 시 수행
 });
 
-</script>
 <script>
-  // 기업 고유번호 (예: 엔씨소프트 00126131)
   const CORP_CODE = "00126131"; 
 
-  // 내가 방금 만든 전용 도로(/dart)로 요청합니다! (막힐 일 없음)
   fetch(`/dart?corp_code=${CORP_CODE}`)
-    .then(response => response.json())
-    .then(data => {
-      if(data.status === "000") {
-        alert("✅ DART 데이터 불러오기 완벽하게 성공!");
-        console.log("데이터 확인:", data.list);
-      } else {
-        alert("❌ DART 응답 실패: " + data.message);
+    .then(async response => {
+      // 일단 요원이 가져온 걸 있는 그대로 까봅니다.
+      const rawText = await response.text(); 
+      
+      try {
+        const data = JSON.parse(rawText);
+        
+        if(data.status === "000") {
+          alert("✅ 대성공! 데이터가 들어왔습니다.");
+          console.log("확인:", data.list);
+        } else {
+          alert("❌ DART에서 거절함: " + data.message);
+        }
+      } catch(error) {
+        // 기절했던 진짜 이유(내용)를 화면에 띄웁니다!
+        alert("❌ 요원이 이상한 걸 들고왔습니다. 내용: [" + rawText + "]");
       }
     })
-    .catch(error => {
-      alert("❌ 통신 에러: " + error);
-    });
-</script>
-
+    .catch(error => alert("❌ 아예 통신이 끊김: " + error));
 </script>
 
 </body>
