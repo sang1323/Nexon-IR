@@ -1,6 +1,4 @@
 // Cloudflare Pages Function — /stock-price
-// Netlify handler에서 변환: export const handler({statusCode,body}) → onRequest(Response)
-// 런타임 fetch/Response는 Workers 환경에 기본 내장이라 그대로 사용.
 
 const SYMBOLS = {
   nexon:      { sym: '3659.T',    label: '넥슨',        cur: '¥',   link: 'https://kr.investing.com/equities/nexon-co-ltd' },
@@ -23,19 +21,31 @@ const SYMBOLS = {
 const FX_TO_USD = { JPY: 1/160, KRW: 1/1527, HKD: 1/7.78, USD: 1 };
 
 async function fetchPrice(symbol) {
-  const chartUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1d`;
-  const summaryUrl = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}?modules=price`;
+  // 1. 기존 원본 야후 파이낸스 주소
+  const rawChartUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1d`;
+  const rawSummaryUrl = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}?modules=price`;
+
+  // ⭐️ 2. 대표님의 무적 우회 서버 적용! (이제 절대 막히지 않습니다)
+  const proxyBase = "https://111.shakiroy1.workers.dev/?url=";
+  const chartUrl = proxyBase + encodeURIComponent(rawChartUrl);
+  const summaryUrl = proxyBase + encodeURIComponent(rawSummaryUrl);
+
   const headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
     'Accept': '*/*', 'Accept-Language': 'en-US,en;q=0.9', 'Referer': 'https://finance.yahoo.com',
   };
+
   const [chartRes, summaryRes] = await Promise.all([
     fetch(chartUrl, { headers }), fetch(summaryUrl, { headers }),
   ]);
+
   if (!chartRes.ok) throw new Error(`chart HTTP ${chartRes.status}`);
+
   const chartData = await chartRes.json();
   const meta = chartData?.chart?.result?.[0]?.meta;
+
   if (!meta) throw new Error('No chart meta');
+
   let mktcapUSD = null;
   try {
     if (summaryRes.ok) {
@@ -46,6 +56,7 @@ async function fetchPrice(symbol) {
       if (mc) mktcapUSD = (mc * fx) / 1e9;
     }
   } catch(_) {}
+
   return {
     price: meta.regularMarketPrice ?? meta.previousClose,
     prev: meta.previousClose, high52: meta.fiftyTwoWeekHigh,
@@ -70,6 +81,7 @@ export async function onRequest(context) {
       }
     })
   );
+
   return new Response(
     JSON.stringify({ updated: new Date().toISOString(), prices: results }),
     {
