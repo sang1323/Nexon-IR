@@ -2154,16 +2154,15 @@ window.addEventListener('load',function(){
   const DART_API_KEY = "5dc27d8d420eaa1f4d21d013454d2850741fee9e";
   const PROXY_URL = "https://111.shakiroy1.workers.dev/?url=";
 
-  // 🎯 1. 자동 업데이트할 국내 상장사 목록과 설정
-  // (원하시는 만큼 기업과 분기를 계속 추가하실 수 있습니다!)
   const DART_TARGETS = [
     { coKey: 'ncsoft',    corpCode: '00126131', year: '2024', reprt: '11013', qKey: '2024Q1' },
     { coKey: 'netmarble', corpCode: '00126380', year: '2024', reprt: '11013', qKey: '2024Q1' },
     { coKey: 'krafton',   corpCode: '00266961', year: '2024', reprt: '11013', qKey: '2024Q1' }
   ];
 
-  // 🎯 2. DART 데이터를 가져와서 대시보드에 꽂아넣는 핵심 함수
   async function fetchDartAndUpdate() {
+    let successCount = 0;
+
     for(let target of DART_TARGETS) {
       const dartUrl = `https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=${DART_API_KEY}&corp_code=${target.corpCode}&bsns_year=${target.year}&reprt_code=${target.reprt}&fs_div=CFS`;
       const fetchUrl = PROXY_URL + encodeURIComponent(dartUrl);
@@ -2176,7 +2175,6 @@ window.addEventListener('load',function(){
           let revenue = 0, profit = 0;
           
           data.list.forEach(item => {
-             // 재무제표 계정과목 이름은 회사마다 조금씩 달라서 모두 대응되게 처리
              const name = item.account_nm;
              if(name === '수익(매출액)' || name === '매출액' || name === '영업수익') {
                  revenue = Number(item.thstrm_amount.replace(/,/g, ''));
@@ -2186,39 +2184,37 @@ window.addEventListener('load',function(){
              }
           });
 
-          // 대표님 대시보드의 QD 데이터 규격(조 단위: 1.0 = 1조)으로 변환
           const revJo = revenue / 1000000000000; 
           const opJo = profit / 1000000000000;
           const opm = revenue === 0 ? 0 : (profit / revenue) * 100;
 
-          // 기존 수동 데이터(QD)를 방금 DART에서 가져온 실시간 데이터로 덮어쓰기!
           if(!QD[target.coKey]) QD[target.coKey] = {};
           QD[target.coKey][target.qKey] = {
             r: Number(revJo.toFixed(4)),
             o: Number(opJo.toFixed(4)),
             m: Number(opm.toFixed(1))
           };
-          
-          console.log(`✅ ${target.coKey} ${target.qKey} DART 덮어쓰기 완료! (매출: ${revJo.toFixed(3)}조)`);
+          successCount++;
+          console.log(`✅ ${target.coKey} 데이터 업데이트 완료!`);
+        } else {
+          console.log(`⚠️ ${target.coKey} 데이터 없음 또는 오류: ${data.message}`);
         }
       } catch (error) {
-        console.error(`❌ ${target.coKey} 업데이트 실패:`, error);
+        alert(`❌ ${target.coKey} 통신 실패! 원인: ` + error.message);
       }
     }
     
-    // 🎯 3. 데이터 덮어쓰기가 끝나면, 차트와 표를 알아서 새로고침!
-    if(typeof buildS1 === 'function') buildS1(); 
-    if(typeof buildProfitRanks === 'function') buildProfitRanks();
-    
-    alert("✅ DART 최신 실적 데이터가 게임사 비교 차트에 완벽하게 반영되었습니다!");
+    if(successCount > 0) {
+      if(typeof buildS1 === 'function') buildS1(); 
+      if(typeof buildProfitRanks === 'function') buildProfitRanks();
+      alert(`🎉 DART 업데이트 대성공! 총 ${successCount}개 기업의 데이터가 차트에 반영되었습니다.`);
+    } else {
+      alert("⚠️ 통신은 성공했지만 DART에서 가져올 데이터가 없었습니다. (키보드 F12 콘솔창을 확인해주세요!)");
+    }
   }
 
-  // 웹사이트가 켜지면 2초 뒤에 백그라운드에서 조용히 DART를 불러오기 시작함
-  window.addEventListener('load', function() {
-     setTimeout(fetchDartAndUpdate, 2000); 
-  });
+  // ⭐️ 페이지 로딩 눈치 보지 않고 1.5초 뒤에 무조건 강제 실행!
+  setTimeout(fetchDartAndUpdate, 1500);
 </script>
-</body>
-</html>
 
 
