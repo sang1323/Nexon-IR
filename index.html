@@ -2151,28 +2151,29 @@ window.addEventListener('load',function(){
 </script> <!-- ⭐️ 제가 이 닫는 태그를 추가했습니다! 이게 없어서 먹통이 된 겁니다. -->
 
 <script>
-  // 1. 발급받은 API 키 입력 (따옴표 유지)
+  // 1. 발급받은 API 키 입력 (큰따옴표 유지)
   const DART_API_KEY = "5dc27d8d420eaa1f4d21d013454d2850741fee9e";
   const CORP_CODE = "00126131"; 
 
-  // 2. DART 원본 주소
+  // 2. DART 원본 주소 세팅
   const DART_URL = `https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=${DART_API_KEY}&corp_code=${CORP_CODE}&bsns_year=2023&reprt_code=11011`;
   
-  // ⭐️ 3. 보안망에 막히지 않는 새로운 우회 서버(CodeTabs) 적용
-  const FETCH_URL = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(DART_URL)}`;
+  // ⭐️ 3. 방금 깃허브에 만든 '내 전용 우회 도로(_worker.js)'를 사용합니다!
+  const FETCH_URL = `/proxy?url=${encodeURIComponent(DART_URL)}`;
 
   fetch(FETCH_URL)
     .then(response => response.json())
     .then(data => {
       if(data.status === "000") {
-        alert("✅ DART 데이터 불러오기 대성공!");
-        console.log("DART 데이터:", data.list);
+        alert("✅ 대성공! 회사 보안망을 뚫고 DART 데이터를 가져왔습니다!");
+        console.log("데이터 확인:", data.list);
       } else {
-        alert("❌ DART에서 거절함: " + data.message);
+        alert("❌ DART 데이터 응답 실패: " + data.message);
       }
     })
-    .catch(error => alert("❌ 인터넷 통신 에러 (이 우회서버도 막혔습니다)"));
+    .catch(error => alert("❌ 통신 에러: " + error));
 </script>
 </body>
 </html>
+
 
