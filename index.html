@@ -2155,76 +2155,78 @@ window.addEventListener('load',function(){
   const DART_API_KEY = "5dc27d8d420eaa1f4d21d013454d2850741fee9e";
   const PROXY_URL = "https://111.shakiroy1.workers.dev/?url=";
 
-  const COMPANIES = [
-    { key: 'ncsoft',    code: '00126131' },
-    { key: 'netmarble', code: '00126380' },
-    { key: 'krafton',   code: '00266961' }
+  // 1. 국내 게임사 전체 (DART 연동)
+  const KR_TARGETS = [
+    { key: 'ncsoft',     code: '00126131' },
+    { key: 'netmarble',  code: '00126380' },
+    { key: 'krafton',    code: '00266961' },
+    { key: 'shiftup',    code: '01384787' },
+    { key: 'pearlabyss', code: '01152470' },
+    { key: 'kakaogames', code: '01137383' },
+    { key: 'wemade',     code: '00444329' },
+    { key: 'com2us',     code: '00476498' },
+    { key: 'webzen',     code: '00405320' },
+    { key: 'neowiz',     code: '00628860' },
+    { key: 'devsisters', code: '01008762' }
+  ];
+  
+  // 2. 글로벌 게임사 전체 (야후 파이낸스 연동 - EDINET 완벽 대체)
+  const GLOBAL_TARGETS = [
+    { key: 'nexon',      symbol: '3659.T' },
+    { key: 'nintendo',   symbol: '7974.T' },
+    { key: 'sony',       symbol: '6758.T' },
+    { key: 'bandai',     symbol: '7832.T' },
+    { key: 'konami',     symbol: '9766.T' },
+    { key: 'capcom',     symbol: '9697.T' },
+    { key: 'segasammy',  symbol: '6460.T' },
+    { key: 'squareenix', symbol: '9684.T' },
+    { key: 'gungho',     symbol: '3765.T' },
+    { key: 'tencent',    symbol: '0700.HK' },
+    { key: 'netease',    symbol: 'NTES' },
+    { key: 'ea',         symbol: 'EA' },
+    { key: 'roblox',     symbol: 'RBLX' },
+    { key: 'ttwo',       symbol: 'TTWO' },
+    { key: 'playtika',   symbol: 'PLTK' },
+    { key: 'cdprojekt',  symbol: 'CDR.WA' },
+    { key: 'ubisoft',    symbol: 'UBI.PA' },
+    { key: 'sea',        symbol: 'SE' },
+    { key: 'aristocrat', symbol: 'ALL.AX' }
   ];
 
-  // ⭐️ 2024년과 2025년의 1~4분기 데이터를 모두 가져옵니다!
+  // ⭐️ 2024년과 2025년의 전 분기 데이터를 모두 가져옵니다!
   const YEARS = ['2024', '2025']; 
 
-  async function fetchDartAndUpdateAll() {
+  async function fetchAllData() {
     let updatedCount = 0;
 
-    for(let co of COMPANIES) {
+    // [A] DART 업데이트 (한국 게임사 전체)
+    for(let co of KR_TARGETS) {
       for(let year of YEARS) {
-        const reports = [
-          { rCode: '11013', q: 'Q1' },
-          { rCode: '11012', q: 'Q2' },
-          { rCode: '11014', q: 'Q3' },
-          { rCode: '11011', q: 'Q4' }
-        ];
-
+        const reports = [{ rCode: '11013', q: 'Q1' }, { rCode: '11012', q: 'Q2' }, { rCode: '11014', q: 'Q3' }, { rCode: '11011', q: 'Q4' }];
         let prevRev = 0, prevProf = 0;
 
         for(let rep of reports) {
           const dartUrl = `https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=${DART_API_KEY}&corp_code=${co.code}&bsns_year=${year}&reprt_code=${rep.rCode}&fs_div=CFS`;
-          const fetchUrl = PROXY_URL + encodeURIComponent(dartUrl);
-
           try {
-            const res = await fetch(fetchUrl);
+            const res = await fetch(PROXY_URL + encodeURIComponent(dartUrl));
             const data = await res.json();
-            
             if(data.status === "000") {
               let accRev = 0, accProf = 0;
               data.list.forEach(item => {
                 const nm = item.account_nm;
-                if(nm === '수익(매출액)' || nm === '매출액' || nm === '영업수익') accRev = Number(item.thstrm_amount.replace(/,/g, ''));
-                if(nm === '영업이익' || nm === '영업이익(손실)') accProf = Number(item.thstrm_amount.replace(/,/g, ''));
+                if(nm.includes('매출') || nm.includes('영업수익')) accRev = Number(item.thstrm_amount.replace(/,/g, ''));
+                if(nm.includes('영업이익')) accProf = Number(item.thstrm_amount.replace(/,/g, ''));
               });
-
-              // 누적값의 함정 해결! (현재 누적값 - 이전 누적값 = 해당 분기 순수 실적)
+              
               const qRev = accRev - prevRev;
               const qProf = accProf - prevProf;
-
               const revJo = qRev / 1000000000000;
               const opJo = qProf / 1000000000000;
-              const opm = qRev === 0 ? 0 : (qProf / qRev) * 100;
-
+              
               if(revJo > 0) {
                 if(!QD[co.key]) QD[co.key] = {};
-                QD[co.key][`${year}${rep.q}`] = { 
-                  r: Number(revJo.toFixed(4)), o: Number(opJo.toFixed(4)), m: Number(opm.toFixed(1)) 
-                };
+                QD[co.key][`${year}${rep.q}`] = { r: Number(revJo.toFixed(4)), o: Number(opJo.toFixed(4)), m: Number(((qProf/qRev)*100).toFixed(1)) };
                 updatedCount++;
               }
-              prevRev = accRev; prevProf = accProf;
-            }
-          } catch(e) {}
-        }
-      }
-    }
-    
-    // 업데이트 완료 후 화면 새로고침
-    if(updatedCount > 0) {
-      if(typeof buildS1 === 'function') buildS1(); 
-      if(typeof buildProfitRanks === 'function') buildProfitRanks();
-      alert(`🎉 2024~2025년 전 분기 DART 자동 반영 완료! (총 ${updatedCount}건)`);
-    }
-  }
-
-  setTimeout(fetchDartAndUpdateAll, 1500);
-</script>
-
+              prevRev = accRev; prevP
 
