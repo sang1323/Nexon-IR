@@ -2151,51 +2151,72 @@ window.addEventListener('load',function(){
 </script> <!-- ⭐️ 제가 이 닫는 태그를 추가했습니다! 이게 없어서 먹통이 된 겁니다. -->
 
 <script>
-  // 1. 발급받은 실제 DART API 키를 큰따옴표 안에 넣어주세요.
   const DART_API_KEY = "5dc27d8d420eaa1f4d21d013454d2850741fee9e";
-  
-  // 엔씨소프트(00126131)의 2023년(2023) 사업보고서(11011) 중 '연결재무제표(CFS)' 요청
-  const CORP_CODE = "00126131"; 
-  const DART_URL = `https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=${DART_API_KEY}&corp_code=${CORP_CODE}&bsns_year=2023&reprt_code=11011&fs_div=CFS`;
-  
-  // 대표님의 무적 우회 서버!
-  const FETCH_URL = `https://111.shakiroy1.workers.dev/?url=${encodeURIComponent(DART_URL)}`;
+  const PROXY_URL = "https://111.shakiroy1.workers.dev/?url=";
 
-  fetch(FETCH_URL)
-    .then(response => response.json())
-    .then(data => {
-      if(data.status === "000") {
-        // DART가 준 복잡한 데이터에서 매출액과 영업이익만 쏙 뽑아냅니다.
-        let revenue = 0; // 매출액
-        let profit = 0;  // 영업이익
-        
-        data.list.forEach(item => {
-           // 이름에 '매출'이 들어가 있으면 매출액에 저장
-           if(item.account_nm.includes('매출')) {
-               revenue = Number(item.thstrm_amount.replace(/,/g, ''));
-           }
-           // 이름에 '영업이익'이 들어가 있으면 영업이익에 저장
-           if(item.account_nm.includes('영업이익')) {
-               profit = Number(item.thstrm_amount.replace(/,/g, ''));
-           }
-        });
-        
-        // 보기 쉽게 억 단위로 변환 (숫자가 너무 크니까요!)
-        const revEok = Math.round(revenue / 100000000);
-        const profEok = Math.round(profit / 100000000);
-        
-        console.log(`✅ 엔씨소프트 2023년 매출액: ${revEok}억 원`);
-        console.log(`✅ 엔씨소프트 2023년 영업이익: ${profEok}억 원`);
-        
-        // ⭐️ [여기가 중요!] 이제 이 변수(revEok, profEok)를 차트 데이터에 갈아 끼우면 됩니다!
-        // 예: PT_DATA.ncsoft.revenue = revEok;
-        // updateCharts();
+  // 🎯 1. 자동 업데이트할 국내 상장사 목록과 설정
+  // (원하시는 만큼 기업과 분기를 계속 추가하실 수 있습니다!)
+  const DART_TARGETS = [
+    { coKey: 'ncsoft',    corpCode: '00126131', year: '2024', reprt: '11013', qKey: '2024Q1' },
+    { coKey: 'netmarble', corpCode: '00126380', year: '2024', reprt: '11013', qKey: '2024Q1' },
+    { coKey: 'krafton',   corpCode: '00266961', year: '2024', reprt: '11013', qKey: '2024Q1' }
+  ];
 
-      } else {
-        console.error("❌ DART 응답 에러:", data.message);
+  // 🎯 2. DART 데이터를 가져와서 대시보드에 꽂아넣는 핵심 함수
+  async function fetchDartAndUpdate() {
+    for(let target of DART_TARGETS) {
+      const dartUrl = `https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=${DART_API_KEY}&corp_code=${target.corpCode}&bsns_year=${target.year}&reprt_code=${target.reprt}&fs_div=CFS`;
+      const fetchUrl = PROXY_URL + encodeURIComponent(dartUrl);
+
+      try {
+        const response = await fetch(fetchUrl);
+        const data = await response.json();
+
+        if(data.status === "000") {
+          let revenue = 0, profit = 0;
+          
+          data.list.forEach(item => {
+             // 재무제표 계정과목 이름은 회사마다 조금씩 달라서 모두 대응되게 처리
+             const name = item.account_nm;
+             if(name === '수익(매출액)' || name === '매출액' || name === '영업수익') {
+                 revenue = Number(item.thstrm_amount.replace(/,/g, ''));
+             }
+             if(name === '영업이익' || name === '영업이익(손실)') {
+                 profit = Number(item.thstrm_amount.replace(/,/g, ''));
+             }
+          });
+
+          // 대표님 대시보드의 QD 데이터 규격(조 단위: 1.0 = 1조)으로 변환
+          const revJo = revenue / 1000000000000; 
+          const opJo = profit / 1000000000000;
+          const opm = revenue === 0 ? 0 : (profit / revenue) * 100;
+
+          // 기존 수동 데이터(QD)를 방금 DART에서 가져온 실시간 데이터로 덮어쓰기!
+          if(!QD[target.coKey]) QD[target.coKey] = {};
+          QD[target.coKey][target.qKey] = {
+            r: Number(revJo.toFixed(4)),
+            o: Number(opJo.toFixed(4)),
+            m: Number(opm.toFixed(1))
+          };
+          
+          console.log(`✅ ${target.coKey} ${target.qKey} DART 덮어쓰기 완료! (매출: ${revJo.toFixed(3)}조)`);
+        }
+      } catch (error) {
+        console.error(`❌ ${target.coKey} 업데이트 실패:`, error);
       }
-    })
-    .catch(error => console.error("❌ 통신 에러: " + error));
+    }
+    
+    // 🎯 3. 데이터 덮어쓰기가 끝나면, 차트와 표를 알아서 새로고침!
+    if(typeof buildS1 === 'function') buildS1(); 
+    if(typeof buildProfitRanks === 'function') buildProfitRanks();
+    
+    alert("✅ DART 최신 실적 데이터가 게임사 비교 차트에 완벽하게 반영되었습니다!");
+  }
+
+  // 웹사이트가 켜지면 2초 뒤에 백그라운드에서 조용히 DART를 불러오기 시작함
+  window.addEventListener('load', function() {
+     setTimeout(fetchDartAndUpdate, 2000); 
+  });
 </script>
 </body>
 </html>
