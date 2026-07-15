@@ -2153,25 +2153,49 @@ window.addEventListener('load',function(){
 <script>
   // 1. 발급받은 실제 DART API 키를 큰따옴표 안에 넣어주세요.
   const DART_API_KEY = "5dc27d8d420eaa1f4d21d013454d2850741fee9e";
-  const CORP_CODE = "00126131"; 
-
-  // 2. DART 원본 주소 세팅
-  const DART_URL = `https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=${DART_API_KEY}&corp_code=${CORP_CODE}&bsns_year=2023&reprt_code=11011`;
   
-  // ⭐️ 3. 드디어 적용하는 '대표님 전용 무적 서버' 주소!
+  // 엔씨소프트(00126131)의 2023년(2023) 사업보고서(11011) 중 '연결재무제표(CFS)' 요청
+  const CORP_CODE = "00126131"; 
+  const DART_URL = `https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=${DART_API_KEY}&corp_code=${CORP_CODE}&bsns_year=2023&reprt_code=11011&fs_div=CFS`;
+  
+  // 대표님의 무적 우회 서버!
   const FETCH_URL = `https://111.shakiroy1.workers.dev/?url=${encodeURIComponent(DART_URL)}`;
 
   fetch(FETCH_URL)
     .then(response => response.json())
     .then(data => {
       if(data.status === "000") {
-        alert("🎉 대성공!!! 철통 보안을 뚫고 DART 데이터를 완벽하게 가져왔습니다!");
-        console.log("데이터 확인:", data.list);
+        // DART가 준 복잡한 데이터에서 매출액과 영업이익만 쏙 뽑아냅니다.
+        let revenue = 0; // 매출액
+        let profit = 0;  // 영업이익
+        
+        data.list.forEach(item => {
+           // 이름에 '매출'이 들어가 있으면 매출액에 저장
+           if(item.account_nm.includes('매출')) {
+               revenue = Number(item.thstrm_amount.replace(/,/g, ''));
+           }
+           // 이름에 '영업이익'이 들어가 있으면 영업이익에 저장
+           if(item.account_nm.includes('영업이익')) {
+               profit = Number(item.thstrm_amount.replace(/,/g, ''));
+           }
+        });
+        
+        // 보기 쉽게 억 단위로 변환 (숫자가 너무 크니까요!)
+        const revEok = Math.round(revenue / 100000000);
+        const profEok = Math.round(profit / 100000000);
+        
+        console.log(`✅ 엔씨소프트 2023년 매출액: ${revEok}억 원`);
+        console.log(`✅ 엔씨소프트 2023년 영업이익: ${profEok}억 원`);
+        
+        // ⭐️ [여기가 중요!] 이제 이 변수(revEok, profEok)를 차트 데이터에 갈아 끼우면 됩니다!
+        // 예: PT_DATA.ncsoft.revenue = revEok;
+        // updateCharts();
+
       } else {
-        alert("❌ 통신은 뚫렸으나 DART에서 거절함: " + data.message);
+        console.error("❌ DART 응답 에러:", data.message);
       }
     })
-    .catch(error => alert("❌ 통신 에러: " + error));
+    .catch(error => console.error("❌ 통신 에러: " + error));
 </script>
 </body>
 </html>
