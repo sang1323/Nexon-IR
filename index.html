@@ -2157,21 +2157,29 @@ window.addEventListener('load',function(){
 
   // 2. DART 원본 주소 세팅
   const DART_URL = `https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=${DART_API_KEY}&corp_code=${CORP_CODE}&bsns_year=2023&reprt_code=11011`;
-  
-  // ⭐️ 3. 방금 깃허브에 만든 '내 전용 우회 도로(_worker.js)'를 사용합니다!
   const FETCH_URL = `/proxy?url=${encodeURIComponent(DART_URL)}`;
 
   fetch(FETCH_URL)
-    .then(response => response.json())
-    .then(data => {
-      if(data.status === "000") {
-        alert("✅ 대성공! 회사 보안망을 뚫고 DART 데이터를 가져왔습니다!");
-        console.log("데이터 확인:", data.list);
-      } else {
-        alert("❌ DART 데이터 응답 실패: " + data.message);
+    .then(async response => {
+      // ⭐️ 기절 방지: 에러가 나든 말든 일단 무조건 '글자'로 까봅니다!
+      const rawText = await response.text(); 
+      
+      try {
+        // 정상적인 데이터인지 확인
+        const data = JSON.parse(rawText);
+        
+        if(data.status === "000") {
+          alert("✅ 대성공! 데이터가 들어왔습니다.");
+          console.log("확인:", data.list);
+        } else {
+          alert("❌ DART에서 거절함: " + data.message);
+        }
+      } catch(error) {
+        // 🚨 여기가 핵심입니다! 왜 빈 껍데기가 왔는지 화면에 띄워줍니다.
+        alert("❌ 전용 도로가 이상한 걸 줬습니다! 내용 확인 ➡️ [" + rawText + "]");
       }
     })
-    .catch(error => alert("❌ 통신 에러: " + error));
+    .catch(error => alert("❌ 아예 통신이 끊김: " + error));
 </script>
 </body>
 </html>
