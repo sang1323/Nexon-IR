@@ -1511,6 +1511,24 @@ function buildUndervalChart(){
     // 캡콤 FY2026: 매출¥195.4B(+15.2%) 영업이익¥75.3B OPM38.5% 13기연속증익 (Icon Era/IR 26.05.13)
     {co:'capcom',     n:'캡콤',         tk:'9697.T',    per:22.0, pbr:5.2,  evEb:13.5, opm:38.5, float:79.0, src:'FY2026 캡콤IR(26.05.13)'},
   ];
+      // ⭐️ [마법의 연동 코드] 방금 긁어온 실시간 데이터로 동종업계 평균 덮어쓰기!
+      PEERS.forEach(function(p){
+        if(QD[p.co]) {
+          var qs = Object.keys(QD[p.co]).sort();
+          var latest = qs[qs.length - 1]; 
+          if(latest && QD[p.co][latest].m) {
+            p.opm = QD[p.co][latest].m; 
+            p.src = '실시간 API 연동 (' + latest + ')';
+          }
+        }
+      });
+      if(QD['nexon']) {
+        var nQs = Object.keys(QD['nexon']).sort();
+        var nLatest = nQs[nQs.length - 1];
+        if(nLatest && QD['nexon'][nLatest].m) {
+          NX.opm = QD['nexon'][nLatest].m;
+        }
+      }
 
   // ★ 차트를 즉시 렌더링 (정적값 기반) — API 성공 여부와 무관하게 항상 표시
   try {
@@ -2269,6 +2287,8 @@ window.addEventListener('load',function(){
     if(updatedCount > 0) {
       if(typeof buildS1 === 'function') buildS1(); 
       if(typeof buildProfitRanks === 'function') buildProfitRanks();
+            if(typeof buildUndervalChart === 'function') buildUndervalChart();
+
       alert(`🎉 국내(DART) + 글로벌(야후) 30개 기업 전체 자동화 완료! (총 ${updatedCount}건 최신화)`);
     }
   }
