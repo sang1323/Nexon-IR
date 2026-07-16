@@ -2219,58 +2219,51 @@ window.addEventListener('load',function(){
 </script>
 </script>
   <script>
-  // 🤖 실시간 주요 이슈 자동 수집기 (Google News 연동)
+   // 🤖 3. 실시간 주요 이슈 자동 수집기 (Google News 연동)
   async function fetchLiveNews() {
-    // 검색어: 넥슨의 실적이나 신작 관련 뉴스만 정밀 타겟팅해서 가져옵니다.
     const keyword = encodeURIComponent("넥슨 (실적 OR 신작 OR 주가)");
     const rssUrl = `https://news.google.com/rss/search?q=${keyword}&hl=ko&gl=KR&ceid=KR:ko`;
-    
-    // 대표님의 무적 우회 서버로 구글 뉴스 차단 뚫기!
-    const proxyUrl = "https://111.shakiroy1.workers.dev/?url=" + encodeURIComponent(rssUrl);
+    const proxyUrl = PROXY_URL + encodeURIComponent(rssUrl);
     
     try {
       const res = await fetch(proxyUrl);
       const text = await res.text();
-      
-      // 구글이 준 데이터를 예쁘게 자르기 위한 도구
       const parser = new DOMParser();
       const xml = parser.parseFromString(text, "text/xml");
       const items = xml.querySelectorAll("item");
       
-      // 대시보드 디자인에 맞춘 세련된 뉴스 박스 생성
       let newsHtml = `
         <div style="margin-top:12px; padding:12px; background:rgba(99,102,241,0.08); border-radius:8px; border:1px solid rgba(99,102,241,0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
           <div style="font-size:11px; font-weight:800; color:var(--accent2); margin-bottom:8px; display:flex; align-items:center; gap:5px;">
             📡 실시간 AI 뉴스 브리핑 <span style="font-size:9px; font-weight:normal; color:var(--tx3);">(Google News 자동 수집)</span>
           </div>
       `;
-        
-      // 가장 중요하고 최신인 뉴스 딱 3개만 뽑아옵니다.
       for(let i=0; i<3; i++) {
         if(!items[i]) break;
         const title = items[i].querySelector("title").textContent;
         const link = items[i].querySelector("link").textContent;
-        // 날짜를 보기 좋게 'X월 X일'로 변환
         const pubDate = new Date(items[i].querySelector("pubDate").textContent).toLocaleDateString('ko-KR', {month:'short', day:'numeric'});
-        
         newsHtml += `
           <div style="font-size:10px; color:var(--tx); margin-bottom:6px; line-height:1.5;">
             <span style="color:#18a974; font-weight:bold; margin-right:4px;">[${pubDate}]</span> 
-            <a href="${link}" target="_blank" style="color:var(--tx); text-decoration:none; transition: color 0.2s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--tx)'">
-              ${title}
-            </a>
+            <a href="${link}" target="_blank" style="color:var(--tx); text-decoration:none; transition: color 0.2s;" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--tx)'">${title}</a>
           </div>
         `;
       }
       newsHtml += `</div>`;
       
-      // 기존에 수동으로 적어둔 이벤트 리스트(pt-ev-list) 맨 밑에 이 자동 뉴스 박스를 자연스럽게 이어 붙입니다!
-      const evList = document.getElementById('pt-ev-list');
-      if(evList) evList.innerHTML += newsHtml;
+      // ⭐️ [핵심 수정] 뉴스가 지워지지 않도록 아예 새로운 전용 박스를 만들어서 딱 붙입니다!
+      let newsBox = document.getElementById('live-news-box');
+      if(!newsBox) {
+         newsBox = document.createElement('div');
+         newsBox.id = 'live-news-box';
+         const evList = document.getElementById('pt-ev-list');
+         // 이벤트 리스트 바로 뒤에 영구적인 뉴스 박스 삽입
+         if(evList) evList.parentNode.insertBefore(newsBox, evList.nextSibling);
+      }
+      newsBox.innerHTML = newsHtml;
       
-    } catch(e) {
-      console.error("뉴스 수집 실패:", e);
-    }
+    } catch(e) { console.error("뉴스 에러", e); }
   }
   
   // 페이지가 켜지고 2초 뒤에 조용히 뉴스를 긁어와서 띄웁니다.
