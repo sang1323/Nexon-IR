@@ -689,6 +689,7 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
 <!-- 분기 선택 + 지표 선택 -->
 <div class="ctrl" style="flex-wrap:wrap;gap:6px 10px;">
   <span class="lbl">분기:</span>
+   <span class="lbl" id="s1q-lbl">분기:</span>
   <select id="s1q" onchange="buildS1()">
     <option value="2026Q1">2026 Q1 ★</option><option value="2025Q4">2025 Q4</option>
     <option value="2025Q3">2025 Q3</option><option value="2025Q2">2025 Q2</option>
@@ -696,6 +697,9 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
     <option value="2024Q3">2024 Q3</option><option value="2024Q2">2024 Q2</option>
     <option value="2024Q1">2024 Q1</option>
   </select>
+  <!-- ⭐️ 실시간 지표를 누르면 튀어나올 마법의 배지 -->
+  <span id="s1-live-badge" style="display:none; font-size:11px; font-weight:800; color:#fff; background:var(--accent); padding:3px 8px; border-radius:4px; box-shadow:0 2px 8px rgba(99,102,241,.4);">🔴 실시간 Live</span>
+
   <span class="lbl" style="margin-left:8px;">지표:</span>
   <span class="pill on" onclick="setMet('mktcap',this)">시가총액</span>
   <span class="pill" onclick="setMet('rev',this)">매출</span>
@@ -1946,10 +1950,29 @@ function buildS5(){
 var rMet='mktcap';
 function setMet(m,el){
   rMet=m;
-  document.querySelectorAll('.ctrl .pill').forEach(function(p){if(p.getAttribute('onclick')&&p.getAttribute('onclick').includes('setMet'))p.classList.remove('on');});
+  document.querySelectorAll('.ctrl .pill').forEach(function(p){
+    if(p.getAttribute('onclick')&&p.getAttribute('onclick').includes('setMet')) p.classList.remove('on');
+  });
   el.classList.add('on');
+
+  // ⭐️ 스마트 UI 로직: 실시간 지표면 분기 선택창 숨기고 Live 배지 켜기!
+  var qSelect = document.getElementById('s1q');
+  var qLabel = document.getElementById('s1q-lbl');
+  var liveBadge = document.getElementById('s1-live-badge');
+  
+  if(m === 'mktcap' || m === 'per' || m === 'pbr') {
+    if(qSelect) qSelect.style.display = 'none';
+    if(qLabel) qLabel.style.display = 'none';
+    if(liveBadge) liveBadge.style.display = 'inline-block';
+  } else {
+    if(qSelect) qSelect.style.display = 'inline-block';
+    if(qLabel) qLabel.style.display = 'inline-block';
+    if(liveBadge) liveBadge.style.display = 'none';
+  }
+
   buildS1();
 }
+
 function getV(co,qk,met){
   if(met==='mktcap'){
     var d=MKTCAP_QD[co]&&MKTCAP_QD[co][qk];
