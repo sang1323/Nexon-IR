@@ -17,7 +17,6 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;
   background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5;}
 .wrap{max-width:1160px;margin:0 auto;padding:0 20px 48px;}
-/* 헤더 */
 .hd{padding:16px 0 0;margin-bottom:20px;}
 .hd-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
   padding:14px 20px;background:linear-gradient(135deg,#1e1b4b,#312e81,#1e1b4b);
@@ -30,16 +29,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans
 .hd-sub{font-size:10px;color:rgba(160,160,200,.7);margin-top:2px;}
 .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-/* 탭 */
 .tab-row{display:flex;flex-wrap:wrap;gap:2px;background:var(--bg2);border:1px solid var(--bd);
   border-radius:var(--rl);padding:4px;margin-bottom:20px;}
 .tab{background:transparent;border:none;border-radius:8px;padding:7px 14px;
   font-size:11.5px;font-weight:500;color:var(--tx3);cursor:pointer;white-space:nowrap;}
 .tab:hover{color:var(--tx2);background:var(--bg3);}
 .tab.on{background:var(--bg3);color:var(--accent2);font-weight:700;border:1px solid rgba(99,102,241,.3);}
-/* 섹션 */
 .sec{display:none;}.sec.on{display:block;}
-/* 컨트롤 */
 .ctrl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:12px;
   padding:10px 14px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--bd);}
 .lbl{font-size:10.5px;font-weight:600;color:var(--tx3);}
@@ -47,7 +43,6 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
 .pill{background:var(--bg3);border:1px solid var(--bd2);border-radius:5px;padding:3px 9px;
   font-size:11px;font-weight:500;color:var(--tx2);cursor:pointer;}
 .pill.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;}
-/* 카드 & UI */
 .card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rl);padding:16px 18px;}
 .card-title{font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:10px;}
 .g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
@@ -80,224 +75,11 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
 .sec-lbl{font-size:10.5px;font-weight:700;color:var(--tx3);text-transform:uppercase;margin:16px 0 10px;display:flex;align-items:center;gap:6px;}
 .sec-lbl::after{content:'';flex:1;height:1px;background:var(--bd);}
 .pgb{display:inline-flex;align-items:center;font-size:10px;font-weight:700;color:var(--tx3);background:var(--bg3);border:1px solid var(--bd);border-radius:20px;padding:3px 10px;margin-bottom:12px;}
-.rk-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;background:transparent;border:1px solid transparent;}
-.rk-row:hover{background:rgba(255,255,255,.03);}
+.rk-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;background:transparent;border:1px solid transparent;transition:transform .18s ease;}
+.rk-row:hover{transform:translateX(4px);background:rgba(255,255,255,.03);}
 .rk-row.nx{background:linear-gradient(90deg,rgba(99,102,241,.18),rgba(99,102,241,.05));border:1px solid rgba(129,140,248,.45);}
 .rk-row.na{opacity:.4;}
 .rk-badge{width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;}
 .rk-badge.g1{background:linear-gradient(135deg,#fde68a,#f59e0b);color:#3a2600;}
 .rk-badge.g2{background:linear-gradient(135deg,#eef2f6,#94a3b8);color:#1f2937;}
-.rk-badge.g3{background:linear-gradient(135deg,#e8a878,#cd7c3a);color:#2b1400;}
-.rk-badge.gx{background:rgba(255,255,255,.08);color:var(--tx3);}
-.rk-name{min-width:72px;max-width:72px;font-size:10px;font-weight:500;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.rk-row.nx .rk-name{font-weight:800;color:var(--accent2);}
-.rk-track{flex:1;height:10px;background:rgba(255,255,255,.05);border-radius:5px;overflow:hidden;position:relative;}
-.rk-fill{position:absolute;top:0;height:100%;border-radius:5px;width:var(--rk-w);left:var(--rk-left);background:var(--rk-grad);}
-.rk-zero{position:absolute;top:-1px;bottom:-1px;width:1px;background:rgba(255,255,255,.28);z-index:1;}
-.rk-val{min-width:44px;text-align:right;font-size:10px;font-weight:400;color:var(--tx2);}
-.rk-row.nx .rk-val{font-weight:700;color:var(--accent2);}
-</style>
-</head>
-<body>
-<div id="build-banner" style="position:fixed;top:0;right:0;z-index:99999;background:#6366f1;color:#fff;font-size:10px;padding:2px 8px;border-radius:0 0 0 6px;opacity:0.85;">DART+YAHOO AUTO-SYNC V4</div>
-<div class="wrap">
-<div class="hd"><div class="hd-inner">
-  <div class="hd-left">
-    <div class="hd-logo">NX</div>
-    <div>
-      <div class="hd-title">넥슨 글로벌 Valuation & Peer 터미널</div>
-      <div class="hd-sub">NEXON Co., Ltd. (3659.T) · 사내 IR 모니터링 · <span class="dot"></span> 실시간 연동 중</div>
-    </div>
-  </div>
-</div></div>
-
-<!-- ⭐️ 탭 이름 IB 터미널 스타일로 전면 개편 -->
-<div class="tab-row">
-  <button class="tab on" onclick="sw(this,'s11')">Valuation Summary</button>
-  <button class="tab"    onclick="sw(this,'s12')">Ownership Risk</button>
-  <button class="tab"    onclick="sw(this,'s4')">Financials</button>
-  <button class="tab"    onclick="sw(this,'s5')">HR & Org</button>
-  <button class="tab"    onclick="sw(this,'s1')">Peer Benchmarking</button>
-</div>
-
-<!-- ==========================================
-     S11: Valuation Summary
-     ========================================== -->
-<div id="s11" class="sec on">
-<div class="pgb">📊 1 · 기업가치 개요 및 적정주가 시뮬레이션</div>
-
-<div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-bottom:14px;">
-  <div class="mc" style="border:1.5px solid rgba(99,102,241,.4);position:relative;">
-    <div style="position:absolute;top:6px;right:6px;font-size:8px;color:var(--tx3);" id="kpi-live-label">로딩중...</div>
-    <div class="mc-l">실시간 주가 <span style="font-size:7px;">15분 지연</span></div>
-    <div class="mc-v" id="kpi-price" style="font-size:22px;color:var(--accent2);">¥2,625</div>
-    <div class="mc-s" id="kpi-chg">—</div>
-  </div>
-  <div class="mc"><div class="mc-l">시가총액 Market Cap</div><div class="mc-v" id="kpi-mktcap" style="font-size:16px;">¥2.08조</div><div class="mc-s" id="kpi-usd">≈ $13.0B</div></div>
-  <div class="mc" style="border:1.5px solid rgba(24,169,116,.3);"><div class="mc-l">12M 목표가 컨센서스</div><div class="mc-v" style="font-size:16px;color:var(--green);">¥3,300</div><div class="mc-s">+45.4% 업사이드</div></div>
-  <div class="mc"><div class="mc-l">투자의견 Buy/Hold/Sell</div><div class="mc-v" style="font-size:13px;">매수 8/9</div><div class="mc-s">9개 브로커</div></div>
-  <div class="mc"><div class="mc-l">PER 주가수익비율</div><div class="mc-v" id="kpi-per" style="font-size:16px;">19.7x</div><div class="mc-s" id="kpi-per-cmp">동종평균 대기중</div></div>
-  <div class="mc"><div class="mc-l">PBR 주가순자산비율</div><div class="mc-v" id="kpi-pbr" style="font-size:16px;">1.68x</div><div class="mc-s"><span style="color:#2dd4a0;">▼업데이트 대기중</span></div></div>
-  <div class="mc"><div class="mc-l">OPM 영업이익률</div><div class="mc-v" id="kpi-opm" style="font-size:16px;color:var(--green);">38.2%</div><div class="mc-s">업계 최상위</div></div>
-</div>
-
-<!-- ⭐️ 1. 자동 생성되는 실시간 AI 밸류에이션 브리핑 & 적정 주가 시뮬레이터 -->
-<div class="g2" style="margin-bottom:14px;">
-  <div class="card" style="background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(30,27,75,0.5)); border:1px solid rgba(99,102,241,0.4);">
-    <div class="card-title" style="color:var(--accent2); font-size:12px;">🤖 AI 실시간 밸류에이션 브리핑</div>
-    <div id="ai-briefing" style="font-size:11px; line-height:1.7; color:var(--tx);">실시간 데이터를 긁어와 분석 중입니다. 잠시만 기다려주세요...</div>
-  </div>
-  <div class="card" style="border:1px solid rgba(24,169,116,0.4);">
-    <div class="card-title" style="color:var(--green); font-size:12px;">🎯 적정 주가 시뮬레이터 (목표 PER 기준)</div>
-    <div style="margin-bottom:10px;">
-      <span style="font-size:11px; color:var(--tx2);">타겟 멀티플(PER) 설정: </span>
-      <span id="sim-per-val" style="font-size:16px; font-weight:bold; color:var(--green);">20x</span>
-      <input type="range" id="sim-per-slider" min="10" max="40" step="1" value="20" style="width:100%; margin-top:8px; cursor:pointer;" oninput="updateSimulator()">
-    </div>
-    <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding:12px; border-radius:8px; border:1px solid var(--bd);">
-      <div>
-        <div style="font-size:10px; color:var(--tx3);">예상 적정 주가 (EPS ¥114 기준)</div>
-        <div id="sim-price-val" style="font-size:22px; font-weight:800; color:var(--tx);">¥2,280</div>
-      </div>
-      <div style="text-align:right;">
-        <div style="font-size:10px; color:var(--tx3);">현재가 대비 예상 변동률</div>
-        <div id="sim-upside-val" style="font-size:18px; font-weight:800; color:var(--green);">---%</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="card" style="margin-bottom:14px;">
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
-    <div>
-      <div class="card-title" style="margin:0;">넥슨(3659) 실제주가 vs 넥슨 자체 분기 가이던스 추이</div>
-      <div style="font-size:10px;color:var(--tx3);margin-top:2px;">분기말 실제 주가 · 가이던스 대비 실제 매출 · 전분기 매출가이던스 (전분기 IR 공시값)</div>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px;" id="pt-kpi"></div>
-  <div style="font-size:10px;font-weight:600;color:var(--tx3);margin-bottom:4px;">📈 주가 추이 (¥) &nbsp;<span style="font-weight:400;">이벤트: <span style="color:#18a974;">●</span>내부이슈 <span style="color:#f59e0b;">●</span>외부이슈 <span style="color:#e05252;">●</span>리스크</span></div>
-  <div style="height:200px;position:relative;margin-bottom:12px;"><canvas id="pt-chart-price"></canvas></div>
-  <div style="height:1px;background:var(--bd);margin-bottom:10px;"></div>
-  <div style="font-size:10px;font-weight:600;color:var(--tx3);margin-bottom:4px;">📊 가이던스 vs 실제 매출 (¥B) &nbsp;<span style="font-weight:400;"><span style="color:#18a974;">━━</span> 가이던스 &nbsp;<span style="color:#f59e0b;">━━</span> 실제매출</span></div>
-  <div style="height:160px;position:relative;"><canvas id="pt-chart"></canvas></div>
-  
-  <div style="display:flex;align-items:center;gap:10px;margin-top:8px;margin-bottom:6px;font-size:10px;color:var(--tx3);">
-    이벤트 마커:
-    <span style="display:flex;align-items:center;gap:3px;"><span style="width:11px;height:11px;border-radius:50%;background:#18a974;display:inline-block;"></span>내부이슈</span>
-    <span style="display:flex;align-items:center;gap:3px;"><span style="width:11px;height:11px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>외부이슈</span>
-    <span style="display:flex;align-items:center;gap:3px;"><span style="width:11px;height:11px;border-radius:50%;background:#e05252;display:inline-block;"></span>리스크</span>
-  </div>
-  <div id="pt-ev-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px;"></div>
-</div>
-
-<div class="g2" style="margin-bottom:14px;">
-  <div class="card" style="display:flex;flex-direction:column;gap:10px;">
-    <div class="card-title">📉 저평가 분석 — 넥슨 vs 동종업계</div>
-    <div id="s11-underval" style="display:flex;flex-direction:column;gap:9px;"></div>
-    <div style="border-top:1px solid var(--bd);padding-top:10px;">
-      <div style="font-size:10px;font-weight:700;color:var(--tx2);margin-bottom:7px;">📌 유통주식 현황 <span style="font-size:9px;font-weight:400;color:var(--tx3);">25.12.31 기준</span></div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:7px;">
-        <div style="padding:6px 8px;border-radius:6px;background:var(--bg3);text-align:center;"><div style="font-size:8px;color:var(--tx3);">총 주식수</div><div style="font-size:10px;font-weight:800;color:var(--tx);">827.2M주</div></div>
-        <div style="padding:6px 8px;border-radius:6px;background:var(--bg3);text-align:center;"><div style="font-size:8px;color:var(--tx3);">발행주식(자사주제외)</div><div style="font-size:10px;font-weight:800;color:var(--tx);">792.9M주</div></div>
-        <div style="padding:6px 8px;border-radius:6px;background:rgba(224,82,82,.1);border:1px solid rgba(224,82,82,.3);text-align:center;"><div style="font-size:8px;color:var(--tx3);">대주주 보유</div><div style="font-size:13px;font-weight:800;color:var(--red);">94.14%</div></div>
-        <div style="padding:6px 8px;border-radius:6px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);text-align:center;"><div style="font-size:8px;color:var(--tx3);">유통 Float</div><div style="font-size:13px;font-weight:800;color:var(--amber);">5.86%</div></div>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-title" style="margin-bottom:12px;">💡 왜 저평가인가 — 구조적 원인</div>
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      <div style="padding:10px 12px;border-radius:6px;background:var(--bg3);border-left:3px solid var(--accent);">
-        <div style="font-size:10px;font-weight:700;color:var(--tx);margin-bottom:4px;">① 시장 접근성 문제 — 일본 상장 + 엔저</div>
-        <div style="font-size:9px;color:var(--tx2);line-height:1.7;">일본 투자자에게는 "잘 모르는 한국 게임사", 한국·글로벌 투자자에게는 "접근 불편한 일본 상장 종목". 어느 시장에서도 주도적으로 편입되기 애매한 구조.</div>
-      </div>
-      <div style="padding:10px 12px;border-radius:6px;background:var(--bg3);border-left:3px solid var(--red);">
-        <div style="font-size:10px;font-weight:700;color:var(--tx);margin-bottom:4px;">② 유통주식 5.86% — 극단적 저유동성</div>
-        <div style="font-size:9px;color:var(--tx2);line-height:1.7;">전체 주식 94% 이상을 대주주 보유. 기관투자자 포지션 구축 사실상 불가능, 글로벌 지수 편입 제한.</div>
-      </div>
-      <div style="padding:10px 12px;border-radius:6px;background:var(--bg3);border-left:3px solid var(--amber);">
-        <div style="font-size:10px;font-weight:700;color:var(--tx);margin-bottom:4px;">③ 구 IP 의존 인식 — 성장성 할인</div>
-        <div style="font-size:9px;color:var(--tx2);line-height:1.7;">던전앤파이터·메이플스토리 등 20년 넘은 IP가 매출 핵심.</div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-
-<!-- ==========================================
-     S12: Ownership Risk
-     ========================================== -->
-<div id="s12" class="sec">
-<div class="pgb">🏢 2 · 주식 및 주주구성</div>
-<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:14px;">
-  <div class="mc" style="border:1.5px solid rgba(224,82,82,.4);"><div class="mc-l">총주식수</div><div class="mc-v" style="font-size:13px;">827,160,972주</div></div>
-  <div class="mc" style="border:1.5px solid rgba(224,82,82,.4);"><div class="mc-l">발행주식(자기주식 제외)</div><div class="mc-v" style="font-size:13px;">792,907,772주</div></div>
-  <div class="mc"><div class="mc-l">대주주 보유</div><div class="mc-v" style="font-size:13px;color:var(--red);">94.14%</div></div>
-  <div class="mc"><div class="mc-l">유통주식 Float</div><div class="mc-v" style="font-size:13px;color:var(--amber);">5.86%</div></div>
-  <div class="mc"><div class="mc-l">NXC 지분</div><div class="mc-v" style="font-size:13px;color:var(--accent2);">46.38%</div></div>
-</div>
-<div style="display:grid;grid-template-columns:1fr 1.9fr;gap:12px;margin-bottom:14px;">
-  <div class="card">
-    <div class="card-title" style="margin-bottom:10px;">주주 구성 (4대 그룹)</div>
-    <div style="height:220px;position:relative;"><canvas id="s12-donut"></canvas></div>
-    <div id="s12-donut-lgd" style="display:flex;flex-direction:column;gap:4px;margin-top:10px;"></div>
-  </div>
-  <div class="card">
-    <div class="card-title" style="margin-bottom:6px;">주요 주주 현황 <span style="font-size:9px;color:var(--tx3);">26.03.24 사업보고서</span></div>
-    <div class="tw"><table class="t" style="min-width:500px;">
-      <thead><tr><th>#</th><th style="text-align:left;">주주명</th><th>유형</th><th>지분율</th><th>주식수</th><th style="text-align:left;">비고</th></tr></thead>
-      <tbody id="s12-tbl"></tbody>
-    </table></div>
-  </div>
-</div>
-</div>
-
-<!-- ==========================================
-     S4: Financials
-     ========================================== -->
-<div id="s4" class="sec">
-<div class="pgb">💰 3 · 수익성 및 재무 현황</div>
-<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px;">
-  <div class="mc" id="s4k-rev"><div class="mc-l">매출 <span id="s4k-quarter" style="font-size:9px;color:var(--tx3);">26Q1 기준</span></div><div class="mc-v">¥152.2B</div></div>
-  <div class="mc" id="s4k-op"><div class="mc-l">영업이익</div><div class="mc-v" style="color:var(--green);">¥58.2B</div></div>
-  <div class="mc"><div class="mc-l">순이익</div><div class="mc-v">¥57.2B</div></div>
-  <div class="mc" id="s4k-opm" style="border:1.5px solid rgba(99,102,241,.3);"><div class="mc-l">OPM 영업이익률</div><div class="mc-v" style="color:var(--accent2);">38.2%</div></div>
-  <div class="mc"><div class="mc-l">NPM 순이익률</div><div class="mc-v">37.6%</div></div>
-</div>
-<div class="card" style="margin-bottom:12px;">
-  <div class="card-title">분기 매출·영업이익 추이</div>
-  <div style="height:240px;position:relative;"><canvas id="s4-rev-chart"></canvas></div>
-</div>
-</div>
-
-<!-- ==========================================
-     S5: HR & Org
-     ========================================== -->
-<div id="s5" class="sec">
-<div class="pgb">🏢 4 · 임직원 현황</div>
-<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px;">
-  <div class="mc" style="border:1.5px solid rgba(99,102,241,.3);"><div class="mc-l">총 임직원</div><div class="mc-v" style="color:var(--accent2);">10,023명</div></div>
-  <div class="mc"><div class="mc-l">한국</div><div class="mc-v">8,473명</div></div>
-  <div class="mc"><div class="mc-l">일본 법인</div><div class="mc-v">244명</div></div>
-  <div class="mc"><div class="mc-l">HR Costs 인건비총액</div><div class="mc-v">¥13,892M</div></div>
-  <div class="mc"><div class="mc-l">1인당 평균 인건비</div><div class="mc-v" style="color:var(--accent2);">¥138.6만</div></div>
-</div>
-<div class="card">
-  <div class="card-title">분기별 임직원 수 상세</div>
-  <div class="tw"><table class="t">
-    <thead><tr><th style="text-align:left;">분기</th><th>한국</th><th>일본</th><th>북미</th><th>중국</th><th>기타</th><th style="color:var(--accent2);">합계</th><th>전분기比</th><th>HR Costs</th></tr></thead>
-    <tbody id="s5-detail-tbl"></tbody>
-  </table></div>
-</div>
-</div>
-
-<!-- ==========================================
-     S1: Peer Benchmarking
-     ========================================== -->
-<div id="s1" class="sec">
-<div class="pgb">📊 5 · Peer Benchmarking</div>
-
-<!-- ⭐️ 2. 수익성 vs 밸류에이션 매트릭스 차트 (신규 추가) -->
-<div class="card" style="margin-bottom:14px; border:1px solid rgba(129,140,248,.5);">
-  <div class="card-title" style="color:var(--accent2);">📈 Valuation Matrix (수익성 vs 밸류에이션)</div>
-  <div style="font-size:10px; color:var(--tx3); margin-bottom:8px;">X축: 영업이익률(OPM), Y축: 주가수익비율(PER). 우측 하단 4사분면이 '고수익·저평가
+.rk-badge.g3{background:linear-gradient(135deg,#e8a878,#cd7c3a);color:#2b
