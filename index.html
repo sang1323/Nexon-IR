@@ -688,8 +688,7 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
 
 <!-- 분기 선택 + 지표 선택 -->
 <div class="ctrl" style="flex-wrap:wrap;gap:6px 10px;">
-  <span class="lbl">분기:</span>
-   <span class="lbl" id="s1q-lbl">분기:</span>
+  <span class="lbl" id="s1q-lbl">분기:</span>
   <select id="s1q" onchange="buildS1()">
     <option value="2026Q1">2026 Q1 ★</option><option value="2025Q4">2025 Q4</option>
     <option value="2025Q3">2025 Q3</option><option value="2025Q2">2025 Q2</option>
@@ -697,6 +696,9 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
     <option value="2024Q3">2024 Q3</option><option value="2024Q2">2024 Q2</option>
     <option value="2024Q1">2024 Q1</option>
   </select>
+  <!-- ⭐️ 여기에 숨겨진 실시간 배지가 들어갑니다! -->
+  <span id="s1-live-badge" style="display:none; font-size:11px; font-weight:800; color:#fff; background:var(--accent); padding:3px 8px; border-radius:4px; box-shadow:0 2px 8px rgba(99,102,241,.4); margin-left:8px;">🔴 실시간 Live</span>
+
   <!-- ⭐️ 실시간 지표를 누르면 튀어나올 마법의 배지 -->
   <span id="s1-live-badge" style="display:none; font-size:11px; font-weight:800; color:#fff; background:var(--accent); padding:3px 8px; border-radius:4px; box-shadow:0 2px 8px rgba(99,102,241,.4);">🔴 실시간 Live</span>
 
@@ -1974,16 +1976,26 @@ function setMet(m,el){
 }
 
 function getV(co,qk,met){
+  // ⭐️ 실시간 지표(시총, PER, PBR)는 무조건 방금 가져온 실시간 데이터(REALTIME_VAL)를 최우선으로 씁니다!
   if(met==='mktcap'){
+    if(window.REALTIME_VAL && window.REALTIME_VAL[co] && window.REALTIME_VAL[co].mktcap) return window.REALTIME_VAL[co].mktcap;
     var d=MKTCAP_QD[co]&&MKTCAP_QD[co][qk];
     if(typeof d==='number') return d;
     return (CO[co]&&CO[co].mktcap!=null)?CO[co].mktcap:null;
   }
+  if(met==='per'){
+    if(window.REALTIME_VAL && window.REALTIME_VAL[co] && window.REALTIME_VAL[co].per) return window.REALTIME_VAL[co].per;
+    var vd=VD[co]&&VD[co][qk]; return(vd&&vd.per!=null)?vd.per:(CO[co]?CO[co].per:null);
+  }
+  if(met==='pbr'){
+    if(window.REALTIME_VAL && window.REALTIME_VAL[co] && window.REALTIME_VAL[co].pbr) return window.REALTIME_VAL[co].pbr;
+    var vd=VD[co]&&VD[co][qk]; return(vd&&vd.pbr!=null)?vd.pbr:(CO[co]?CO[co].pbr:null);
+  }
+  
   var vd=VD[co]&&VD[co][qk];
-  if(met==='per') return(vd&&vd.per!=null)?vd.per:(CO[co]?CO[co].per:null);
-  if(met==='pbr') return(vd&&vd.pbr!=null)?vd.pbr:(CO[co]?CO[co].pbr:null);
   if(met==='roe') return(vd&&vd.roe!=null)?vd.roe:(CO[co]?CO[co].roe:null);
   if(met==='dy')  return(vd&&vd.dy!=null)?vd.dy:CO[co].dy;
+
   var qd=QD[co]&&QD[co][qk];
   if(met==='rev') return qd?qd.r:null;
   if(met==='op')  return qd?qd.o:null;
@@ -1996,6 +2008,7 @@ function getV(co,qk,met){
   }
   return null;
 }
+
 function buildS1(){
   var qk=document.getElementById('s1q').value;
   var metLabels={mktcap:'시가총액 (십억$)',rev:'매출 (백만$)',op:'영업이익 (백만$)',opm:'영업이익률 OPM (%)',per:'주가수익비율 PER (배)',pbr:'주가순자산비율 PBR (배)',roe:'자기자본이익률 ROE (%)'};
@@ -2196,56 +2209,58 @@ window.addEventListener('load',function(){
   const DART_API_KEY = "5dc27d8d420eaa1f4d21d013454d2850741fee9e";
   const PROXY_URL = "https://111.shakiroy1.workers.dev/?url=";
 
-  // 1. 국내 게임사 전체 (DART 연동)
   const KR_TARGETS = [
-    { key: 'ncsoft',     code: '00126131' },
-    { key: 'netmarble',  code: '00126380' },
-    { key: 'krafton',    code: '00266961' },
-    { key: 'shiftup',    code: '01384787' },
-    { key: 'pearlabyss', code: '01152470' },
-    { key: 'kakaogames', code: '01137383' },
-    { key: 'wemade',     code: '00444329' },
-    { key: 'com2us',     code: '00476498' },
-    { key: 'webzen',     code: '00405320' },
-    { key: 'neowiz',     code: '00628860' },
-    { key: 'devsisters', code: '01008762' }
+    { key: 'ncsoft', code: '00126131' }, { key: 'netmarble', code: '00126380' }, { key: 'krafton', code: '00266961' },
+    { key: 'shiftup', code: '01384787' }, { key: 'pearlabyss', code: '01152470' }, { key: 'kakaogames', code: '01137383' },
+    { key: 'wemade', code: '00444329' }, { key: 'com2us', code: '00476498' }, { key: 'webzen', code: '00405320' },
+    { key: 'neowiz', code: '00628860' }, { key: 'devsisters', code: '01008762' }
   ];
   
-  // 2. 글로벌 게임사 전체 (야후 파이낸스 연동 - EDINET 완벽 대체)
   const GLOBAL_TARGETS = [
-    { key: 'nexon',      symbol: '3659.T' },
-    { key: 'nintendo',   symbol: '7974.T' },
-    { key: 'sony',       symbol: '6758.T' },
-    { key: 'bandai',     symbol: '7832.T' },
-    { key: 'konami',     symbol: '9766.T' },
-    { key: 'capcom',     symbol: '9697.T' },
-    { key: 'segasammy',  symbol: '6460.T' },
-    { key: 'squareenix', symbol: '9684.T' },
-    { key: 'gungho',     symbol: '3765.T' },
-    { key: 'tencent',    symbol: '0700.HK' },
-    { key: 'netease',    symbol: 'NTES' },
-    { key: 'ea',         symbol: 'EA' },
-    { key: 'roblox',     symbol: 'RBLX' },
-    { key: 'ttwo',       symbol: 'TTWO' },
-    { key: 'playtika',   symbol: 'PLTK' },
-    { key: 'cdprojekt',  symbol: 'CDR.WA' },
-    { key: 'ubisoft',    symbol: 'UBI.PA' },
-    { key: 'sea',        symbol: 'SE' },
+    { key: 'nexon', symbol: '3659.T' }, { key: 'nintendo', symbol: '7974.T' }, { key: 'sony', symbol: '6758.T' },
+    { key: 'bandai', symbol: '7832.T' }, { key: 'konami', symbol: '9766.T' }, { key: 'capcom', symbol: '9697.T' },
+    { key: 'segasammy', symbol: '6460.T' }, { key: 'squareenix', symbol: '9684.T' }, { key: 'gungho', symbol: '3765.T' },
+    { key: 'tencent', symbol: '0700.HK' }, { key: 'netease', symbol: 'NTES' }, { key: 'ea', symbol: 'EA' },
+    { key: 'roblox', symbol: 'RBLX' }, { key: 'ttwo', symbol: 'TTWO' }, { key: 'playtika', symbol: 'PLTK' },
+    { key: 'cdprojekt', symbol: 'CDR.WA' }, { key: 'ubisoft', symbol: 'UBI.PA' }, { key: 'sea', symbol: 'SE' },
     { key: 'aristocrat', symbol: 'ALL.AX' }
   ];
 
-  // ⭐️ 2024년과 2025년의 전 분기 데이터를 모두 가져옵니다!
-  const YEARS = ['2024', '2025']; 
+  // ⭐️ 2026년을 추가했습니다!
+  const YEARS = ['2024', '2025', '2026']; 
+  window.REALTIME_VAL = {}; 
 
   async function fetchAllData() {
     let updatedCount = 0;
+    const allKeys = Object.keys(CO);
 
-    // [A] DART 업데이트 (한국 게임사 전체)
+    // 🚀 [1] 실시간 주가/PER/PBR (야후 차단 방지를 위해 하나씩 순서대로 가져옵니다)
+    for (let key of allKeys) {
+      const tk = CO[key].tk;
+      if(!tk) continue;
+      const valUrl = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${tk}?modules=summaryDetail,defaultKeyStatistics`;
+      try {
+        const res = await fetch(PROXY_URL + encodeURIComponent(valUrl));
+        const data = await res.json();
+        const res0 = data.quoteSummary.result[0];
+        
+        const per = res0?.summaryDetail?.trailingPE?.raw || res0?.defaultKeyStatistics?.forwardPE?.raw;
+        const pbr = res0?.defaultKeyStatistics?.priceToBook?.raw;
+        const mktcap = res0?.summaryDetail?.marketCap?.raw; // 실시간 시가총액 추가!
+        
+        window.REALTIME_VAL[key] = {
+          per: per ? Number(per.toFixed(2)) : null,
+          pbr: pbr ? Number(pbr.toFixed(2)) : null,
+          mktcap: mktcap ? Number((mktcap / 1000000000).toFixed(2)) : null // 십억 달러 기준
+        };
+      } catch(e) {}
+    }
+
+    // 🚀 [2] DART 업데이트 (순차적으로 가져와 차단 방지)
     for(let co of KR_TARGETS) {
       for(let year of YEARS) {
         const reports = [{ rCode: '11013', q: 'Q1' }, { rCode: '11012', q: 'Q2' }, { rCode: '11014', q: 'Q3' }, { rCode: '11011', q: 'Q4' }];
         let prevRev = 0, prevProf = 0;
-
         for(let rep of reports) {
           const dartUrl = `https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=${DART_API_KEY}&corp_code=${co.code}&bsns_year=${year}&reprt_code=${rep.rCode}&fs_div=CFS`;
           try {
@@ -2258,12 +2273,8 @@ window.addEventListener('load',function(){
                 if(nm.includes('매출') || nm.includes('영업수익')) accRev = Number(item.thstrm_amount.replace(/,/g, ''));
                 if(nm.includes('영업이익')) accProf = Number(item.thstrm_amount.replace(/,/g, ''));
               });
-              
-              const qRev = accRev - prevRev;
-              const qProf = accProf - prevProf;
-              const revJo = qRev / 1000000000000;
-              const opJo = qProf / 1000000000000;
-              
+              const qRev = accRev - prevRev; const qProf = accProf - prevProf;
+              const revJo = qRev / 1000000000000; const opJo = qProf / 1000000000000;
               if(revJo > 0) {
                 if(!QD[co.key]) QD[co.key] = {};
                 QD[co.key][`${year}${rep.q}`] = { r: Number(revJo.toFixed(4)), o: Number(opJo.toFixed(4)), m: Number(((qProf/qRev)*100).toFixed(1)) };
@@ -2276,16 +2287,15 @@ window.addEventListener('load',function(){
       }
     }
 
-    // [B] 야후 파이낸스 업데이트 (해외 게임사 전체)
+    // 🚀 [3] 야후 파이낸스 실적 (순차적으로 가져와 차단 방지)
     for(let co of GLOBAL_TARGETS) {
       const yahooUrl = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${co.symbol}?modules=incomeStatementHistoryQuarterly`;
       try {
         const res = await fetch(PROXY_URL + encodeURIComponent(yahooUrl));
         const data = await res.json();
         const history = data.quoteSummary.result[0].incomeStatementHistoryQuarterly.incomeStatementHistory;
-        
         history.forEach(hq => {
-           const dateStr = hq.endDate.fmt; // 예: "2024-03-31"
+           const dateStr = hq.endDate.fmt;
            const year = dateStr.substring(0,4);
            const month = parseInt(dateStr.substring(5,7));
            let q = month <= 3 ? 'Q1' : month <= 6 ? 'Q2' : month <= 9 ? 'Q3' : 'Q4';
@@ -2293,31 +2303,26 @@ window.addEventListener('load',function(){
            if(YEARS.includes(year)) {
              let rev = hq.totalRevenue.raw / 1000000000; 
              let op = hq.operatingIncome.raw / 1000000000;
-             
              if(!QD[co.key]) QD[co.key] = {};
-             QD[co.key][year+q] = {
-               r: Number(rev.toFixed(4)),
-               o: Number(op.toFixed(4)),
-               m: Number(((op/rev)*100).toFixed(1))
-             };
+             QD[co.key][year+q] = { r: Number(rev.toFixed(4)), o: Number(op.toFixed(4)), m: Number(((op/rev)*100).toFixed(1)) };
              updatedCount++;
            }
         });
-      } catch(e) { console.error("야후 파이낸스 에러", e); }
+      } catch(e) {}
     }
 
     // 모든 작업이 끝나면 대시보드 새로고침!
-    if(updatedCount > 0) {
+    if(updatedCount > 0 || Object.keys(window.REALTIME_VAL).length > 0) {
       if(typeof buildS1 === 'function') buildS1(); 
       if(typeof buildProfitRanks === 'function') buildProfitRanks();
-            if(typeof buildUndervalChart === 'function') buildUndervalChart();
-
-      alert(`🎉 국내(DART) + 글로벌(야후) 30개 기업 전체 자동화 완료! (총 ${updatedCount}건 최신화)`);
+      if(typeof buildUndervalChart === 'function') buildUndervalChart();
+      alert(`🎉 차단 방지 적용 완료! 안전하게 데이터를 가져와 반영했습니다.`);
     }
   }
 
-  // 페이지 로딩 후 1.5초 뒤에 30개 기업의 모든 데이터를 자동으로 수집합니다.
-  setTimeout(fetchAllData, 1500);
+  // 로딩 후 차단 당하지 않게 조금 천천히 긁어옵니다.
+  setTimeout(fetchAllData, 2000);
+</script>
 </script>
   <script>
   // 🤖 실시간 주요 이슈 자동 수집기 (Google News 연동)
