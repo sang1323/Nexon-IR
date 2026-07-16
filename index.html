@@ -2206,6 +2206,7 @@ window.addEventListener('load',function(){
 </script> <!-- ⭐️ 제가 이 닫는 태그를 추가했습니다! 이게 없어서 먹통이 된 겁니다. -->
 
 <script>
+<script>
   const DART_API_KEY = "5dc27d8d420eaa1f4d21d013454d2850741fee9e";
   const PROXY_URL = "https://111.shakiroy1.workers.dev/?url=";
 
@@ -2213,115 +2214,8 @@ window.addEventListener('load',function(){
     { key: 'ncsoft', code: '00126131' }, { key: 'netmarble', code: '00126380' }, { key: 'krafton', code: '00266961' },
     { key: 'shiftup', code: '01384787' }, { key: 'pearlabyss', code: '01152470' }, { key: 'kakaogames', code: '01137383' },
     { key: 'wemade', code: '00444329' }, { key: 'com2us', code: '00476498' }, { key: 'webzen', code: '00405320' },
-    { key: 'neowiz', code: '00628860' }, { key: 'devsisters', code: '01008762' }
-  ];
-  
-  const GLOBAL_TARGETS = [
-    { key: 'nexon', symbol: '3659.T' }, { key: 'nintendo', symbol: '7974.T' }, { key: 'sony', symbol: '6758.T' },
-    { key: 'bandai', symbol: '7832.T' }, { key: 'konami', symbol: '9766.T' }, { key: 'capcom', symbol: '9697.T' },
-    { key: 'segasammy', symbol: '6460.T' }, { key: 'squareenix', symbol: '9684.T' }, { key: 'gungho', symbol: '3765.T' },
-    { key: 'tencent', symbol: '0700.HK' }, { key: 'netease', symbol: 'NTES' }, { key: 'ea', symbol: 'EA' },
-    { key: 'roblox', symbol: 'RBLX' }, { key: 'ttwo', symbol: 'TTWO' }, { key: 'playtika', symbol: 'PLTK' },
-    { key: 'cdprojekt', symbol: 'CDR.WA' }, { key: 'ubisoft', symbol: 'UBI.PA' }, { key: 'sea', symbol: 'SE' },
-    { key: 'aristocrat', symbol: 'ALL.AX' }
-  ];
+    { key: 'neowiz', code
 
-  // ⭐️ 2026년을 추가했습니다!
-  const YEARS = ['2024', '2025', '2026']; 
-  window.REALTIME_VAL = {}; 
-
-  async function fetchAllData() {
-    let updatedCount = 0;
-    const allKeys = Object.keys(CO);
-
-    // 🚀 [1] 실시간 주가/PER/PBR (야후 차단 방지를 위해 하나씩 순서대로 가져옵니다)
-    for (let key of allKeys) {
-      const tk = CO[key].tk;
-      if(!tk) continue;
-      const valUrl = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${tk}?modules=summaryDetail,defaultKeyStatistics`;
-      try {
-        const res = await fetch(PROXY_URL + encodeURIComponent(valUrl));
-        const data = await res.json();
-        const res0 = data.quoteSummary.result[0];
-        
-        const per = res0?.summaryDetail?.trailingPE?.raw || res0?.defaultKeyStatistics?.forwardPE?.raw;
-        const pbr = res0?.defaultKeyStatistics?.priceToBook?.raw;
-        const mktcap = res0?.summaryDetail?.marketCap?.raw; // 실시간 시가총액 추가!
-        
-        window.REALTIME_VAL[key] = {
-          per: per ? Number(per.toFixed(2)) : null,
-          pbr: pbr ? Number(pbr.toFixed(2)) : null,
-          mktcap: mktcap ? Number((mktcap / 1000000000).toFixed(2)) : null // 십억 달러 기준
-        };
-      } catch(e) {}
-    }
-
-    // 🚀 [2] DART 업데이트 (순차적으로 가져와 차단 방지)
-    for(let co of KR_TARGETS) {
-      for(let year of YEARS) {
-        const reports = [{ rCode: '11013', q: 'Q1' }, { rCode: '11012', q: 'Q2' }, { rCode: '11014', q: 'Q3' }, { rCode: '11011', q: 'Q4' }];
-        let prevRev = 0, prevProf = 0;
-        for(let rep of reports) {
-          const dartUrl = `https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=${DART_API_KEY}&corp_code=${co.code}&bsns_year=${year}&reprt_code=${rep.rCode}&fs_div=CFS`;
-          try {
-            const res = await fetch(PROXY_URL + encodeURIComponent(dartUrl));
-            const data = await res.json();
-            if(data.status === "000") {
-              let accRev = 0, accProf = 0;
-              data.list.forEach(item => {
-                const nm = item.account_nm;
-                if(nm.includes('매출') || nm.includes('영업수익')) accRev = Number(item.thstrm_amount.replace(/,/g, ''));
-                if(nm.includes('영업이익')) accProf = Number(item.thstrm_amount.replace(/,/g, ''));
-              });
-              const qRev = accRev - prevRev; const qProf = accProf - prevProf;
-              const revJo = qRev / 1000000000000; const opJo = qProf / 1000000000000;
-              if(revJo > 0) {
-                if(!QD[co.key]) QD[co.key] = {};
-                QD[co.key][`${year}${rep.q}`] = { r: Number(revJo.toFixed(4)), o: Number(opJo.toFixed(4)), m: Number(((qProf/qRev)*100).toFixed(1)) };
-                updatedCount++;
-              }
-              prevRev = accRev; prevProf = accProf;
-            }
-          } catch(e) {}
-        }
-      }
-    }
-
-    // 🚀 [3] 야후 파이낸스 실적 (순차적으로 가져와 차단 방지)
-    for(let co of GLOBAL_TARGETS) {
-      const yahooUrl = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${co.symbol}?modules=incomeStatementHistoryQuarterly`;
-      try {
-        const res = await fetch(PROXY_URL + encodeURIComponent(yahooUrl));
-        const data = await res.json();
-        const history = data.quoteSummary.result[0].incomeStatementHistoryQuarterly.incomeStatementHistory;
-        history.forEach(hq => {
-           const dateStr = hq.endDate.fmt;
-           const year = dateStr.substring(0,4);
-           const month = parseInt(dateStr.substring(5,7));
-           let q = month <= 3 ? 'Q1' : month <= 6 ? 'Q2' : month <= 9 ? 'Q3' : 'Q4';
-           
-           if(YEARS.includes(year)) {
-             let rev = hq.totalRevenue.raw / 1000000000; 
-             let op = hq.operatingIncome.raw / 1000000000;
-             if(!QD[co.key]) QD[co.key] = {};
-             QD[co.key][year+q] = { r: Number(rev.toFixed(4)), o: Number(op.toFixed(4)), m: Number(((op/rev)*100).toFixed(1)) };
-             updatedCount++;
-           }
-        });
-      } catch(e) {}
-    }
-
-    // 모든 작업이 끝나면 대시보드 새로고침!
-    if(updatedCount > 0 || Object.keys(window.REALTIME_VAL).length > 0) {
-      if(typeof buildS1 === 'function') buildS1(); 
-      if(typeof buildProfitRanks === 'function') buildProfitRanks();
-      if(typeof buildUndervalChart === 'function') buildUndervalChart();
-      alert(`🎉 차단 방지 적용 완료! 안전하게 데이터를 가져와 반영했습니다.`);
-    }
-  }
-
-  // 로딩 후 차단 당하지 않게 조금 천천히 긁어옵니다.
-  setTimeout(fetchAllData, 2000);
 </script>
 </script>
   <script>
