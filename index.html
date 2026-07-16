@@ -2457,26 +2457,6 @@ window.addEventListener('load',function(){
   });
 })();
 </script>
-<!-- ⭐️ 이 코드를 </body> 바로 위에 붙여넣어주세요 ⭐️ -->
-<script>
-(function() {
-  const DART_API_KEY = "5dc27d8d420eaa1f4d21d013454d2850741fee9e";
-  const PROXY_URL = "https://111.shakiroy1.workers.dev/?url=";
-  window.REALTIME_VAL = {};
-  const TARGET_YEARS = ['2025', '2026'];
-  const DART_MAP = {'ncsoft':'00126131', 'netmarble':'00126380', 'krafton':'00266961', 'shiftup':'01384787', 'pearlabyss':'01152470', 'kakaogames':'01137383', 'wemade':'00444329', 'com2us':'00476498', 'webzen':'00405320', 'neowiz':'00628860', 'devsisters':'01008762'};
-
-  function injectNewUI() {
-    try {
-      const tabs = document.querySelectorAll('.tab-row .tab');
-      if(tabs.length >= 5) {
-        tabs[0].textContent = "Valuation Summary"; tabs[1].textContent = "Ownership Risk";
-        tabs[2].textContent = "Financials"; tabs[3].textContent = "HR & Org"; tabs[4].textContent = "Peer Benchmarking";
-      }
-      
-      const kpiGrid = document.querySelector('#s11 > div:nth-child(2)');
-      if(kpiGrid && !document.getElementById('ai-briefing')) {
-        const ui = document.createElement('div'); ui.className = 'g2'; ui.style
 
 </body>
 </html>
