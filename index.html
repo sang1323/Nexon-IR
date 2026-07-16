@@ -2228,5 +2228,53 @@ window.addEventListener('load',function(){
                 QD[co.key][`${year}${rep.q}`] = { r: Number(revJo.toFixed(4)), o: Number(opJo.toFixed(4)), m: Number(((qProf/qRev)*100).toFixed(1)) };
                 updatedCount++;
               }
-              prevRev = accRev; prevP
+              prevRev = accRev; prevProf = accProf;
+            }
+          } catch(e) {}
+        }
+      }
+    }
 
+    // [B] 야후 파이낸스 업데이트 (해외 게임사 전체)
+    for(let co of GLOBAL_TARGETS) {
+      const yahooUrl = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${co.symbol}?modules=incomeStatementHistoryQuarterly`;
+      try {
+        const res = await fetch(PROXY_URL + encodeURIComponent(yahooUrl));
+        const data = await res.json();
+        const history = data.quoteSummary.result[0].incomeStatementHistoryQuarterly.incomeStatementHistory;
+        
+        history.forEach(hq => {
+           const dateStr = hq.endDate.fmt; // 예: "2024-03-31"
+           const year = dateStr.substring(0,4);
+           const month = parseInt(dateStr.substring(5,7));
+           let q = month <= 3 ? 'Q1' : month <= 6 ? 'Q2' : month <= 9 ? 'Q3' : 'Q4';
+           
+           if(YEARS.includes(year)) {
+             let rev = hq.totalRevenue.raw / 1000000000; 
+             let op = hq.operatingIncome.raw / 1000000000;
+             
+             if(!QD[co.key]) QD[co.key] = {};
+             QD[co.key][year+q] = {
+               r: Number(rev.toFixed(4)),
+               o: Number(op.toFixed(4)),
+               m: Number(((op/rev)*100).toFixed(1))
+             };
+             updatedCount++;
+           }
+        });
+      } catch(e) { console.error("야후 파이낸스 에러", e); }
+    }
+
+    // 모든 작업이 끝나면 대시보드 새로고침!
+    if(updatedCount > 0) {
+      if(typeof buildS1 === 'function') buildS1(); 
+      if(typeof buildProfitRanks === 'function') buildProfitRanks();
+      alert(`🎉 국내(DART) + 글로벌(야후) 30개 기업 전체 자동화 완료! (총 ${updatedCount}건 최신화)`);
+    }
+  }
+
+  // 페이지 로딩 후 1.5초 뒤에 30개 기업의 모든 데이터를 자동으로 수집합니다.
+  setTimeout(fetchAllData, 1500);
+</script>
+</body>
+</html>
