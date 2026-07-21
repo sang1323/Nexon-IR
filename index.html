@@ -2448,7 +2448,7 @@ window.addEventListener('load',function(){
   });
 })();
 </script>
-<!-- ⭐️ [최종 완성형 패치] </body> 바로 위에 그대로 붙여넣으세요 -->
+<!-- ⭐️ [최종 완성형 패치] 불필요한 UI 청소 기능이 추가되었습니다 -->
 <script>
 (function() {
   const DART_API_KEY = "5dc27d8d420eaa1f4d21d013454d2850741fee9e";
@@ -2456,7 +2456,6 @@ window.addEventListener('load',function(){
   window.REALTIME_VAL = {};
   const TARGET_YEARS = ['2025', '2026'];
   
-  // DART 고유번호 매핑
   const DART_MAP = {
     'ncsoft':'00126131', 'netmarble':'00126380', 'krafton':'00266961',
     'shiftup':'01384787', 'pearlabyss':'01152470', 'kakaogames':'01137383',
@@ -2464,11 +2463,10 @@ window.addEventListener('load',function(){
     'neowiz':'00628860', 'devsisters':'01008762'
   };
 
-  // 1. UI 안전 주입 (기존 레이아웃 파괴 없이 배지와 설명 텍스트만 안전하게 주입)
+  // 1. UI 주입 및 불필요한 부분 자동 청소 (표 숨기기 + 뉴스 중복 제거)
   function injectUI() {
     const ctrl = document.querySelector('#s1 .ctrl');
     if(ctrl && !document.getElementById('s1-live-badge')) {
-      // 영업이익 버튼 추가
       const revPill = Array.from(ctrl.querySelectorAll('.pill')).find(el => el.textContent.includes('매출'));
       if(revPill) {
         const opPill = document.createElement('span');
@@ -2476,16 +2474,38 @@ window.addEventListener('load',function(){
         opPill.setAttribute('onclick', "setMet('op', this)");
         revPill.insertAdjacentElement('afterend', opPill);
       }
-      // 실시간 배지 추가
       const badge = document.createElement('span');
       badge.id = 's1-live-badge';
       badge.style.cssText = 'display:none; font-size:11px; font-weight:800; color:#fff; background:var(--accent); padding:3px 8px; border-radius:4px; margin-left:8px;';
       badge.textContent = '🔴 실시간 Live';
       ctrl.appendChild(badge);
     }
+
+    // 🧹 [청소 1] 가이던스 vs 실제 매출 "상세 표"와 주석을 화면에서 완전히 숨깁니다.
+    const ptBody = document.getElementById('pt-body');
+    if(ptBody) {
+      const tblWrap = ptBody.closest('.tw');
+      if(tblWrap) {
+        tblWrap.style.display = 'none'; // 표 본체 숨김
+        if(tblWrap.previousElementSibling) tblWrap.previousElementSibling.style.display = 'none'; // 표 위쪽 설명 숨김
+        if(tblWrap.nextElementSibling && tblWrap.nextElementSibling.classList.contains('note')) {
+          tblWrap.nextElementSibling.style.display = 'none'; // 표 아래쪽 주석 숨김
+        }
+      }
+    }
+
+    // 🧹 [청소 2] 과거에 박제되어 작동하지 않는 위쪽 '고장난 뉴스 박스' 제거
+    const evList = document.getElementById('pt-ev-list');
+    if(evList) {
+      Array.from(evList.children).forEach(child => {
+        if(child.textContent.includes('실시간 AI 뉴스 브리핑')) {
+          child.style.display = 'none';
+        }
+      });
+    }
   }
 
-  // 2. 기존 함수 업그레이드 (CORS와 시가총액 USD 단위 왜곡 해결)
+  // 2. 기존 함수 업그레이드
   window.setMet = function(m, el) {
     rMet = m;
     document.querySelectorAll('.ctrl .pill').forEach(p => p.classList.remove('on'));
@@ -2506,7 +2526,6 @@ window.addEventListener('load',function(){
   };
 
   window.getV = function(co, qk, met) {
-    // 실시간 주가/PER/PBR/시총 데이터 우선 적용
     if(met === 'mktcap' && window.REALTIME_VAL[co]?.mktcap) return window.REALTIME_VAL[co].mktcap;
     if(met === 'per' && window.REALTIME_VAL[co]?.per) return window.REALTIME_VAL[co].per;
     if(met === 'pbr' && window.REALTIME_VAL[co]?.pbr) return window.REALTIME_VAL[co].pbr;
@@ -2528,9 +2547,11 @@ window.addEventListener('load',function(){
     return null;
   };
 
-  // 3. 실시간 AI 뉴스 브리핑 & 동종업계 평균 설명 명확화
+  // 3. 브리핑 렌더러
   function renderUndervalHeader(avgPer, avgOpm) {
     const perCmp = document.getElementById('kpi-per-cmp');
+    const perEl = document.getElementById('kpi-per');
+    const pbrEl = document.getElementById('kpi-pbr');
     if(perEl) perEl.textContent = (window.REALTIME_VAL['nexon']?.per || 19.7) + 'x';
     if(pbrEl) pbrEl.textContent = (window.REALTIME_VAL['nexon']?.pbr || 1.68) + 'x';
     if(perCmp) perCmp.textContent = `주요 피어 6개사 평균(${avgPer}x) 대비`;
@@ -2538,7 +2559,6 @@ window.addEventListener('load',function(){
 
   // 4. 통신 엔진 (야후 + DART + 구글 뉴스)
   async function runAutoSync() {
-    // 구글 실시간 뉴스 수집
     try {
       const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent("넥슨 (실적 OR 신작 OR 주가)")}&hl=ko&gl=KR&ceid=KR:ko`;
       const res = await fetch(PROXY_URL + encodeURIComponent(rssUrl));
@@ -2564,7 +2584,6 @@ window.addEventListener('load',function(){
       }
     } catch(e) {}
 
-    // 야후 파이낸스 실시간 주가 및 통화 변환 (USD 단일화)
     const allKeys = Object.keys(CO);
     await Promise.all(allKeys.map(async (key) => {
       const cObj = CO[key]; if(!cObj.tk) return;
@@ -2579,10 +2598,7 @@ window.addEventListener('load',function(){
         let mktcap = res0?.summaryDetail?.marketCap?.raw;
         const price = res0?.price?.regularMarketPrice?.raw;
         
-        // ⭐️ [통화 왜곡 수정] 각 통화를 달러(USD) 기준으로 변환하여 동종 업계 평균 및 비교 랭킹 일치화
-        if(mktcap && cObj.fx) {
-          mktcap = mktcap / cObj.fx; // JPY, KRW, HKD 등을 달러로 변환
-        }
+        if(mktcap && cObj.fx) mktcap = mktcap / cObj.fx;
         
         window.REALTIME_VAL[key] = {
           per: per ? Number(per.toFixed(2)) : null,
@@ -2591,7 +2607,6 @@ window.addEventListener('load',function(){
           price: price
         };
         
-        // 해외 실적 25-26년 실적 데이터 병합
         if(cObj.rg !== 'kr') {
           const hq = res0?.incomeStatementHistoryQuarterly?.incomeStatementHistory;
           if(hq) {
@@ -2608,7 +2623,6 @@ window.addEventListener('load',function(){
       } catch(e) {}
     }));
 
-    // 한국 DART 25-26년 실적 순차 병합
     for(let key of allKeys) {
       if(CO[key].rg === 'kr' && DART_MAP[key]) {
         for(let y of TARGET_YEARS) {
@@ -2638,7 +2652,6 @@ window.addEventListener('load',function(){
       }
     }
     
-    // 평균 재계산 및 텍스트 갱신
     let perV=[], opmV=[];
     ['krafton','ncsoft','netmarble','nintendo','sony','ea'].forEach(c => {
       if(window.REALTIME_VAL[c]?.per) perV.push(window.REALTIME_VAL[c].per);
@@ -2649,7 +2662,6 @@ window.addEventListener('load',function(){
     
     renderUndervalHeader(avgPer, avgOpm);
     
-    // 저평가 분석 하단 동종업계 평균 텍스트 설명 보강
     const undervalEl = document.getElementById('s11-underval');
     if(undervalEl && !document.getElementById('peer-avg-note')) {
       undervalEl.insertAdjacentHTML('beforeend', `<div id="peer-avg-note" style="margin-top:6px; padding:8px 10px; border-radius:6px; background:rgba(255,255,255,0.03); border:1px solid var(--bd); font-size:9px; color:var(--tx3); line-height:1.5;">💡 <b>안내</b>: 저평가 분석 차트의 '업계 평균'은 아래의 <b>체급이 일치하는 동종 업계 피어 6개사(크래프톤, 엔씨, 넷마블, 닌텐도, 소니, EA)</b>의 실시간 가중 평균값을 기준으로 합니다. (전체 30개사 평균이 아닙니다.)</div>`);
@@ -2658,20 +2670,19 @@ window.addEventListener('load',function(){
     if(typeof buildS1 === 'function') buildS1();
     if(typeof buildUndervalChart === 'function') buildUndervalChart();
     
-    // 실시간 주가 갱신
     const pe = document.getElementById('kpi-price');
     if(pe && window.REALTIME_VAL['nexon'] && window.REALTIME_VAL['nexon'].price) {
        pe.textContent = '¥' + window.REALTIME_VAL['nexon'].price.toLocaleString();
     }
   }
 
-  // 실행
   window.addEventListener('load', () => {
     injectUI();
     setTimeout(runAutoSync, 1500);
   });
 })();
 </script>
+
 
 </body>
 </html>
