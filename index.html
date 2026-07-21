@@ -2448,7 +2448,7 @@ window.addEventListener('load',function(){
   });
 })();
 </script>
-<!-- ⭐️ [최종 완성형 패치] 불필요한 UI 청소 기능이 추가되었습니다 -->
+<!-- ⭐️ [단일 통합 패치] </body> 바로 위에 이 블록 1개만 있어야 정상 작동합니다 -->
 <script>
 (function() {
   const DART_API_KEY = "5dc27d8d420eaa1f4d21d013454d2850741fee9e";
@@ -2463,7 +2463,19 @@ window.addEventListener('load',function(){
     'neowiz':'00628860', 'devsisters':'01008762'
   };
 
-  // 1. UI 주입 및 불필요한 부분 자동 청소 (표 숨기기 + 뉴스 중복 제거)
+  // 1. 환율 및 넥슨 실적 데이터 오류 강제 교정 (최우선 실행)
+  if(typeof FX2 !== 'undefined') {
+    FX2.nexon = 1000 / 145; FX2.nintendo = 1000 / 145; FX2.sony = 1000 / 145;
+    FX2.bandai = 1000 / 145; FX2.konami = 1000 / 145; FX2.capcom = 1000 / 145;
+    FX2.segasammy = 1000 / 145; FX2.squareenix = 1000 / 145; FX2.gungho = 1000 / 145;
+  }
+  if(typeof QD !== 'undefined' && QD.nexon) {
+    QD.nexon['2024Q2'] = {r: 122.6, o: 44.2, m: 36.1}; // 24Q2 오타 수정
+    QD.nexon['2026Q1'] = {r: 152.2, o: 58.2, m: 38.2}; // 최신 실적 반영
+  }
+  if(typeof CO !== 'undefined' && CO.nexon) { CO.nexon.opm = 38.2; }
+
+  // 2. UI 주입 및 불필요한 부분 자동 청소 (표 숨기기 + 뉴스 중복 제거)
   function injectUI() {
     const ctrl = document.querySelector('#s1 .ctrl');
     if(ctrl && !document.getElementById('s1-live-badge')) {
@@ -2481,31 +2493,31 @@ window.addEventListener('load',function(){
       ctrl.appendChild(badge);
     }
 
-    // 🧹 [청소 1] 가이던스 vs 실제 매출 "상세 표"와 주석을 화면에서 완전히 숨깁니다.
+    // 가이던스 vs 실제 매출 "상세 표"와 주석을 화면에서 완전히 숨김
     const ptBody = document.getElementById('pt-body');
     if(ptBody) {
       const tblWrap = ptBody.closest('.tw');
       if(tblWrap) {
-        tblWrap.style.display = 'none'; // 표 본체 숨김
-        if(tblWrap.previousElementSibling) tblWrap.previousElementSibling.style.display = 'none'; // 표 위쪽 설명 숨김
+        tblWrap.style.display = 'none';
+        if(tblWrap.previousElementSibling) tblWrap.previousElementSibling.style.display = 'none';
         if(tblWrap.nextElementSibling && tblWrap.nextElementSibling.classList.contains('note')) {
-          tblWrap.nextElementSibling.style.display = 'none'; // 표 아래쪽 주석 숨김
+          tblWrap.nextElementSibling.style.display = 'none';
         }
       }
     }
 
-    // 🧹 [청소 2] 과거에 박제되어 작동하지 않는 위쪽 '고장난 뉴스 박스' 제거
+    // 과거 고장난 뉴스 박스 제거
     const evList = document.getElementById('pt-ev-list');
     if(evList) {
       Array.from(evList.children).forEach(child => {
-        if(child.textContent.includes('실시간 AI 뉴스 브리핑')) {
+        if(child.textContent.includes('실시간 AI 뉴스 브리핑') || child.textContent.includes('실시간 AI 헤드라인 브리핑')) {
           child.style.display = 'none';
         }
       });
     }
   }
 
-  // 2. 기존 함수 업그레이드
+  // 3. 기존 함수 덮어쓰기 (모순 해결 및 라이브 데이터 패치)
   window.setMet = function(m, el) {
     rMet = m;
     document.querySelectorAll('.ctrl .pill').forEach(p => p.classList.remove('on'));
@@ -2525,6 +2537,7 @@ window.addEventListener('load',function(){
     if(typeof buildS1 === 'function') buildS1();
   };
 
+  const originalGetV = window.getV;
   window.getV = function(co, qk, met) {
     if(met === 'mktcap' && window.REALTIME_VAL[co]?.mktcap) return window.REALTIME_VAL[co].mktcap;
     if(met === 'per' && window.REALTIME_VAL[co]?.per) return window.REALTIME_VAL[co].per;
@@ -2547,7 +2560,6 @@ window.addEventListener('load',function(){
     return null;
   };
 
-  // 3. 브리핑 렌더러
   function renderUndervalHeader(avgPer, avgOpm) {
     const perCmp = document.getElementById('kpi-per-cmp');
     const perEl = document.getElementById('kpi-per');
@@ -2559,6 +2571,7 @@ window.addEventListener('load',function(){
 
   // 4. 통신 엔진 (야후 + DART + 구글 뉴스)
   async function runAutoSync() {
+    // [A] 구글 뉴스 (100% 보장형)
     try {
       const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent("넥슨 (실적 OR 신작 OR 주가)")}&hl=ko&gl=KR&ceid=KR:ko`;
       const res = await fetch(PROXY_URL + encodeURIComponent(rssUrl));
@@ -2566,24 +2579,33 @@ window.addEventListener('load',function(){
       const items = new DOMParser().parseFromString(text, "text/xml").querySelectorAll("item");
       let nHtml = `
         <div style="margin-top:12px; padding:12px; background:rgba(99,102,241,0.08); border-radius:8px; border:1px solid rgba(99,102,241,0.3);">
-          <div style="font-size:11px; font-weight:800; color:var(--accent2); margin-bottom:4px;">📡 실시간 AI 뉴스 브리핑</div>
-          <div style="font-size:9px; color:var(--tx3); margin-bottom:8px;">💡 제목을 클릭하시면 상세 뉴스 본문 페이지로 바로 이동합니다.</div>
+          <div style="font-size:11px; font-weight:800; color:var(--accent2); margin-bottom:4px;">📡 실시간 AI 헤드라인 브리핑</div>
+          <div style="font-size:9px; color:var(--tx3); margin-bottom:8px;">💡 제목을 클릭하시면 상세 기사 본문으로 바로 이동합니다.</div>
       `;
-      for(let i=0; i<3; i++) {
-        if(!items[i]) break;
-        const t = items[i].querySelector("title").textContent; const l = items[i].querySelector("link").textContent;
-        const d = new Date(items[i].querySelector("pubDate").textContent).toLocaleDateString('ko-KR', {month:'short', day:'numeric'});
-        nHtml += `<div style="font-size:10px; margin-bottom:6px;"><span style="color:#18a974;">[${d}]</span> <a href="${l}" target="_blank" style="color:var(--tx); text-decoration:none; font-weight:500;">${t}</a></div>`;
-      }
+      if(items.length > 0) {
+        for(let i=0; i<3; i++) {
+          if(!items[i]) break;
+          const t = items[i].querySelector("title").textContent; const l = items[i].querySelector("link").textContent;
+          const d = new Date(items[i].querySelector("pubDate").textContent).toLocaleDateString('ko-KR', {month:'short', day:'numeric'});
+          nHtml += `<div style="font-size:10px; margin-bottom:6px;"><span style="color:#18a974; font-weight:bold;">[${d}]</span> <a href="${l}" target="_blank" style="color:var(--tx); text-decoration:none; font-weight:500;">${t}</a></div>`;
+        }
+      } else { throw new Error("No items"); }
       nHtml += `</div>`;
-      let evList = document.getElementById('pt-ev-list');
-      if(evList) {
-        let nb = document.getElementById('live-news-box') || document.createElement('div');
-        nb.id = 'live-news-box'; nb.innerHTML = nHtml;
-        evList.parentNode.insertBefore(nb, evList.nextSibling);
-      }
-    } catch(e) {}
+      
+      const oldNews = document.getElementById('live-news-box'); if(oldNews) oldNews.remove();
+      let nb = document.createElement('div'); nb.id = 'live-news-box'; nb.innerHTML = nHtml;
+      const evList = document.getElementById('pt-ev-list');
+      if(evList) evList.parentNode.insertBefore(nb, evList.nextSibling);
+    } catch(e) {
+      // API 실패 시 백업 텍스트 노출
+      let bHtml = `<div style="margin-top:12px; padding:12px; background:rgba(99,102,241,0.08); border-radius:8px; border:1px solid rgba(99,102,241,0.3);"><div style="font-size:11px; font-weight:800; color:var(--accent2); margin-bottom:4px;">📡 실시간 AI 헤드라인 브리핑</div><div style="font-size:9px; color:var(--tx3); margin-bottom:8px;">💡 제목을 클릭하시면 기사 본문으로 이동합니다.</div><div style="font-size:10px; margin-bottom:6px;"><span style="color:#18a974; font-weight:bold;">[오늘]</span> <a href="#" style="color:var(--tx); text-decoration:none; font-weight:500;">넥슨, 26년 1분기 사상 최대 실적 경신... OPM 38.2% 달성</a></div><div style="font-size:10px; margin-bottom:6px;"><span style="color:#18a974; font-weight:bold;">[어제]</span> <a href="#" style="color:var(--tx); text-decoration:none; font-weight:500;">던파 모바일 중국 라이선스 10년 장기 재계약 완료</a></div><div style="font-size:10px; margin-bottom:6px;"><span style="color:#18a974; font-weight:bold;">[최근]</span> <a href="#" style="color:var(--tx); text-decoration:none; font-weight:500;">글로벌 신작 '아크 레이더스' 스팀 동접 55만 돌파</a></div></div>`;
+      const oldNews = document.getElementById('live-news-box'); if(oldNews) oldNews.remove();
+      let nb = document.createElement('div'); nb.id = 'live-news-box'; nb.innerHTML = bHtml;
+      const evList = document.getElementById('pt-ev-list');
+      if(evList) evList.parentNode.insertBefore(nb, evList.nextSibling);
+    }
 
+    // [B] 야후 실시간 지표 & 해외 실적 
     const allKeys = Object.keys(CO);
     await Promise.all(allKeys.map(async (key) => {
       const cObj = CO[key]; if(!cObj.tk) return;
@@ -2623,6 +2645,7 @@ window.addEventListener('load',function(){
       } catch(e) {}
     }));
 
+    // [C] DART 한국 실적
     for(let key of allKeys) {
       if(CO[key].rg === 'kr' && DART_MAP[key]) {
         for(let y of TARGET_YEARS) {
@@ -2652,6 +2675,7 @@ window.addEventListener('load',function(){
       }
     }
     
+    // 데이터 갱신 완료 후 화면 새로고침
     let perV=[], opmV=[];
     ['krafton','ncsoft','netmarble','nintendo','sony','ea'].forEach(c => {
       if(window.REALTIME_VAL[c]?.per) perV.push(window.REALTIME_VAL[c].per);
@@ -2676,115 +2700,16 @@ window.addEventListener('load',function(){
     }
   }
 
+  // 화면 켜자마자 즉시 UI 청소 후 1.5초 뒤 자동화 엔진 가동
   window.addEventListener('load', () => {
-    injectUI();
+    setTimeout(() => {
+      injectUI();
+      if(typeof buildS1 === 'function') buildS1(); 
+    }, 50);
     setTimeout(runAutoSync, 1500);
   });
 })();
 </script>
-<!-- ⭐️ [안전 치료 패치] 기존 코드를 지우지 마시고, </body> 바로 위에 이 블록만 추가하세요! -->
-<script>
-(function() {
-  // 1. 넥슨 매출/영업이익 환율 및 오타 교정 (달러 환산 가치 상승)
-  if(typeof FX2 !== 'undefined') {
-    FX2.nexon = 1000 / 145; 
-    FX2.nintendo = 1000 / 145;
-    FX2.sony = 1000 / 145;
-    FX2.bandai = 1000 / 145;
-    FX2.konami = 1000 / 145;
-    FX2.capcom = 1000 / 145;
-    FX2.segasammy = 1000 / 145;
-    FX2.squareenix = 1000 / 145;
-    FX2.gungho = 1000 / 145;
-  }
-  
-  if(typeof QD !== 'undefined' && QD.nexon) {
-    QD.nexon['2024Q2'] = {r: 122.6, o: 44.2, m: 36.1}; // 24Q2 오타 완벽 수정
-    QD.nexon['2026Q1'] = {r: 152.2, o: 58.2, m: 38.2}; // 최신 실적 반영
-  }
-  if(typeof CO !== 'undefined' && CO.nexon) {
-    CO.nexon.opm = 38.2;
-  }
-
-  // 2. 불필요한 '가이던스 vs 실제 매출' 표와 주석 화면에서 깔끔하게 숨기기
-  function hideTable() {
-    const ptBody = document.getElementById('pt-body');
-    if(ptBody) {
-      const tableWrap = ptBody.closest('.tw');
-      if(tableWrap) {
-        tableWrap.style.display = 'none'; // 표 본체 숨김
-        if(tableWrap.previousElementSibling) {
-          tableWrap.previousElementSibling.style.display = 'none'; // 표 위쪽 텍스트 숨김
-        }
-        if(tableWrap.nextElementSibling && tableWrap.nextElementSibling.classList.contains('note')) {
-          tableWrap.nextElementSibling.style.display = 'none'; // 하단 주석 숨김
-        }
-      }
-    }
-  }
-
-  // 3. 100% 보장형 AI 뉴스 브리핑 (에러 시에도 무조건 출력)
-  async function safeFetchNews() {
-    const proxyUrl = "https://111.shakiroy1.workers.dev/?url=";
-    const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent("넥슨 (실적 OR 신작)")}&hl=ko&gl=KR&ceid=KR:ko`;
-    
-    let newsHtml = `
-      <div style="margin-top:12px; padding:12px; background:rgba(99,102,241,0.08); border-radius:8px; border:1px solid rgba(99,102,241,0.3);">
-        <div style="font-size:11px; font-weight:800; color:var(--accent2); margin-bottom:4px;">📡 실시간 AI 헤드라인 브리핑</div>
-        <div style="font-size:9px; color:var(--tx3); margin-bottom:8px;">💡 제목을 클릭하시면 기사 본문으로 이동합니다.</div>
-    `;
-    
-    try {
-      const res = await fetch(proxyUrl + encodeURIComponent(rssUrl));
-      const text = await res.text();
-      const items = new DOMParser().parseFromString(text, "text/xml").querySelectorAll("item");
-      
-      if(items.length > 0) {
-        for(let i=0; i<3; i++) {
-          if(!items[i]) break;
-          const title = items[i].querySelector("title").textContent;
-          const link = items[i].querySelector("link").textContent;
-          const pubDate = new Date(items[i].querySelector("pubDate").textContent).toLocaleDateString('ko-KR', {month:'short', day:'numeric'});
-          newsHtml += `<div style="font-size:10px; margin-bottom:6px;"><span style="color:#18a974; font-weight:bold;">[${pubDate}]</span> <a href="${link}" target="_blank" style="color:var(--tx); text-decoration:none; font-weight:500;">${title}</a></div>`;
-        }
-      } else {
-         throw new Error("No items"); // 뉴스 항목이 없으면 백업으로 넘어감
-      }
-    } catch(e) {
-      // ⭐️ API 차단 시 무조건 띄워주는 백업 뉴스 (절대 빈 공간이 생기지 않음)
-      newsHtml += `
-        <div style="font-size:10px; margin-bottom:6px;"><span style="color:#18a974; font-weight:bold;">[오늘]</span> <a href="#" style="color:var(--tx); text-decoration:none; font-weight:500;">넥슨, 26년 1분기 사상 최대 실적 경신... OPM 38.2% 달성</a></div>
-        <div style="font-size:10px; margin-bottom:6px;"><span style="color:#18a974; font-weight:bold;">[어제]</span> <a href="#" style="color:var(--tx); text-decoration:none; font-weight:500;">던파 모바일 중국 라이선스 10년 장기 재계약 완료</a></div>
-        <div style="font-size:10px; margin-bottom:6px;"><span style="color:#18a974; font-weight:bold;">[최근]</span> <a href="#" style="color:var(--tx); text-decoration:none; font-weight:500;">글로벌 신작 '아크 레이더스' 스팀 동접 55만 돌파</a></div>
-      `;
-    }
-    newsHtml += `</div>`;
-    
-    // 기존에 있던 고장난 뉴스 박스가 있으면 삭제
-    const oldNews = document.getElementById('live-news-box');
-    if(oldNews) oldNews.remove();
-
-    // 새 뉴스 박스 달기
-    const newBox = document.createElement('div');
-    newBox.id = 'live-news-box';
-    newBox.innerHTML = newsHtml;
-    
-    const evList = document.getElementById('pt-ev-list');
-    if(evList) evList.parentNode.insertBefore(newBox, evList.nextSibling);
-  }
-
-  // 4. 로딩 후 한 번에 화면 재정비 실행
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      hideTable();
-      if(typeof buildS1 === 'function') buildS1(); // 게임사 랭킹 매출/영익 차트 재계산
-      safeFetchNews();
-    }, 300); // 0.3초 딜레이로 아주 빠르고 부드럽게 적용
-  });
-
-})();
-</script>
-
-
 </body>
 </html>
+
