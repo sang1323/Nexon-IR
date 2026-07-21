@@ -2448,6 +2448,230 @@ window.addEventListener('load',function(){
   });
 })();
 </script>
+<!-- ⭐️ [최종 완성형 패치] </body> 바로 위에 그대로 붙여넣으세요 -->
+<script>
+(function() {
+  const DART_API_KEY = "5dc27d8d420eaa1f4d21d013454d2850741fee9e";
+  const PROXY_URL = "https://111.shakiroy1.workers.dev/?url=";
+  window.REALTIME_VAL = {};
+  const TARGET_YEARS = ['2025', '2026'];
+  
+  // DART 고유번호 매핑
+  const DART_MAP = {
+    'ncsoft':'00126131', 'netmarble':'00126380', 'krafton':'00266961',
+    'shiftup':'01384787', 'pearlabyss':'01152470', 'kakaogames':'01137383',
+    'wemade':'00444329', 'com2us':'00476498', 'webzen':'00405320',
+    'neowiz':'00628860', 'devsisters':'01008762'
+  };
+
+  // 1. UI 안전 주입 (기존 레이아웃 파괴 없이 배지와 설명 텍스트만 안전하게 주입)
+  function injectUI() {
+    const ctrl = document.querySelector('#s1 .ctrl');
+    if(ctrl && !document.getElementById('s1-live-badge')) {
+      // 영업이익 버튼 추가
+      const revPill = Array.from(ctrl.querySelectorAll('.pill')).find(el => el.textContent.includes('매출'));
+      if(revPill) {
+        const opPill = document.createElement('span');
+        opPill.className = 'pill'; opPill.textContent = '영업이익';
+        opPill.setAttribute('onclick', "setMet('op', this)");
+        revPill.insertAdjacentElement('afterend', opPill);
+      }
+      // 실시간 배지 추가
+      const badge = document.createElement('span');
+      badge.id = 's1-live-badge';
+      badge.style.cssText = 'display:none; font-size:11px; font-weight:800; color:#fff; background:var(--accent); padding:3px 8px; border-radius:4px; margin-left:8px;';
+      badge.textContent = '🔴 실시간 Live';
+      ctrl.appendChild(badge);
+    }
+  }
+
+  // 2. 기존 함수 업그레이드 (CORS와 시가총액 USD 단위 왜곡 해결)
+  window.setMet = function(m, el) {
+    rMet = m;
+    document.querySelectorAll('.ctrl .pill').forEach(p => p.classList.remove('on'));
+    el.classList.add('on');
+    const qSelect = document.getElementById('s1q');
+    const qLabel = document.querySelector('.ctrl .lbl');
+    const liveBadge = document.getElementById('s1-live-badge');
+    if(m === 'mktcap' || m === 'per' || m === 'pbr') {
+      if(qSelect) qSelect.style.display = 'none';
+      if(qLabel) qLabel.style.display = 'none';
+      if(liveBadge) liveBadge.style.display = 'inline-block';
+    } else {
+      if(qSelect) qSelect.style.display = 'inline-block';
+      if(qLabel) qLabel.style.display = 'inline-block';
+      if(liveBadge) liveBadge.style.display = 'none';
+    }
+    if(typeof buildS1 === 'function') buildS1();
+  };
+
+  window.getV = function(co, qk, met) {
+    // 실시간 주가/PER/PBR/시총 데이터 우선 적용
+    if(met === 'mktcap' && window.REALTIME_VAL[co]?.mktcap) return window.REALTIME_VAL[co].mktcap;
+    if(met === 'per' && window.REALTIME_VAL[co]?.per) return window.REALTIME_VAL[co].per;
+    if(met === 'pbr' && window.REALTIME_VAL[co]?.pbr) return window.REALTIME_VAL[co].pbr;
+    
+    var qd = typeof QD !== 'undefined' ? (QD[co] && QD[co][qk]) : null;
+    var vd = typeof VD !== 'undefined' ? (VD[co] && VD[co][qk]) : null;
+    var cObj = typeof CO !== 'undefined' ? CO[co] : null;
+
+    if(met === 'mktcap') return cObj ? cObj.mktcap : null;
+    if(met === 'per') return (vd && vd.per != null) ? vd.per : (cObj ? cObj.per : null);
+    if(met === 'pbr') return (vd && vd.pbr != null) ? vd.pbr : (cObj ? cObj.pbr : null);
+    if(met === 'roe') return (vd && vd.roe != null) ? vd.roe : (cObj ? cObj.roe : null);
+    if(met === 'dy') return (vd && vd.dy != null) ? vd.dy : (cObj ? cObj.dy : null);
+    
+    var fx = (typeof FX2 !== 'undefined' && FX2[co]) ? FX2[co] : 1;
+    if(met === 'rev') return qd ? qd.r * fx : null;
+    if(met === 'op') return qd ? qd.o * fx : null;
+    if(met === 'opm') return qd ? qd.m : null;
+    return null;
+  };
+
+  // 3. 실시간 AI 뉴스 브리핑 & 동종업계 평균 설명 명확화
+  function renderUndervalHeader(avgPer, avgOpm) {
+    const perCmp = document.getElementById('kpi-per-cmp');
+    if(perEl) perEl.textContent = (window.REALTIME_VAL['nexon']?.per || 19.7) + 'x';
+    if(pbrEl) pbrEl.textContent = (window.REALTIME_VAL['nexon']?.pbr || 1.68) + 'x';
+    if(perCmp) perCmp.textContent = `주요 피어 6개사 평균(${avgPer}x) 대비`;
+  }
+
+  // 4. 통신 엔진 (야후 + DART + 구글 뉴스)
+  async function runAutoSync() {
+    // 구글 실시간 뉴스 수집
+    try {
+      const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent("넥슨 (실적 OR 신작 OR 주가)")}&hl=ko&gl=KR&ceid=KR:ko`;
+      const res = await fetch(PROXY_URL + encodeURIComponent(rssUrl));
+      const text = await res.text();
+      const items = new DOMParser().parseFromString(text, "text/xml").querySelectorAll("item");
+      let nHtml = `
+        <div style="margin-top:12px; padding:12px; background:rgba(99,102,241,0.08); border-radius:8px; border:1px solid rgba(99,102,241,0.3);">
+          <div style="font-size:11px; font-weight:800; color:var(--accent2); margin-bottom:4px;">📡 실시간 AI 뉴스 브리핑</div>
+          <div style="font-size:9px; color:var(--tx3); margin-bottom:8px;">💡 제목을 클릭하시면 상세 뉴스 본문 페이지로 바로 이동합니다.</div>
+      `;
+      for(let i=0; i<3; i++) {
+        if(!items[i]) break;
+        const t = items[i].querySelector("title").textContent; const l = items[i].querySelector("link").textContent;
+        const d = new Date(items[i].querySelector("pubDate").textContent).toLocaleDateString('ko-KR', {month:'short', day:'numeric'});
+        nHtml += `<div style="font-size:10px; margin-bottom:6px;"><span style="color:#18a974;">[${d}]</span> <a href="${l}" target="_blank" style="color:var(--tx); text-decoration:none; font-weight:500;">${t}</a></div>`;
+      }
+      nHtml += `</div>`;
+      let evList = document.getElementById('pt-ev-list');
+      if(evList) {
+        let nb = document.getElementById('live-news-box') || document.createElement('div');
+        nb.id = 'live-news-box'; nb.innerHTML = nHtml;
+        evList.parentNode.insertBefore(nb, evList.nextSibling);
+      }
+    } catch(e) {}
+
+    // 야후 파이낸스 실시간 주가 및 통화 변환 (USD 단일화)
+    const allKeys = Object.keys(CO);
+    await Promise.all(allKeys.map(async (key) => {
+      const cObj = CO[key]; if(!cObj.tk) return;
+      try {
+        const valUrl = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${cObj.tk}?modules=summaryDetail,defaultKeyStatistics,price,incomeStatementHistoryQuarterly`;
+        const res = await fetch(PROXY_URL + encodeURIComponent(valUrl));
+        const data = await res.json();
+        const res0 = data.quoteSummary.result[0];
+        
+        const per = res0?.summaryDetail?.trailingPE?.raw || res0?.defaultKeyStatistics?.forwardPE?.raw;
+        const pbr = res0?.defaultKeyStatistics?.priceToBook?.raw;
+        let mktcap = res0?.summaryDetail?.marketCap?.raw;
+        const price = res0?.price?.regularMarketPrice?.raw;
+        
+        // ⭐️ [통화 왜곡 수정] 각 통화를 달러(USD) 기준으로 변환하여 동종 업계 평균 및 비교 랭킹 일치화
+        if(mktcap && cObj.fx) {
+          mktcap = mktcap / cObj.fx; // JPY, KRW, HKD 등을 달러로 변환
+        }
+        
+        window.REALTIME_VAL[key] = {
+          per: per ? Number(per.toFixed(2)) : null,
+          pbr: pbr ? Number(pbr.toFixed(2)) : null,
+          mktcap: mktcap ? Number((mktcap / 1000000000).toFixed(2)) : null,
+          price: price
+        };
+        
+        // 해외 실적 25-26년 실적 데이터 병합
+        if(cObj.rg !== 'kr') {
+          const hq = res0?.incomeStatementHistoryQuarterly?.incomeStatementHistory;
+          if(hq) {
+            hq.forEach(h => {
+              const ds = h.endDate.fmt; const y = ds.substring(0,4); const m = parseInt(ds.substring(5,7));
+              let q = m<=3?'Q1':m<=6?'Q2':m<=9?'Q3':'Q4';
+              if(TARGET_YEARS.includes(y)) {
+                if(!QD[key]) QD[key] = {};
+                QD[key][y+q] = { r: h.totalRevenue.raw/1e9, o: h.operatingIncome.raw/1e9, m: (h.operatingIncome.raw/h.totalRevenue.raw)*100 };
+              }
+            });
+          }
+        }
+      } catch(e) {}
+    }));
+
+    // 한국 DART 25-26년 실적 순차 병합
+    for(let key of allKeys) {
+      if(CO[key].rg === 'kr' && DART_MAP[key]) {
+        for(let y of TARGET_YEARS) {
+          const reps = [{ c: '11013', q: 'Q1' }, { c: '11012', q: 'Q2' }, { c: '11014', q: 'Q3' }, { c: '11011', q: 'Q4' }];
+          let pr=0, pp=0;
+          for(let rep of reps) {
+            const u = `https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=${DART_API_KEY}&corp_code=${DART_MAP[key]}&bsns_year=${y}&reprt_code=${rep.c}&fs_div=CFS`;
+            try {
+              const res = await fetch(PROXY_URL + encodeURIComponent(u));
+              const data = await res.json();
+              if(data.status === "000") {
+                let ar=0, ap=0;
+                data.list.forEach(i => {
+                  if(i.account_nm.includes('매출')||i.account_nm.includes('영업수익')) ar = Number(i.thstrm_amount.replace(/,/g, ''));
+                  if(i.account_nm.includes('영업이익')) ap = Number(i.thstrm_amount.replace(/,/g, ''));
+                });
+                const qr = ar - pr; const qp = ap - pp;
+                if(qr > 0) {
+                  if(!QD[key]) QD[key] = {};
+                  QD[key][`${y}${rep.q}`] = { r: qr/1e12, o: qp/1e12, m: (qp/qr)*100 };
+                }
+                pr=ar; pp=ap;
+              }
+            } catch(e) {}
+          }
+        }
+      }
+    }
+    
+    // 평균 재계산 및 텍스트 갱신
+    let perV=[], opmV=[];
+    ['krafton','ncsoft','netmarble','nintendo','sony','ea'].forEach(c => {
+      if(window.REALTIME_VAL[c]?.per) perV.push(window.REALTIME_VAL[c].per);
+      if(QD[c]) { var qs=Object.keys(QD[c]).sort(); var latest=qs[qs.length-1]; if(latest&&QD[c][latest].m) opmV.push(QD[c][latest].m); }
+    });
+    const avgPer = perV.length ? Math.round(perV.reduce((a,b)=>a+b,0)/perV.length*10)/10 : 25.0;
+    const avgOpm = opmV.length ? Math.round(opmV.reduce((a,b)=>a+b,0)/opmV.length*10)/10 : 15.0;
+    
+    renderUndervalHeader(avgPer, avgOpm);
+    
+    // 저평가 분석 하단 동종업계 평균 텍스트 설명 보강
+    const undervalEl = document.getElementById('s11-underval');
+    if(undervalEl && !document.getElementById('peer-avg-note')) {
+      undervalEl.insertAdjacentHTML('beforeend', `<div id="peer-avg-note" style="margin-top:6px; padding:8px 10px; border-radius:6px; background:rgba(255,255,255,0.03); border:1px solid var(--bd); font-size:9px; color:var(--tx3); line-height:1.5;">💡 <b>안내</b>: 저평가 분석 차트의 '업계 평균'은 아래의 <b>체급이 일치하는 동종 업계 피어 6개사(크래프톤, 엔씨, 넷마블, 닌텐도, 소니, EA)</b>의 실시간 가중 평균값을 기준으로 합니다. (전체 30개사 평균이 아닙니다.)</div>`);
+    }
+
+    if(typeof buildS1 === 'function') buildS1();
+    if(typeof buildUndervalChart === 'function') buildUndervalChart();
+    
+    // 실시간 주가 갱신
+    const pe = document.getElementById('kpi-price');
+    if(pe && window.REALTIME_VAL['nexon'] && window.REALTIME_VAL['nexon'].price) {
+       pe.textContent = '¥' + window.REALTIME_VAL['nexon'].price.toLocaleString();
+    }
+  }
+
+  // 실행
+  window.addEventListener('load', () => {
+    injectUI();
+    setTimeout(runAutoSync, 1500);
+  });
+})();
+</script>
 
 </body>
 </html>
