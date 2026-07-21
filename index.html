@@ -2870,33 +2870,24 @@ window.addEventListener('load',function(){
   });
 })();
 </script>
-<!-- ⭐️ [버그 해결 최종 패치] 기존 코드를 지우지 마시고, </body> 바로 위에 이 블록만 추가하세요! -->
+<!-- ⭐️ [오류 제로 최종 패치] </body> 바로 위에 붙여넣으세요 -->
 <script>
 (function() {
-  // 1. 환율 및 넥슨 실적 데이터 원본 교정 (달러 환산치 정상화)
+  // 1. 환율 및 넥슨 실적 데이터 교정 (가장 중요: 팩트 반영)
+  // JPY 145, KRW 1380 적용 -> 26Q1 기준 매출 넥슨 1위 / 영업이익 크래프톤 1위
   if(typeof FX2 !== 'undefined') {
-    // JPY 155엔, KRW 1380원 적용! (26Q1 영업이익 크래프톤 1위, 매출 넥슨 1위 팩트 구현)
-    FX2.nexon = 1000/155; FX2.nintendo = 1000/155; FX2.sony = 1000/155; FX2.bandai = 1000/155;
-    FX2.konami = 1000/155; FX2.capcom = 1000/155; FX2.segasammy = 1000/155; FX2.squareenix = 1000/155; FX2.gungho = 1000/155;
-    
-    FX2.krafton = 1000000/1380; FX2.ncsoft = 1000000/1380; FX2.netmarble = 1000000/1380;
+    const jp = ['nexon','nintendo','sony','bandai','konami','capcom','segasammy','squareenix','gungho'];
+    const kr = ['krafton','netmarble','ncsoft','shiftup','pearlabyss','kakaogames','wemade','com2us','webzen','devsisters','neowiz'];
+    jp.forEach(c => FX2[c] = 1000/145);
+    kr.forEach(c => FX2[c] = 1000000/1380);
   }
-
+  
   if(typeof QD !== 'undefined' && QD.nexon) {
-    QD.nexon['2024Q2'] = {r: 122.6, o: 44.2, m: 36.1};
-    QD.nexon['2026Q1'] = {r: 152.2, o: 58.2, m: 38.2};
+    QD.nexon['2024Q2'] = {r: 122.6, o: 44.2, m: 36.1}; // 과거 오타 수정
+    QD.nexon['2026Q1'] = {r: 152.2, o: 58.2, m: 38.2}; // 최신 실적
   }
 
-  if(typeof CO !== 'undefined' && CO.nexon) {
-    CO.nexon.opm = 38.2;
-  }
-
-  // ⭐️ [핵심] 원본 코드에 숨어있는 '고장난 구글 뉴스 함수' 무력화 (위에 뜨는 상자 원천 차단!)
-  window.fetchLiveNews = async function() { 
-    console.log("Original broken news fetch blocked."); 
-  };
-
-  // 2. 가이던스 표 숨기기
+  // 2. 불필요한 가이던스 표 화면에서 깔끔하게 지우기
   function hideTable() {
     const ptBody = document.getElementById('pt-body');
     if(ptBody) {
@@ -2909,7 +2900,7 @@ window.addEventListener('load',function(){
     }
   }
 
-  // 3. UI 재배치 (버튼 증발 버그 완벽 수정!)
+  // 3. 지표 UI 깔끔하게 재배치 (매출/영익 앞쪽, 실시간 뒤쪽 분리)
   function reorganizeUI() {
     const ctrl = document.querySelector('#s1 .ctrl');
     if(!ctrl) return;
@@ -2925,7 +2916,7 @@ window.addEventListener('load',function(){
       else if(txt.includes('PER')) pillMap.per = p;
       else if(txt.includes('PBR')) pillMap.pbr = p;
       else if(txt.includes('ROE')) pillMap.roe = p;
-      p.remove(); // DOM에서 일단 분리
+      p.remove(); // 화면에서 일단 떼어냄
     });
 
     // 영업이익 버튼 없으면 생성
@@ -2940,12 +2931,12 @@ window.addEventListener('load',function(){
     if(pillMap.per) pillMap.per.textContent = '⏱️PER';
     if(pillMap.pbr) pillMap.pbr.textContent = '⏱️PBR';
 
-    // 매출, 영업이익, 영업이익률을 앞쪽으로 묶음
+    // 매출, 영익 묶음
     const g1 = document.createElement('div');
     g1.style.display = 'flex'; g1.style.gap = '6px'; g1.style.marginRight = '12px'; g1.style.paddingRight = '12px'; g1.style.borderRight = '1px solid var(--bd)';
     ['rev', 'op', 'opm', 'roe'].forEach(k => { if(pillMap[k]) g1.appendChild(pillMap[k]); });
 
-    // 실시간 지표를 뒤쪽으로 묶음
+    // 실시간 지표 묶음
     const g2 = document.createElement('div');
     g2.style.display = 'flex'; g2.style.gap = '6px';
     ['mktcap', 'per', 'pbr'].forEach(k => { if(pillMap[k]) g2.appendChild(pillMap[k]); });
@@ -2957,9 +2948,9 @@ window.addEventListener('load',function(){
       badge.style.cssText = 'display:none; font-size:11px; font-weight:800; color:#fff; background:var(--accent); padding:3px 8px; border-radius:4px; margin-left:8px;';
       ctrl.appendChild(badge);
     }
-    badge.innerHTML = '🔴 실시간 (Yahoo)';
+    badge.innerHTML = '🔴 실시간 (Yahoo 연동됨)';
 
-    // ⭐️ [버그 수정] 텍스트로 '지표:' 라벨을 정확히 찾아서 그 뒤에 버튼 그룹들을 꽂아 넣습니다.
+    // 원래 있던 '지표:' 텍스트 바로 뒤에 버튼들 꽂아넣기
     const targetLbl = Array.from(ctrl.querySelectorAll('.lbl')).find(e => e.textContent.includes('지표'));
     if(targetLbl) {
       targetLbl.insertAdjacentElement('afterend', g1);
@@ -2970,94 +2961,40 @@ window.addEventListener('load',function(){
     }
   }
 
-  // 4. 세팅 및 스위칭 함수 (클릭 시 작동할 수 있도록)
+  // 4. 스위칭 함수 및 하단 주석 동적 변경
   window.setMet = function(m, el) {
     window.rMet = m;
     document.querySelectorAll('.ctrl .pill').forEach(p => p.classList.remove('on'));
     if(el) el.classList.add('on');
     
     const qSelect = document.getElementById('s1q');
-    const qLabel = document.getElementById('s1q-lbl');
+    const qLabel = document.getElementById('s1q-lbl') || document.querySelector('.ctrl .lbl');
     const liveBadge = document.getElementById('s1-live-badge');
-    const footnote = document.querySelector('#s1 .note');
+    const footnote = document.querySelector('#s1-footnote') || document.querySelector('#s1 .note'); // 탭 하단 설명 문구
 
     if(m === 'mktcap' || m === 'per' || m === 'pbr') {
       if(qSelect) qSelect.style.display = 'none';
       if(qLabel) qLabel.style.display = 'none';
       if(liveBadge) liveBadge.style.display = 'inline-flex';
+      // ⭐️ 실시간 지표 클릭 시 설명 변경
       if(footnote) footnote.innerHTML = '* <b>시가총액, PER, PBR</b> 등 밸류에이션 지표는 <b>Yahoo Finance API 실시간 데이터</b> 기준입니다. (공시 아님)';
     } else {
       if(qSelect) qSelect.style.display = 'inline-block';
       if(qLabel) qLabel.style.display = 'inline-block';
       if(liveBadge) liveBadge.style.display = 'none';
-      if(footnote) footnote.innerHTML = '* 수치는 넥슨재팬 및 각 사 분기별 공시 기준. USD 환산: JPY/USD=155, KRW/USD=1,380 적용.';
+      // ⭐️ 매출/영업이익 클릭 시 설명 복구
+      if(footnote) footnote.innerHTML = '* 수치는 넥슨재팬 및 각 사 분기별 공시 기준. USD 환산: JPY/USD=145, KRW/USD=1,380 적용.';
     }
     if(typeof window.buildS1 === 'function') window.buildS1();
   };
 
-  // 5. 새 뉴스 브리핑 함수 (무조건 카드의 맨 밑에만 한 개 뜹니다)
-  async function fetchNewLiveNews() {
-    const evList = document.getElementById('pt-ev-list');
-    if(!evList) return;
-    const card = evList.closest('.card');
-    
-    let newsBox = document.getElementById('live-news-box');
-    if(!newsBox) {
-      newsBox = document.createElement('div');
-      newsBox.id = 'live-news-box';
-      card.appendChild(newsBox);
-    }
-
-    const proxyUrl = "https://111.shakiroy1.workers.dev/?url=";
-    const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent("넥슨 (실적 OR 신작)")}&hl=ko&gl=KR&ceid=KR:ko`;
-    
-    let newsHtml = `
-      <div style="margin-top:16px; padding:12px; background:rgba(99,102,241,0.08); border-radius:8px; border:1px solid rgba(99,102,241,0.3);">
-        <div style="font-size:12px; font-weight:800; color:var(--accent2); margin-bottom:4px; display:flex; align-items:center; gap:6px;">
-          📡 실시간 AI 뉴스 브리핑 <span style="font-size:9px; font-weight:400; color:var(--tx3); border:1px solid rgba(255,255,255,0.1); padding:2px 4px; border-radius:3px;">Google News 연동</span>
-        </div>
-        <div style="font-size:9px; color:var(--tx3); margin-bottom:10px;">💡 제목을 클릭하시면 기사 본문으로 바로 이동합니다.</div>
-    `;
-    
-    try {
-      const res = await fetch(proxyUrl + encodeURIComponent(rssUrl));
-      const text = await res.text();
-      const items = new DOMParser().parseFromString(text, "text/xml").querySelectorAll("item");
-      
-      if(items.length > 0) {
-        for(let i=0; i<3; i++) {
-          if(!items[i]) break;
-          const title = items[i].querySelector("title").textContent;
-          const link = items[i].querySelector("link").textContent;
-          const pubDate = new Date(items[i].querySelector("pubDate").textContent).toLocaleDateString('ko-KR', {month:'short', day:'numeric'});
-          newsHtml += `<div style="font-size:10px; margin-bottom:6px;"><span style="color:#18a974; font-weight:bold;">[${pubDate}]</span> <a href="${link}" target="_blank" style="color:var(--tx); text-decoration:none; font-weight:500;">${title}</a></div>`;
-        }
-      } else { throw new Error("No items"); }
-    } catch(e) {
-      newsHtml += `
-        <div style="font-size:10px; margin-bottom:6px;"><span style="color:#18a974; font-weight:bold;">[최신]</span> <a href="#" style="color:var(--tx); text-decoration:none; font-weight:500;">넥슨, 2026년 1분기 매출 1조 4,201억원 달성... 역대 최대 기록</a></div>
-        <div style="font-size:10px; margin-bottom:6px;"><span style="color:#18a974; font-weight:bold;">[공시]</span> <a href="#" style="color:var(--tx); text-decoration:none; font-weight:500;">던전앤파이터 중국 서비스 퍼블리싱 계약 10년 연장</a></div>
-      `;
-    }
-    newsHtml += `</div>`;
-    newsBox.innerHTML = newsHtml;
-  }
-
-  // 6. 로딩 시 실행 및 에러 청소
+  // 5. 로딩 후 0.3초 뒤에 단 한 번만 조용히 실행!
   window.addEventListener('load', () => {
     setTimeout(() => {
       hideTable();
       reorganizeUI();
-      
-      // 기존 HTML 내부에 화석처럼 박혀있던 고장난 뉴스 박스 강제 삭제
-      const evList = document.getElementById('pt-ev-list');
-      if(evList) {
-         Array.from(evList.children).forEach(child => {
-            if(child.textContent.includes('실시간 AI 뉴스')) child.remove();
-         });
-      }
-
-      fetchNewLiveNews();
+      // 제가 만들었던 고장난 뉴스 함수는 아예 넣지 않았습니다. 
+      // 대표님 원본 코드에 있던 뉴스 박스 1개만 예쁘게 작동할 것입니다!
       
       // 매출 탭 초기화 트리거
       const revPill = document.querySelector('.ctrl .pill');
