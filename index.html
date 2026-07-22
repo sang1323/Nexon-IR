@@ -862,18 +862,6 @@ function buildPTChart(){
   var ge=document.getElementById('pt-chart');
   if(ge){ kc('pt-chart'); new Chart(ge,{type:'line',data:{labels:labels,datasets:[{label:'가이던스',data:targets,borderColor:'#18a974',borderWidth:2,borderDash:[5,4],tension:.3},{label:'실제매출',data:actuals,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.08)',borderWidth:2.5,fill:true,tension:.3}]},options:{responsive:true,maintainAspectRatio:false}}); }
 
-  // 가이던스 상세 표 숨기기 (완벽 적용)
-  var tbody=document.getElementById('pt-body');
-  if(tbody) {
-    var tw = tbody.closest('.tw');
-    if(tw) {
-       tw.style.display = 'none';
-       if(tw.previousElementSibling) tw.previousElementSibling.style.display = 'none';
-       if(tw.nextElementSibling && tw.nextElementSibling.classList.contains('note')) tw.nextElementSibling.style.display = 'none';
-    }
-  }
-}
-
 // =====================================================================
 // 3. 지표 조회 (getV) 및 버튼 스위치 (setMet) - 분기별 랭킹 기능 완벽 복구
 // =====================================================================
@@ -1196,7 +1184,9 @@ window.addEventListener('load', () => {
   setTimeout(() => {
     initUI();
     const revPill = document.querySelector('.ctrl .pill');
-    if(revPill) window.setMet('rev', revPill); // ⭐️ 매출 버튼을 강제 클릭해서 랭킹을 가장 처음부터 완벽하게 그림!
+    if(revPill) window.setMet('rev', revPill);
+    
+    buildS11(); // ⭐️ 페이지 로딩 시 첫 화면 차트 강제 렌더링 추가!
     
     fetchCleanLiveNews();
     runDataEngine();
