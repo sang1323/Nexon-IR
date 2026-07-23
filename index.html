@@ -46,8 +46,6 @@
         .industry-list div { margin-bottom: 5px; line-height: 1.5; font-size: 12px; }
         .guide-box { background: rgba(91,157,255,0.08); padding: 12px; border-radius: 6px; margin-top: 10px; border: 1px solid rgba(91,157,255,0.3); color: #c8d3e0; font-size: 12px; }
         .guide-box b { color: #5b9dff; }
-        
-        /* 💡 출처/시점 안내 정보용 스타일 */
         .source-badge { font-size: 10.5px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); padding: 3px 6px; border-radius: 4px; color: var(--txt3); display: inline-block; margin-top: 5px; }
     </style>
 </head>
@@ -74,9 +72,11 @@
                 <div style="height: 250px;"><canvas id="peerMultiplesChart"></canvas></div>
                 <div class="note industry-list">
                     <div style="color: var(--txt2); font-weight: bold; margin-bottom: 8px;">[게임 산업 평균 산출 포함 기업 명단 전체]</div>
-                    <div>· <b style="color: var(--kr);">한국 게임산업 (15개사):</b> 크래프톤, 엔씨소프트, 넷마블, 펄어비스, 카카오게임즈, 위메이드, 컴투스, 네오위즈 등 주요 상장사</div>
-                    <div>· <b style="color: var(--ov);">글로벌 게임산업 (25개사):</b> 텐센트, 넷이즈, EA, 테이크투(TTWO), 닌텐도, 캡콤, 스퀘어 에닉스 등 25개사</div>
-                    <span class="source-badge">출처: Yahoo Finance (실시간 주가) / DART 공시 데이터 (최근 12개월 분기 실적 합산, TTM)</span>
+                    <div>· <b style="color: var(--kr);">한국 게임산업:</b> 크래프톤, 엔씨소프트, 넷마블, 펄어비스, 카카오게임즈, 위메이드 등 주요 상장사</div>
+                    <!-- 💡 소니 및 MS 명단 추가 및 주석 처리 -->
+                    <div>· <b style="color: var(--ov);">글로벌 게임산업:</b> 소니(Sony), 마이크로소프트(Xbox), 텐센트, 넷이즈, EA, 테이크투(TTWO), 닌텐도, 캡콤, 스퀘어 에닉스, 로블록스 등 주요 글로벌 리딩 기업</div>
+                    <div style="color: #7f92ad; font-size: 10.5px; margin-top: 4px; line-height: 1.4;">※ 단, 소니, MS, 텐센트 등 복합기업은 게임/엔터테인먼트 부문 펀더멘탈 비중을 고려하여 산업 지표에 제한적으로 편입됩니다.</div>
+                    <span class="source-badge">출처: Yahoo Finance (실시간 주가) / DART 공시 데이터 (TTM 실적 합산)</span>
                 </div>
             </div>
         </div>
