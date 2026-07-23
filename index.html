@@ -30,6 +30,7 @@
         .schip.good { background: rgba(63,207,142,.16); color: #3fcf8e; }
         .schip.bad { background: rgba(240,106,106,.16); color: #f06a6a; }
         .schip.mid { background: rgba(127,146,173,.14); color: #9fb0c8; }
+        
         .anSec { margin-bottom: 16px; padding: 13px 15px; border-radius: 10px; background: rgba(255,255,255,.03); border-left: 3px solid var(--line); }
         .anSec.kr { border-left-color: #f4c151; }
         .anSec.ov { border-left-color: #5b9dff; }
@@ -39,6 +40,10 @@
         .anL b { color: #fff; font-weight: 800; }
         .anL .up { color: #3fcf8e; font-weight: 800; }
         .anL .dn { color: #f06a6a; font-weight: 800; }
+        
+        /* 피어 그룹 명단 강조용 스타일 */
+        .peer-list { background: rgba(255,255,255,0.03); padding: 10px 12px; border-radius: 6px; margin-top: 10px; border: 1px solid var(--line); }
+        .peer-list div { margin-bottom: 3px; }
     </style>
 </head>
 <body>
@@ -50,6 +55,7 @@
                     <span class="r">과거 5년 기준</span>
                 </div>
                 <div style="height: 250px;"><canvas id="peBandChart"></canvas></div>
+                <div class="note">※ 넥슨의 과거 5년간 주당순이익(EPS)과 주가 데이터를 바탕으로 PER 밴드를 산출하여 현재 주가의 상대적 위치를 보여줍니다.</div>
             </div>
         </div>
         <div class="col">
@@ -58,25 +64,100 @@
                     <span class="r" id="vsMeta">Yahoo/DART 실측 중앙값</span>
                 </div>
                 <div style="height: 250px;"><canvas id="peerMultiplesChart"></canvas></div>
+                <!-- 💡 비교 대상 기업(Peer Group) 실명 노출 영역 추가 -->
+                <div class="note peer-list">
+                    <div style="color: var(--txt2); font-weight: bold; margin-bottom: 6px;">[비교 대상 피어 그룹 기업 명단]</div>
+                    <div>· <b style="color: var(--kr);">국내 피어:</b> 크래프톤, 엔씨소프트, 넷마블</div>
+                    <div>· <b style="color: var(--ov);">해외 피어:</b> 텐센트, 넷이즈, EA, Take-Two, 닌텐도, 캡콤, 스퀘어에닉스 등 14개사</div>
+                </div>
             </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col">
             <div class="card">
-                <div class="ct"><span class="bar"></span>각 지표 현재 상태 진단</div>
+                <div class="ct"><span class="bar"></span>각 지표 현재 상태 진단
+                    <span class="r">국내/해외 피어 중앙값 대비</span>
+                </div>
                 <div class="statgrid" id="diagGrid"></div>
+                <div class="note" id="diagNote"></div>
             </div>
         </div>
         <div class="col">
             <div class="card">
-                <div class="ct"><span class="bar"></span>넥슨 주가 종합 평가</div>
+                <div class="ct"><span class="bar"></span>넥슨 주가 종합 평가
+                    <span class="r">Yahoo 실측 기반 · 투자 추천 아님</span>
+                </div>
                 <div id="anBody"></div>
             </div>
         </div>
     </div>
 
-    <!-- 하단 안내 및 실시간 업데이트 뱃지 -->
     <div class="note" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
         <span id="footNote">※ 실시간 데이터 연결 중…</span>
-        <span id
+        <span id="updateTimeBadge" style="background: rgba(77,214,193,0.1); color: var(--mint); padding: 5px 10px; border-radius: 15px; font-weight: 700; display: none;">
+            업데이트 기준: 로딩 중...
+        </span>
+    </div>
+
+<script>
+const API_ENDPOINT = 'https://iririr.shakiroy1.workers.dev/'; 
+
+const CHART_DEFAULTS = { fontColor: '#e8edf5', gridColor: 'rgba(255, 255, 255, 0.1)', nexon: '#4dd6c1', kr: '#f4c151', ov: '#5b9dff' };
+
+// 1. API 데이터 호출
+window.__ready = fetch(API_ENDPOINT)
+    .then(res => {
+        if (!res.ok) throw new Error('서버 응답 오류');
+        return res.json();
+    })
+    .then(data => {
+        if (data.meta && data.meta.updatedAt) {
+            const ut = new Date(data.meta.updatedAt);
+            const formatted = ut.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+            const badge = document.getElementById('updateTimeBadge');
+            badge.style.display = 'inline-block';
+            badge.textContent = `기준 시점: ${formatted}`;
+        }
+        document.getElementById('footNote').innerHTML = "※ 본 자료는 참고용이며, 출처는 Yahoo Finance 및 DART입니다.";
+        return data;
+    })
+    .catch(err => {
+        console.error(err);
+        document.getElementById('footNote').innerHTML = "<span style='color:#f06a6a'>※ 데이터 연동 실패. API 상태를 확인하세요.</span>";
+        throw err;
+    });
+
+// 2. 차트 렌더링 함수
+function drawPeBandChart(data) {
+    const ctx = document.getElementById('peBandChart');
+    if (!ctx || !data || data.length === 0) return;
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [
+                { label: '현재 주가', data: data.map(d => ({ x: d.date, y: d.price })), borderColor: CHART_DEFAULTS.nexon, borderWidth: 2, tension: 0.1, pointRadius: 0 },
+                { label: 'PER High (30x)', data: data.map(d => ({ x: d.date, y: d.eps * 30 })), borderColor: 'rgba(240, 106, 106, 0.5)', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 },
+                { label: 'PER Avg (20x)', data: data.map(d => ({ x: d.date, y: d.eps * 20 })), borderColor: 'rgba(255, 255, 255, 0.4)', borderWidth: 1, pointRadius: 0 },
+                { label: 'PER Low (10x)', data: data.map(d => ({ x: d.date, y: d.eps * 10 })), borderColor: 'rgba(91, 157, 255, 0.5)', borderWidth: 1, borderDash: [5, 5], pointRadius: 0, fill: { target: 'end', above: 'rgba(91, 157, 255, 0.05)' } }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: CHART_DEFAULTS.fontColor, boxWidth: 12 } } }, scales: { x: { type: 'time', time: { unit: 'year' }, grid: { color: CHART_DEFAULTS.gridColor }, ticks: { color: CHART_DEFAULTS.fontColor } }, y: { grid: { color: CHART_DEFAULTS.gridColor }, ticks: { color: CHART_DEFAULTS.fontColor } } } }
+    });
+}
+
+function drawPeerChart(me, kr, ov) {
+    const ctx = document.getElementById('peerMultiplesChart');
+    if (!ctx || !me) return;
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['PER (x)', 'PBR (x)', '영업이익률 (%)'],
+            datasets: [
+                { label: '넥슨', data: [me.per, me.pbr, me.opm], backgroundColor: CHART_DEFAULTS.nexon },
+                { label: '국내 피어', data: [kr.per, kr.pbr, kr.opm], backgroundColor: CHART_DEFAULTS.kr },
+                { label: '해외 피어', data: [ov.per, ov.pbr, ov.opm], backgroundColor: CHART_DEFAULTS.ov }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: CHART_DEFAULTS.fontColor } } }, scale
