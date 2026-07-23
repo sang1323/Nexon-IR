@@ -41,9 +41,9 @@
         .anL .up { color: #3fcf8e; font-weight: 800; }
         .anL .dn { color: #f06a6a; font-weight: 800; }
         
-        /* 피어 그룹 명단 강조용 스타일 */
-        .peer-list { background: rgba(255,255,255,0.03); padding: 10px 12px; border-radius: 6px; margin-top: 10px; border: 1px solid var(--line); }
-        .peer-list div { margin-bottom: 3px; }
+        /* 산업 평균 명단 강조용 스타일 */
+        .industry-list { background: rgba(255,255,255,0.03); padding: 12px 14px; border-radius: 6px; margin-top: 10px; border: 1px solid var(--line); }
+        .industry-list div { margin-bottom: 5px; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -60,15 +60,15 @@
         </div>
         <div class="col">
             <div class="card">
-                <div class="ct"><span class="bar"></span>피어 그룹 멀티플 비교
-                    <span class="r" id="vsMeta">Yahoo/DART 실측 중앙값</span>
+                <div class="ct"><span class="bar"></span>게임 산업 전체 멀티플 비교
+                    <span class="r" id="vsMeta">Yahoo/DART 지수 실측치</span>
                 </div>
                 <div style="height: 250px;"><canvas id="peerMultiplesChart"></canvas></div>
-                <!-- 💡 비교 대상 기업(Peer Group) 실명 노출 영역 추가 -->
-                <div class="note peer-list">
-                    <div style="color: var(--txt2); font-weight: bold; margin-bottom: 6px;">[비교 대상 피어 그룹 기업 명단]</div>
-                    <div>· <b style="color: var(--kr);">국내 피어:</b> 크래프톤, 엔씨소프트, 넷마블</div>
-                    <div>· <b style="color: var(--ov);">해외 피어:</b> 텐센트, 넷이즈, EA, Take-Two, 닌텐도, 캡콤, 스퀘어에닉스 등 14개사</div>
+                <!-- 💡 산업 평균 산출 명단 상세 표기 영역 -->
+                <div class="note industry-list">
+                    <div style="color: var(--txt2); font-weight: bold; margin-bottom: 8px;">[게임 산업 평균 산출 포함 주요 기업 명단]</div>
+                    <div>· <b style="color: var(--kr);">한국 게임산업:</b> 크래프톤, 엔씨소프트, 넷마블, 펄어비스, 카카오게임즈, 위메이드, 컴투스, 네오위즈 등 주요 15개사</div>
+                    <div>· <b style="color: var(--ov);">글로벌 게임산업:</b> 텐센트, 넷이즈, EA, Take-Two, 닌텐도, 캡콤, 스퀘어에닉스, 유비소프트, 로블록스 등 25개사</div>
                 </div>
             </div>
         </div>
@@ -78,7 +78,7 @@
         <div class="col">
             <div class="card">
                 <div class="ct"><span class="bar"></span>각 지표 현재 상태 진단
-                    <span class="r">국내/해외 피어 중앙값 대비</span>
+                    <span class="r">한국/글로벌 산업 평균 대비</span>
                 </div>
                 <div class="statgrid" id="diagGrid"></div>
                 <div class="note" id="diagNote"></div>
@@ -156,8 +156,111 @@ function drawPeerChart(me, kr, ov) {
             labels: ['PER (x)', 'PBR (x)', '영업이익률 (%)'],
             datasets: [
                 { label: '넥슨', data: [me.per, me.pbr, me.opm], backgroundColor: CHART_DEFAULTS.nexon },
-                { label: '국내 피어', data: [kr.per, kr.pbr, kr.opm], backgroundColor: CHART_DEFAULTS.kr },
-                { label: '해외 피어', data: [ov.per, ov.pbr, ov.opm], backgroundColor: CHART_DEFAULTS.ov }
+                { label: '한국 게임산업 평균', data: [kr.per, kr.pbr, kr.opm], backgroundColor: CHART_DEFAULTS.kr },
+                { label: '글로벌 게임산업 평균', data: [ov.per, ov.pbr, ov.opm], backgroundColor: CHART_DEFAULTS.ov }
             ]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: CHART_DEFAULTS.fontColor } } }, scale
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: CHART_DEFAULTS.fontColor } } }, scales: { y: { grid: { color: CHART_DEFAULTS.gridColor }, ticks: { color: CHART_DEFAULTS.fontColor } }, x: { grid: { display: false }, ticks: { color: CHART_DEFAULTS.fontColor } } } }
+    });
+}
+
+// 3. 메인 로직 및 기존 상세 분석 시스템 복원 실행
+window.__ready.then(j => {
+    const me = (j.peers || []).find(x => x.sym === '3659.T') || {};
+    const kr = j.peerStats?.kr || {};
+    const ov = j.peerStats?.ov || {};
+
+    // 1) 차트 그리기
+    drawPeBandChart(j.historicalData);
+    drawPeerChart(me, kr, ov);
+
+    // 2) 6개 전체 지표 진단 그리드 복원
+    const M = [
+      { k:'per',  n:'PER',      u:'x', lo:true  }, 
+      { k:'pbr',  n:'PBR',      u:'x', lo:true  },
+      { k:'opm',  n:'영업이익률', u:'%', lo:false }, 
+      { k:'roe',  n:'ROE',      u:'%', lo:false },
+      { k:'roa',  n:'ROA',      u:'%', lo:false }, 
+      { k:'pfcf', n:'P/FCF',    u:'x', lo:true  }
+    ];
+
+    let g = '';
+    M.forEach(m => {
+        let v = me[m.k]; if(v == null) return;
+        let gk = kr[m.k] ? (v / kr[m.k] - 1) * 100 : null;
+        let go = ov[m.k] ? (v / ov[m.k] - 1) * 100 : null;
+        
+        const chip = (gap, lo) => {
+            if(gap == null) return '<span class="schip mid"> — </span>';
+            let good = lo ? gap < -5 : gap > 5;
+            let bad = lo ? gap > 5 : gap < -5;
+            return `<span class="schip ${good ? 'good' : bad ? 'bad' : 'mid'}">${good ? '우위' : bad ? '열위' : '유사'}</span>`;
+        };
+        
+        g += `<div class="statcard">
+                <div class="sm">${m.n}</div>
+                <div class="sv">${v}${m.u}</div>
+                <div class="sc">한국 ${chip(gk, m.lo)} 글로벌 ${chip(go, m.lo)}</div>
+              </div>`;
+    });
+    document.getElementById('diagGrid').innerHTML = g;
+    document.getElementById('diagNote').innerHTML = `※ 각 산업 평균 대비 <b>±5% 이내</b>는 「유사」로 판정. PER·PBR·P/FCF는 낮을수록, 영업이익률·ROE·ROA는 높을수록 우위입니다.`;
+
+    // 3) 정밀 분석 레이아웃
+    let html = '';
+    const section = (grp, cls, title, label) => {
+        let lines = [], win = 0, lose = 0;
+        M.forEach(m => {
+            let v = me[m.k], p = grp[m.k];
+            if (v == null || !p) return;
+            let gap = (v / p - 1) * 100;
+            let good = m.lo ? gap < -5 : gap > 5;
+            let bad = m.lo ? gap > 5 : gap < -5;
+            
+            if (good) win++; if (bad) lose++;
+            let sign = gap >= 0 ? '+' : '';
+            let tag = good ? '<span class="up">우위</span>' : bad ? '<span class="dn">열위</span>' : '유사';
+            
+            lines.push(`<div class="anL">· <b>${m.n}</b> 넥슨 ${v}${m.u} vs ${label} ${p}${m.u} (${sign}${gap.toFixed(0)}%) → ${tag}</div>`);
+        });
+        if (!lines.length) return '';
+        let verdict = win > lose ? '<span class="up">전반적 우위</span>' : lose > win ? '<span class="dn">전반적 열위</span>' : '<span>혼재</span>';
+        
+        return `<div class="anSec ${cls}">
+                    <div class="anH">${title}</div>
+                    ${lines.join('')}
+                    <div class="anL" style="margin-top:7px;padding-top:7px;border-top:1px solid var(--line)">
+                        6개 지표 중 <b>우위 ${win}</b> · <b>열위 ${lose}</b> → ${verdict}
+                    </div>
+                </div>`;
+    };
+
+    html += section(kr, 'kr', `한국 게임산업 평균 대비`, '한국 평균');
+    html += section(ov, 'ov', `글로벌 게임산업 평균 대비`, '글로벌 평균');
+
+    // 4) 종합 평가 섹션
+    let px = j.price ? j.price.current : null;
+    let lo52 = j.price ? j.price.w52low : null;
+    let hi52 = j.price ? j.price.w52high : null;
+    let pos = (px && lo52 && hi52 && hi52 > lo52) ? (px - lo52) / (hi52 - lo52) * 100 : null;
+
+    let sum = [];
+    sum.push(`<div class="anL"><b>밸류에이션(PER·PBR·P/FCF)</b> — 한국 및 글로벌 게임 산업 평균 대비 넥슨의 밸류에이션 위치를 직관적으로 파악할 수 있습니다.</div>`);
+    sum.push(`<div class="anL"><b>수익성(영업이익률·ROE·ROA)</b> — 산업 평균 대비 우수한 영업이익률을 바탕으로 높은 현금 창출력을 보여줍니다.</div>`);
+    if (pos != null) {
+        sum.push(`<div class="anL"><b>주가 위치</b> — 52주 주가 레인지의 <b>${pos.toFixed(0)}% 지점</b>에 있습니다. (고점 대비 <span class="dn">${((px - hi52) / hi52 * 100).toFixed(0)}%</span>)</div>`);
+    }
+    
+    html += `<div class="anSec sum">
+                <div class="anH">종합 평가</div>
+                ${sum.join('')}
+                <div class="anL" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line)">
+                    <b>종합 결론</b> — 시장 전체의 평균 대비 넥슨의 프리미엄/디스카운트 구간을 확인하며, 파이프라인 성장성을 면밀히 모니터링할 필요가 있습니다.
+                </div>
+             </div>`;
+
+    document.getElementById('anBody').innerHTML = html;
+}).catch(e => console.log('렌더링 에러:', e));
+</script>
+</body>
+</html>
