@@ -2450,12 +2450,137 @@ window.addEventListener('load',function(){
     }
   }
 
-  // 4. 페이지 로딩 후 백그라운드 실행
-  window.addEventListener('load', () => {
-    injectUI();
-    setTimeout(runAutoSync, 1500);
-  });
-})();
+// =====================================================================
+// 6. DART/YAHOO 데이터 통신 엔진 (DART API 연동 버전)
+// =====================================================================
+
+// [1] DART Open API 기본 설정
+const DART_API_KEY = "5dc27d8d420eaa1f4d21d013454d2850741fee9e";
+
+// 국내 상장 게임사 종목코드 -> DART 고유번호(corp_code) 매핑
+const DART_CORP_CODES = {
+  "259960": "00659616", // 크래프톤
+  "251270": "01201170", // 넷마블
+  "036570": "00266961", // 엔씨소프트
+  "462870": "01615846", // 시프트업
+  "263750": "01202258", // 펄어비스
+  "293490": "00994998", // 카카오게임즈
+  "112040": "00332884", // 위메이드
+  "078340": "00288404", // 컴투스
+  "069080": "00404981", // 웹젠
+  "095660": "00547071", // 네오위즈
+  "194480": "01004121"  // 데브시스터즈
+};
+
+// [2] DART 재무 데이터 호출 함수
+async function fetchDartFinancialData(stockCode, year, reprtCode) {
+  const corpCode = DART_CORP_CODES[stockCode];
+  if (!corpCode) return null;
+
+  const dartUrl = `https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=${DART_API_KEY}&corp_code=${corpCode}&bsns_year=${year}&reprt_code=${reprtCode}`;
+  const PROXY_URL = "https://111.shakiroy1.workers.dev/?url=";
+
+  try {
+    const res = await fetch(PROXY_URL + encodeURIComponent(dartUrl));
+    const data = await res.json();
+
+    if (data.status === "000" && data.list) {
+      const revenue = data.list.find(item => item.account_nm === '매출액');
+      const opProfit = data.list.find(item => item.account_nm === '영업이익');
+      return {
+        revenue: revenue ? parseInt(revenue.thstrm_amount.replace(/,/g, '')) : null,
+        operatingProfit: opProfit ? parseInt(opProfit.thstrm_amount.replace(/,/g, '')) : null
+      };
+    }
+  } catch (error) {
+    console.error(`[DART API] ${stockCode} 통신 실패:`, error);
+  }
+  return null;
+}
+
+// [3] 메인 데이터 통신 엔진
+async function startDataFetching() {
+  const allKeys = Object.keys(CO);
+  const TARGET_YEARS = ['2025', '2026'];
+  const PROXY_URL = "https://111.shakiroy1.workers.dev/?url=";
+
+  await Promise.all(allKeys.map(async (key) => {
+    const tk = CO[key].tk;
+    if(!tk) return;
+    
+    try {
+      // 1. 공통: 야후 파이낸스 실시간 주가/시총/PER/PBR 호출
+      const res = await fetch(PROXY_URL + encodeURIComponent(`https://query1.finance.yahoo.com/v10/finance/quoteSummary/${tk}?modules=summaryDetail,defaultKeyStatistics,price,incomeStatementHistoryQuarterly`));
+      const data = await res.json();
+      const res0 = data.quoteSummary.result[0];
+      const per = res0?.summaryDetail?.trailingPE?.raw || res0?.defaultKeyStatistics?.forwardPE?.raw;
+      const pbr = res0?.defaultKeyStatistics?.priceToBook?.raw;
+      let mktcap = res0?.summaryDetail?.marketCap?.raw;
+      const price = res0?.price?.regularMarketPrice?.raw;
+      
+      if(mktcap && FX2[key]) mktcap = mktcap / FX2[key];
+      
+      window.REALTIME_VAL[key] = {
+        per: per ? Number(per.toFixed(2)) : null,
+        pbr: pbr ? Number(pbr.toFixed(2)) : null,
+        mktcap: mktcap ? Number((mktcap / 1000000000).toFixed(2)) : null,
+        price: price ? price : null
+      };
+
+      // 2. 실적 연동 분기 처리
+      if(CO[key].rg !== 'kr') {
+        // [해외 상장사] 기존처럼 야후 파이낸스 손익계산서 데이터 사용
+        const hq = res0?.incomeStatementHistoryQuarterly?.incomeStatementHistory;
+        if(hq) {
+          hq.forEach(h => {
+             const ds = h.endDate.fmt; const y = ds.substring(0,4); const m = parseInt(ds.substring(5,7));
+             let q = m<=3?'Q1':m<=6?'Q2':m<=9?'Q3':'Q4';
+             if(TARGET_YEARS.includes(y)) {
+               if(!QD[key]) QD[key] = {};
+               QD[key][y+q] = { r: h.totalRevenue.raw/1e9, o: h.operatingIncome.raw/1e9, m: (h.operatingIncome.raw/h.totalRevenue.raw)*100 };
+             }
+          });
+        }
+      } else {
+        // [국내 상장사] DART 실적 데이터 덮어쓰기
+        const stockCode = tk.replace('.KS', '').replace('.KQ', '');
+        
+        // DART에서 2025년 4분기/사업보고서(11011) 데이터 호출
+        const dartData = await fetchDartFinancialData(stockCode, "2025", "11011");
+        
+        if (dartData && dartData.revenue && dartData.operatingProfit) {
+          if (!QD[key]) QD[key] = {};
+          
+          QD[key]['2025Q4'] = { 
+            r: dartData.revenue / 1000000000, 
+            o: dartData.operatingProfit / 1000000000, 
+            m: (dartData.operatingProfit / dartData.revenue) * 100 
+          };
+        }
+      }
+    } catch(e) { /* 일부 종목 조회 실패 시 무시 */ }
+  }));
+
+  window.updateAiBriefing();
+  window.updateSimulator();
+  if(typeof window.buildS1 === 'function') window.buildS1();
+}
+
+// =====================================================================
+// 7. 로딩 완료 시 모든 마법 순차 실행 (DART 연동 버전)
+// =====================================================================
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    initUI();
+    const revPill = document.querySelector('.ctrl .pill');
+    if(revPill) window.setMet('rev', revPill);
+    
+    buildS11();
+    
+    fetchCleanLiveNews();
+    startDataFetching(); // DART 및 야후 데이터 가져오기 시작
+  }, 300);
+});
 </script>
 
 </body>
