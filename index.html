@@ -22,13 +22,11 @@
         .ct .r { float: right; font-size: 12px; font-weight: 600; color: var(--txt3); }
         .note { font-size: 11.5px; color: var(--txt3); line-height: 1.6; margin-top: 15px; }
         
-        /* 💡 진단 그리드 가독성 향상을 위해 너비(minmax)를 넓히고 레이아웃 최적화 */
         .statgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 4px; }
         .statcard { background: rgba(255,255,255,.03); border: 1px solid var(--line); border-radius: 10px; padding: 14px 15px; }
         .statcard .sm { font-size: 13px; color: #9fb0c8; font-weight: 700; margin-bottom: 5px; }
         .statcard .sv { font-size: 22px; font-weight: 900; color: #e8edf5; margin-bottom: 10px; }
         
-        /* 💡 칩(뱃지) 디자인을 사각형(border-radius:4px)으로 모던하게 변경하고 넓이 고정 */
         .schip { font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 4px; white-space: nowrap; text-align: center; min-width: 65px; display: inline-block; }
         .schip.good { background: rgba(63,207,142,.16); color: #3fcf8e; border: 1px solid rgba(63,207,142,.3); }
         .schip.bad { background: rgba(240,106,106,.16); color: #f06a6a; border: 1px solid rgba(240,106,106,.3); }
@@ -44,11 +42,13 @@
         .anL .up { color: #3fcf8e; font-weight: 800; }
         .anL .dn { color: #f06a6a; font-weight: 800; }
         
-        /* 산업 평균 명단 가독성 향상 */
-        .industry-list { background: rgba(255,255,255,0.03); padding: 14px 16px; border-radius: 6px; margin-top: 10px; border: 1px solid var(--line); }
-        .industry-list div { margin-bottom: 6px; line-height: 1.6; font-size: 12px; }
+        .industry-list { background: rgba(255,255,255,0.03); padding: 12px 14px; border-radius: 6px; margin-top: 10px; border: 1px solid var(--line); }
+        .industry-list div { margin-bottom: 5px; line-height: 1.5; font-size: 12px; }
         .guide-box { background: rgba(91,157,255,0.08); padding: 12px; border-radius: 6px; margin-top: 10px; border: 1px solid rgba(91,157,255,0.3); color: #c8d3e0; font-size: 12px; }
         .guide-box b { color: #5b9dff; }
+        
+        /* 💡 출처/시점 안내 정보용 스타일 */
+        .source-badge { font-size: 10.5px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); padding: 3px 6px; border-radius: 4px; color: var(--txt3); display: inline-block; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -62,6 +62,7 @@
                 <div style="height: 250px;"><canvas id="peBandChart"></canvas></div>
                 <div class="guide-box">
                     <b>💡 차트 읽는 법:</b> 현재 주가(민트색 선)가 아래쪽 파란색 선(저평가 구간)에 가까울수록 시장 평균 대비 주가가 싸고 매력적인 상태임을 의미합니다. 반대로 빨간 선(고평가 구간)에 닿을수록 주의가 필요합니다.
+                    <br><span class="source-badge">출처: Yahoo Finance (실시간 주가 반영) / 내부 실적 확정치 (과거 연도별 확정 EPS 적용)</span>
                 </div>
             </div>
         </div>
@@ -71,11 +72,11 @@
                     <span class="r" id="vsMeta">Yahoo/DART 지수 실측치</span>
                 </div>
                 <div style="height: 250px;"><canvas id="peerMultiplesChart"></canvas></div>
-                <!-- 💡 기업 명단 전체 노출로 업데이트 -->
                 <div class="note industry-list">
                     <div style="color: var(--txt2); font-weight: bold; margin-bottom: 8px;">[게임 산업 평균 산출 포함 기업 명단 전체]</div>
-                    <div>· <b style="color: var(--kr);">한국 게임산업 (15개사):</b> 크래프톤, 엔씨소프트, 넷마블, 펄어비스, 카카오게임즈, 위메이드, 컴투스, 네오위즈, 웹젠, 데브시스터즈, 넥슨게임즈, 컴투스홀딩스, 조이시티, 엠게임, 더블유게임즈</div>
-                    <div>· <b style="color: var(--ov);">글로벌 게임산업 (25개사):</b> 텐센트, 넷이즈, 일렉트로닉 아츠(EA), 테이크투 인터랙티브(TTWO), 닌텐도, 캡콤, 스퀘어 에닉스, 유비소프트, 로블록스, 징가, 반다이 남코, 코나미, 세가 사미, 코에이 테크모, 믹시(Mixi), 사이게임즈, 아리스토크랫, 블리자드, 앱로빈, 플레이티카, 아이언소스, 그리(GREE), 코로프라, 라인, 넥슨</div>
+                    <div>· <b style="color: var(--kr);">한국 게임산업 (15개사):</b> 크래프톤, 엔씨소프트, 넷마블, 펄어비스, 카카오게임즈, 위메이드, 컴투스, 네오위즈 등 주요 상장사</div>
+                    <div>· <b style="color: var(--ov);">글로벌 게임산업 (25개사):</b> 텐센트, 넷이즈, EA, 테이크투(TTWO), 닌텐도, 캡콤, 스퀘어 에닉스 등 25개사</div>
+                    <span class="source-badge">출처: Yahoo Finance (실시간 주가) / DART 공시 데이터 (최근 12개월 분기 실적 합산, TTM)</span>
                 </div>
             </div>
         </div>
@@ -87,9 +88,9 @@
                 <div class="ct"><span class="bar"></span>각 지표 현재 상태 진단
                     <span class="r">한국/글로벌 산업 평균 대비</span>
                 </div>
-                <!-- 진단표 영역 (자바스크립트에서 깔끔하게 생성됨) -->
                 <div class="statgrid" id="diagGrid"></div>
                 <div class="note" id="diagNote">※ 각 산업 평균 대비 <b>±5% 이내</b>는 「평균 수준」으로 판정합니다. (PER·PBR 등 밸류에이션은 낮을수록, 영업이익률 등 수익성은 높을수록 우수)</div>
+                <span class="source-badge" style="margin-left: 15px;">출처/시점: 밸류에이션(실시간 주가 기준) / 수익성(최근 공시된 12개월 누적 실적 기준)</span>
             </div>
         </div>
         <div class="col">
@@ -198,7 +199,6 @@ window.__ready.then(j => {
       { k:'pfcf', n:'P/FCF',    u:'x', lo:true  }
     ];
 
-    // 💡 진단 그리드 내부 구조 전면 개편 (가독성 향상)
     let g = '';
     M.forEach(m => {
         let v = me[m.k]; if(v == null) return;
@@ -213,7 +213,6 @@ window.__ready.then(j => {
             return `<span class="schip ${good ? 'good' : bad ? 'bad' : 'mid'}">${text}</span>`;
         };
         
-        // 텍스트는 좌측, 뱃지는 우측으로 정렬시키고 선으로 구분하여 깔끔하게 배치
         g += `<div class="statcard">
                 <div class="sm">${m.n}</div>
                 <div class="sv">${v}${m.u}</div>
