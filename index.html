@@ -691,23 +691,7 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
   <span class="lbl" id="s1q-lbl">분기:</span>
   <select id="s1q" onchange="buildS1()">
     <option value="2026Q1">2026 Q1 ★</option><option value="2025Q4">2025 Q4</option>
-    <option value="2025Q3">2025 Q3</option><option value="2025Q2">2025 Q2</option>
-    <option value="2025Q1">2025 Q1</option><option value="2024Q4">2024 Q4</option>
-    <option value="2024Q3">2024 Q3</option><option value="2024Q2">2024 Q2</option>
-    <option value="2024Q1">2024 Q1</option>
-  </select>
-  <!-- ⭐️ 여기에 숨겨진 실시간 배지가 들어갑니다! -->
-  <span id="s1-live-badge" style="display:none; font-size:11px; font-weight:800; color:#fff; background:var(--accent); padding:3px 8px; border-radius:4px; box-shadow:0 2px 8px rgba(99,102,241,.4); margin-left:8px;">🔴 실시간 Live</span>
-
-  <!-- ⭐️ 실시간 지표를 누르면 튀어나올 마법의 배지 -->
-  <span id="s1-live-badge" style="display:none; font-size:11px; font-weight:800; color:#fff; background:var(--accent); padding:3px 8px; border-radius:4px; box-shadow:0 2px 8px rgba(99,102,241,.4);">🔴 실시간 Live</span>
-
-  <span class="lbl" style="margin-left:8px;">지표:</span>
-  <span class="pill on" onclick="setMet('mktcap',this)">시가총액</span>
-  <span class="pill" onclick="setMet('rev',this)">매출</span>
-  <span class="pill" onclick="setMet('op',this)">영업이익</span> 
-  <span class="pill" onclick="setMet('opm',this)">영업이익률(OPM)</span>
-  <span class="pill" onclick="setMet('per',this)">주가수익비율(PER)</span>
+    ... (중략) ...
   <span class="pill" onclick="setMet('pbr',this)">주가순자산비율(PBR)</span>
   <span class="pill" onclick="setMet('roe',this)">자기자본이익률(ROE)</span>
 </div>
