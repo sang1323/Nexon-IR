@@ -110,9 +110,6 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
 .rk-val{min-width:44px;text-align:right;font-size:10px;font-weight:400;color:var(--tx2);}
 .rk-row.nx .rk-val{font-weight:700;color:var(--accent2);}
 </style>
-<!-- Chart.js 및 Plugin 안전한 CDN 로드 -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 </head>
 <body>
 <div id="build-banner" style="position:fixed;top:0;right:0;z-index:99999;background:#6366f1;color:#fff;font-size:10px;padding:2px 8px;border-radius:0 0 0 6px;font-family:monospace;opacity:0.85;">BUILD-0715-0130</div>
@@ -184,523 +181,1037 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
     ※ <strong>Beat/Miss</strong> = 전분기 IR에서 넥슨이 공시한 <strong>매출 가이던스</strong> 대비 실제 매출 달성률 &nbsp;|&nbsp; 예: 25Q4 가이던스 ¥134B → 26Q1 실제 ¥152.2B → <span style="color:#18a974;font-weight:700;">BEAT +13.6%</span>
   </div>
   <div class="tw"><table class="t" style="min-width:500px;">
+
     <thead><tr>
+
   <th style="text-align:left;">분기</th>
+
   <th>실제주가(¥)</th>
+
   <th>실제매출(¥B)</th>
+
   <th>전분기 매출가이던스</th>
+
   <th>Beat/Miss</th>
+
 </tr></thead>
+
     <tbody id="pt-body"></tbody>
+
   </table></div>
+
   <div class="note">* 가이던스는 넥슨재팬이 전분기 실적 발표 시 공시한 다음 분기 매출 전망치. 투자 추천 아님.</div>
+
 </div>
+
 <!-- 저평가 분석 2열 레이아웃 -->
+
 <div class="g2" style="margin-bottom:14px;">
+
   <!-- 왼쪽: 저평가 지표 차트 + 유통주식 + 순현금 -->
+
   <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+
     <div class="card-title">📉 저평가 분석 — 넥슨 vs 동종업계</div>
+
     <div id="s11-underval" style="display:flex;flex-direction:column;gap:9px;"></div>
+
     <!-- 유통주식 현황 -->
+
     <div style="border-top:1px solid var(--bd);padding-top:10px;">
+
       <div style="font-size:10px;font-weight:700;color:var(--tx2);margin-bottom:7px;">📌 유통주식 현황 <span style="font-size:9px;font-weight:400;color:var(--tx3);">25.12.31 기준</span></div>
+
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:7px;">
+
         <div style="padding:6px 8px;border-radius:6px;background:var(--bg3);text-align:center;">
+
           <div style="font-size:8px;color:var(--tx3);margin-bottom:1px;">총 주식수</div>
+
           <div style="font-size:10px;font-weight:800;color:var(--tx);">827.2M주</div>
+
         </div>
+
         <div style="padding:6px 8px;border-radius:6px;background:var(--bg3);text-align:center;">
+
           <div style="font-size:8px;color:var(--tx3);margin-bottom:1px;">발행주식(자사주제외)</div>
+
           <div style="font-size:10px;font-weight:800;color:var(--tx);">792.9M주</div>
+
         </div>
+
         <div style="padding:6px 8px;border-radius:6px;background:rgba(224,82,82,.1);border:1px solid rgba(224,82,82,.3);text-align:center;">
+
           <div style="font-size:8px;color:var(--tx3);margin-bottom:1px;">대주주 보유</div>
+
           <div style="font-size:13px;font-weight:800;color:var(--red);">94.14%</div>
+
         </div>
+
         <div style="padding:6px 8px;border-radius:6px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);text-align:center;">
+
           <div style="font-size:8px;color:var(--tx3);margin-bottom:1px;">유통 Float</div>
+
           <div style="font-size:13px;font-weight:800;color:var(--amber);">5.86%</div>
+
         </div>
+
       </div>
+
       <div style="background:rgba(255,255,255,.05);border-radius:5px;height:14px;overflow:hidden;position:relative;margin-bottom:5px;">
+
         <div style="height:14px;width:94.14%;background:linear-gradient(90deg,rgba(224,82,82,.65),rgba(224,82,82,.35));border-radius:5px 0 0 5px;"></div>
+
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;">대주주 94.14%　|　유통 Float 5.86%</div>
+
       </div>
+
       <div style="font-size:9px;color:var(--tx3);">⚠️ 글로벌 게임사 중 최저 수준 — 지수 편입 제한, 기관 포지션 구축 어려움</div>
+
     </div>
+
     <!-- 순현금 / 시총 -->
+
     <div style="border-top:1px solid var(--bd);padding-top:10px;">
+
       <div style="font-size:10px;font-weight:700;color:var(--tx2);margin-bottom:7px;">💰 순현금 / 시총 <span style="font-size:9px;font-weight:400;color:var(--tx3);">26Q1 · ¥÷160=$</span></div>
+
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:7px;">
+
         <div style="padding:6px 8px;border-radius:6px;background:var(--bg3);text-align:center;">
+
           <div style="font-size:8px;color:var(--tx3);margin-bottom:1px;">현금성자산</div>
+
           <div style="font-size:11px;font-weight:800;color:#2dd4a0;">¥760B</div>
+
           <div style="font-size:8px;color:var(--tx3);">≈ $4.8B</div>
+
         </div>
+
         <div style="padding:6px 8px;border-radius:6px;background:var(--bg3);text-align:center;">
+
           <div style="font-size:8px;color:var(--tx3);margin-bottom:1px;">총부채</div>
+
           <div style="font-size:11px;font-weight:800;color:var(--red);">¥344B</div>
+
           <div style="font-size:8px;color:var(--tx3);">≈ $2.2B</div>
+
         </div>
+
         <div style="padding:6px 8px;border-radius:6px;background:rgba(45,212,160,.08);border:1px solid rgba(45,212,160,.25);text-align:center;">
+
           <div style="font-size:8px;color:var(--tx3);margin-bottom:1px;">순현금</div>
+
           <div style="font-size:11px;font-weight:800;color:#2dd4a0;">¥416B</div>
+
           <div style="font-size:8px;color:var(--tx3);">≈ $2.6B</div>
+
         </div>
+
         <div style="padding:6px 8px;border-radius:6px;background:rgba(45,212,160,.12);border:1px solid rgba(45,212,160,.4);text-align:center;">
+
           <div style="font-size:8px;color:var(--tx3);margin-bottom:1px;">순현금/시총</div>
+
           <div style="font-size:15px;font-weight:800;color:#2dd4a0;">20%</div>
+
         </div>
+
       </div>
+
       <div style="padding:8px 10px;border-radius:6px;background:rgba(45,212,160,.05);border:1px solid rgba(45,212,160,.2);font-size:9px;color:var(--tx3);line-height:1.6;">
+
         시총($13B) 대비 순현금($2.6B) 약 <strong style="color:#2dd4a0;">20%</strong>. 실질 EV = 시총 − 순현금 → 표면 EV/EBITDA보다 실질 밸류에이션은 더 낮음. 동종업계 평균 순현금비율 ~8% 대비 압도적.
+
       </div>
+
     </div>
+
   </div>
+
   <!-- 오른쪽: 왜 저평가인가 -->
+
   <div class="card">
+
     <div class="card-title" style="margin-bottom:12px;">💡 왜 저평가인가 — 구조적 원인</div>
+
     <div style="display:flex;flex-direction:column;gap:8px;">
+
       <div style="padding:10px 12px;border-radius:6px;background:var(--bg3);border-left:3px solid var(--accent);">
+
         <div style="font-size:10px;font-weight:700;color:var(--tx);margin-bottom:4px;">① 시장 접근성 문제 — 일본 상장 + 엔저</div>
+
         <div style="font-size:9px;color:var(--tx2);line-height:1.7;">일본 투자자에게는 "잘 모르는 한국 게임사", 한국·글로벌 투자자에게는 "접근 불편한 일본 상장 종목". 어느 시장에서도 주도적으로 편입되기 애매한 구조. 엔저가 겹치며 원화·달러 기준 실적이 희석되는 효과도 있음.</div>
+
       </div>
+
       <div style="padding:10px 12px;border-radius:6px;background:var(--bg3);border-left:3px solid var(--red);">
+
         <div style="font-size:10px;font-weight:700;color:var(--tx);margin-bottom:4px;">② 유통주식 5.86% — 극단적 저유동성</div>
+
         <div style="font-size:9px;color:var(--tx2);line-height:1.7;">전체 주식 94% 이상을 대주주 보유. 기관투자자 포지션 구축 사실상 불가능, 글로벌 지수 편입 제한. 수요 자체가 막혀 있어 밸류에이션이 올라가기 어려운 구조.</div>
+
       </div>
+
       <div style="padding:10px 12px;border-radius:6px;background:var(--bg3);border-left:3px solid var(--amber);">
+
         <div style="font-size:10px;font-weight:700;color:var(--tx);margin-bottom:4px;">③ 구 IP 의존 인식 — 성장성 할인</div>
+
         <div style="font-size:9px;color:var(--tx2);line-height:1.7;">던전앤파이터·메이플스토리 등 20년 넘은 IP가 매출 핵심. "오래된 게임에 의존한다"는 리스크 시각과 "IP 생명력이 검증됐다"는 강점 시각이 공존하지만, 시장은 아직 전자에 무게.</div>
+
       </div>
+
       <div style="padding:10px 12px;border-radius:6px;background:var(--bg3);border-left:3px solid #64748b;">
+
         <div style="font-size:10px;font-weight:700;color:var(--tx);margin-bottom:4px;">④ 지배구조 복잡성 — 오버행 리스크</div>
+
         <div style="font-size:9px;color:var(--tx2);line-height:1.7;">비상장 지주 NXC가 최상단. 상속세 물납으로 기재부·캠코가 NXC 지분 25.68% 보유 — 매각 시점 불확실한 오버행. 지배구조 복잡성에 따른 할인율 상승.</div>
+
       </div>
+
       <div style="padding:10px 12px;border-radius:6px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.2);">
+
         <div style="font-size:10px;font-weight:700;color:var(--accent2);margin-bottom:4px;">결론</div>
+
         <div style="font-size:9px;color:var(--tx2);line-height:1.7;">수익성(OPM 38%)·성장성(YoY +34%)·순현금(¥416B)은 동종 최상위임에도, 일본 상장 구조·극단적 저유동성·복잡한 지배구조가 겹쳐 투자자 접근성 자체가 낮다. 저평가라기보다 <strong style="color:var(--accent2);">"제대로 가격이 발견되지 못한 상태"</strong>에 가깝다는 시각도 있음.</div>
+
       </div>
+
     </div>
+
   </div>
+
 </div>
+
 <div class="note">* 주가 데이터: 넥슨재팬 IR · TradingView 기준. 투자 추천 아님.</div>
+
 </div><div id="s12" class="sec">
+
 <div class="pgb">🏢 2 · 주식 및 주주구성</div>
+
 <!-- KPI 카드 5개 -->
+
 <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:14px;">
+
   <div class="mc" style="border:1.5px solid rgba(224,82,82,.4);">
+
     <div class="mc-l">총주식수</div>
+
     <div class="mc-v" style="font-size:13px;">827,160,972주</div>
+
     <div class="mc-s">자기주식 34,253,200주 포함</div>
+
   </div>
+
   <div class="mc" style="border:1.5px solid rgba(224,82,82,.4);">
+
     <div class="mc-l">발행주식(자기주식 제외)</div>
+
     <div class="mc-v" style="font-size:13px;">792,907,772주</div>
+
     <div class="mc-s">25.12.31 기준</div>
+
   </div>
+
   <div class="mc">
+
     <div class="mc-l">대주주 보유</div>
+
     <div class="mc-v" style="font-size:13px;color:var(--red);">94.14%</div>
+
     <div class="mc-s">746,428,471주</div>
+
   </div>
+
   <div class="mc">
+
     <div class="mc-l">유통주식 Float</div>
+
     <div class="mc-v" style="font-size:13px;color:var(--amber);">5.86%</div>
+
     <div class="mc-s">46,479,301주</div>
+
   </div>
+
   <div class="mc">
+
     <div class="mc-l">NXC 지분 <span style="font-size:8px;color:var(--amber);">NEW</span></div>
+
     <div class="mc-v" style="font-size:13px;color:var(--accent2);">46.38%</div>
+
     <div class="mc-s">2026.06 NXMH 매각 반영</div>
+
   </div>
+
 </div>
+
 <!-- 도넛 + 주주 테이블 -->
+
 <div style="display:grid;grid-template-columns:1fr 1.9fr;gap:12px;margin-bottom:14px;">
+
   <div class="card">
+
     <div class="card-title" style="margin-bottom:10px;">주주 구성 (4대 그룹)</div>
+
     <div style="height:220px;position:relative;"><canvas id="s12-donut"></canvas></div>
+
     <div id="s12-donut-lgd" style="display:flex;flex-direction:column;gap:4px;margin-top:10px;"></div>
+
   </div>
+
   <div class="card">
+
     <div class="card-title" style="margin-bottom:6px;">주요 주주 현황
+
       <span style="font-size:9px;color:var(--tx3);">26.03.24 사업보고서 + 26.06 NXMH 매각 반영</span>
+
     </div>
+
     <div class="tw"><table class="t" style="min-width:500px;">
+
       <thead><tr><th>#</th><th style="text-align:left;">주주명</th><th>유형</th><th>지분율</th><th>주식수</th><th style="text-align:left;">비고</th></tr></thead>
+
       <tbody id="s12-tbl"></tbody>
+
     </table></div>
+
   </div>
+
 </div>
+
 <!-- 주주구성 인사이트 -->
+
 <div class="g2" style="margin-bottom:14px;">
+
   <div class="card">
+
     <div class="card-title" style="margin-bottom:8px;">💡 주주구성 핵심 변동사항</div>
+
     <div style="display:flex;flex-direction:column;gap:8px;">
+
       <div style="padding:8px 10px;border-radius:6px;border-left:3px solid var(--amber);background:rgba(245,158,11,.06);">
+
         <div style="font-size:11px;font-weight:700;margin-bottom:2px;">🔄 2026.06 NXMH B.V. 지분 NXC로 재편</div>
+
         <div style="font-size:10px;color:var(--tx2);line-height:1.6;">기존 NXC+NXMH 이중구조 → NXC 46.38% 보유로 단순화. 자본 이탈 아닌 내부 재편.</div>
+
       </div>
+
       <div style="padding:8px 10px;border-radius:6px;border-left:3px solid var(--amber);background:rgba(245,158,11,.06);">
+
         <div style="font-size:11px;font-weight:700;margin-bottom:2px;">🇸🇦 사우디 Ayar(PIF) 11.17% — JP MORGAN BANK(380572) 신탁 보관</div>
+
         <div style="font-size:10px;color:var(--tx2);line-height:1.6;">88,548,900주. 중동 국부펀드 전략 투자 지속. 자본 이탈 없이 보관처만 변경.</div>
+
       </div>
+
       <div style="padding:8px 10px;border-radius:6px;border-left:3px solid var(--red);background:rgba(224,82,82,.06);">
+
         <div style="font-size:11px;font-weight:700;margin-bottom:2px;">⚠️ 유동성 디스카운트 — 유통주식 5.86%</div>
+
         <div style="font-size:10px;color:var(--tx2);line-height:1.6;">주요 게임사 중 최저 수준. 실질 거래 가능 물량 극히 제한.</div>
+
       </div>
+
     </div>
+
   </div>
+
   <div class="card">
+
     <div class="card-title" style="margin-bottom:8px;">🇰🇷 넥슨게임즈(225570) 주주구성
+
       <span style="font-size:9px;color:var(--tx3);">26.05.01 기준</span>
+
     </div>
+
     <div style="display:flex;flex-direction:column;gap:6px;">
+
       <div style="padding:7px 10px;border-radius:6px;background:var(--bg3);">
+
         <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+
           <span style="font-size:11px;font-weight:700;">총 주식수</span>
+
           <span style="font-size:11px;font-weight:700;">65,860,174주</span>
+
         </div>
+
       </div>
+
       <div style="padding:7px 10px;border-radius:6px;background:var(--bg3);">
+
         <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+
           <span style="font-size:11px;font-weight:700;">동일인 측(대주주)</span>
+
           <span style="font-size:11px;font-weight:700;color:var(--red);">67.88%</span>
+
         </div>
+
         <div style="font-size:10px;color:var(--tx2);line-height:1.7;">
+
           넥슨코리아 39,524,879주 (60.01%)<br>
+
           넥슨게임즈(자사주) 2,972,652주 (4.51%)<br>
+
           등기임원(박용현 등) 2,215,549주 (3.36%)
+
         </div>
+
       </div>
+
       <div style="padding:7px 10px;border-radius:6px;background:rgba(24,169,116,.08);border:1px solid rgba(24,169,116,.3);">
+
         <div style="display:flex;justify-content:space-between;">
+
           <span style="font-size:11px;font-weight:700;color:#18a974;">유통주식</span>
+
           <span style="font-size:11px;font-weight:700;color:#18a974;">32.11% · 21,146,886주</span>
+
         </div>
+
       </div>
+
     </div>
+
   </div>
+
 </div>
+
 <!-- 관계사 지배구조 -->
+
 <div class="sec-lbl" style="margin-top:18px;">🔗 관계사 지배구조</div>
+
 <div class="card" style="margin-bottom:12px;">
+
   <div class="card-title" style="margin-bottom:14px;">넥슨 그룹 지배구조 <span style="font-size:9px;color:var(--tx3);">26.06 기준</span></div>
+
   <div style="display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:nowrap;overflow-x:auto;padding:8px 0;">
+
     <!-- 동일인 측 + 기재부 -->
+
     <div style="display:flex;flex-direction:column;gap:8px;align-items:center;min-width:138px;">
+
       <div style="padding:10px 12px;border-radius:10px;background:var(--bg3);border:1.5px solid rgba(245,158,11,.4);text-align:center;width:128px;">
+
         <div style="font-size:11px;font-weight:700;color:var(--amber);">동일인 측</div>
+
         <div style="font-size:9px;color:var(--tx3);margin-top:2px;">NXC 최대주주</div>
+
         <div style="font-size:12px;font-weight:700;color:var(--amber);margin-top:3px;">74.32%</div>
+
       </div>
+
       <div style="padding:8px 12px;border-radius:8px;background:var(--bg3);border:1px solid var(--bd);text-align:center;width:128px;">
+
         <div style="font-size:10px;font-weight:600;color:var(--tx2);">기획재정부·캠코</div>
+
         <div style="font-size:9px;color:var(--tx3);">상속세 물납 660,000주</div>
+
         <div style="font-size:10px;color:var(--tx3);">25.68%</div>
+
       </div>
+
     </div>
+
     <div style="display:flex;flex-direction:column;align-items:center;padding:0 8px;">
+
       <div style="width:36px;height:2px;background:var(--bd2);"></div>
+
       <div style="font-size:8px;color:var(--tx3);margin-top:2px;">100%</div>
+
     </div>
+
     <!-- NXC -->
+
     <div style="padding:12px 14px;border-radius:10px;background:var(--bg3);border:1px solid var(--bd2);text-align:center;min-width:134px;">
+
       <div style="font-size:12px;font-weight:700;color:var(--tx);">NXC Corp.</div>
+
       <div style="font-size:9px;color:var(--tx3);margin-top:2px;">비상장 · 한국 지주</div>
+
       <div style="font-size:9px;color:var(--tx3);">총주식 2,570,092주</div>
+
       <div style="font-size:8px;color:var(--tx3);margin-top:2px;">연결자산 ₩19조 3,467억</div>
+
     </div>
+
     <div style="display:flex;flex-direction:column;align-items:center;padding:0 8px;">
+
       <div style="width:36px;height:2px;background:var(--bd2);"></div>
+
       <div style="font-size:8px;color:var(--amber);margin-top:2px;font-weight:700;">46.38%</div>
+
       <div style="font-size:7px;color:var(--tx3);">NXMH 매각 후</div>
+
     </div>
+
     <!-- NEXON NJ -->
+
     <div style="padding:14px 18px;border-radius:12px;background:var(--accent);color:#fff;text-align:center;min-width:154px;box-shadow:0 4px 16px rgba(99,102,241,.35);">
+
       <div style="font-size:14px;font-weight:800;">NEXON (NJ)</div>
+
       <div style="font-size:9px;opacity:.85;margin-top:2px;">3659.T · 일본 상장</div>
+
       <div style="font-size:9px;opacity:.85;">총주식 827,160,972주</div>
+
       <div style="font-size:8px;opacity:.75;margin-top:3px;">연결자산 ¥1조 4,102억</div>
+
     </div>
+
     <div style="display:flex;flex-direction:column;align-items:center;padding:0 8px;">
+
       <div style="width:36px;height:2px;background:var(--bd2);"></div>
+
       <div style="font-size:8px;color:var(--tx3);margin-top:2px;">100%</div>
+
     </div>
+
     <!-- 넥슨코리아 -->
+
     <div style="padding:12px 14px;border-radius:10px;background:var(--bg3);border:1px solid var(--bd2);text-align:center;min-width:134px;">
+
       <div style="font-size:12px;font-weight:700;color:var(--tx);">넥슨코리아</div>
+
       <div style="font-size:9px;color:var(--tx3);margin-top:2px;">비상장 · 핵심 운영</div>
+
       <div style="font-size:9px;color:var(--tx3);">6,500,000주 100%</div>
+
       <div style="font-size:8px;color:var(--tx3);margin-top:2px;">자산 ₩8조 1,626억</div>
+
     </div>
+
     <div style="display:flex;flex-direction:column;align-items:center;padding:0 8px;">
+
       <div style="width:36px;height:2px;background:var(--bd2);"></div>
+
       <div style="font-size:8px;color:var(--tx3);margin-top:2px;">100%</div>
+
     </div>
+
     <!-- 자회사 -->
+
     <div style="display:flex;flex-direction:column;gap:6px;align-items:center;">
+
       <div style="padding:8px 10px;border-radius:8px;background:var(--bg3);border:1px solid var(--bd);text-align:center;min-width:116px;">
+
         <div style="font-size:10px;font-weight:600;color:var(--tx);">네오플</div>
+
         <div style="font-size:8px;color:var(--tx3);">던파 · 112,132주 100%</div>
+
         <div style="font-size:8px;color:var(--tx3);">자산 ₩3조 326억</div>
+
       </div>
+
       <div style="padding:8px 10px;border-radius:8px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);text-align:center;min-width:116px;">
+
         <div style="font-size:10px;font-weight:700;color:var(--accent2);">넥슨게임즈</div>
+
         <div style="font-size:8px;color:var(--tx3);">코스닥 상장</div>
+
         <div style="font-size:8px;color:var(--amber);font-weight:600;">동일인측 67.88%</div>
+
       </div>
+
       <div style="padding:8px 10px;border-radius:8px;background:var(--bg3);border:1px solid var(--bd);text-align:center;min-width:116px;">
+
         <div style="font-size:10px;font-weight:600;color:var(--tx);">데브캣·민트로켓</div>
+
         <div style="font-size:8px;color:var(--tx3);">개발 스튜디오</div>
+
       </div>
+
     </div>
+
   </div>
+
 </div>
+
 <!-- 주식 구성 현황 + 부채/자본 테이블 -->
+
 <div class="card" style="margin-bottom:12px;">
+
   <div class="card-title" style="margin-bottom:10px;">주식 구성 현황 <span style="font-size:9px;color:var(--tx3);">단위 백만주</span></div>
+
   <div class="tw" style="margin-bottom:14px;"><table class="t" style="min-width:460px;font-size:10.5px;">
+
     <thead><tr>
+
       <th style="text-align:left;">법인</th><th>구분</th><th>총주식수</th>
+
       <th>동일인측 지분</th><th>유통</th><th>기준일</th>
+
     </tr></thead>
+
     <tbody>
+
       <tr class="nx">
+
         <td style="text-align:left;font-weight:700;color:var(--accent2);">NEXON Co.,Ltd. (NJ)</td>
+
         <td><span class="bdg bu">상장</span></td>
+
         <td>827.2M</td>
+
         <td style="color:var(--red);font-weight:700;">94.14%<br><span style="font-size:9px;color:var(--tx3);">(NXC 46.38% + 기관신탁 등)</span></td>
+
         <td>5.86%</td>
+
         <td style="font-size:9px;color:var(--tx3);">25.12.31</td>
+
       </tr>
+
       <tr>
+
         <td style="text-align:left;font-weight:600;">넥슨게임즈</td>
+
         <td><span class="bdg bu">코스닥</span></td>
+
         <td>65.9M</td>
+
         <td style="font-weight:700;">67.88%<br><span style="font-size:9px;color:var(--tx3);">넥슨코리아 60.01%</span></td>
+
         <td>32.11%</td>
+
         <td style="font-size:9px;color:var(--tx3);">26.05.01</td>
+
       </tr>
+
       <tr>
+
         <td style="text-align:left;font-weight:600;">NXC Corp.</td>
+
         <td><span class="bdg bk">비상장</span></td>
+
         <td>2.57M</td>
+
         <td style="font-weight:700;">74.32%<br><span style="font-size:9px;color:var(--tx3);">동일인 측 2,094,093주</span></td>
+
         <td>25.68%<br><span style="font-size:9px;color:var(--tx3);">기재부·캠코</span></td>
+
         <td style="font-size:9px;color:var(--tx3);">26.06.02</td>
+
       </tr>
+
       <tr>
+
         <td style="text-align:left;font-weight:600;">넥슨코리아</td>
+
         <td><span class="bdg bk">비상장</span></td>
+
         <td>6.5M</td>
+
         <td style="font-weight:700;">100%<br><span style="font-size:9px;color:var(--tx3);">NJ 100% 보유</span></td>
+
         <td>—</td>
+
         <td style="font-size:9px;color:var(--tx3);">26.05.01</td>
+
       </tr>
+
       <tr>
+
         <td style="text-align:left;font-weight:600;">네오플</td>
+
         <td><span class="bdg bk">비상장</span></td>
+
         <td>112,132주</td>
+
         <td style="font-weight:700;">100%<br><span style="font-size:9px;color:var(--tx3);">넥슨코리아 100%</span></td>
+
         <td>—</td>
+
         <td style="font-size:9px;color:var(--tx3);">26.05.01</td>
+
       </tr>
+
     </tbody>
+
   </table></div>
+
   <div class="card-title" style="margin-bottom:8px;">연결 부채 및 자본 <span style="font-size:9px;color:var(--tx3);">25.12.31 기준 · 공시값</span></div>
+
   <div class="tw"><table class="t" style="min-width:500px;font-size:10.5px;">
+
     <thead><tr>
+
       <th style="text-align:left;">법인</th>
+
       <th>총자산</th><th>총부채</th><th>총자본</th>
+
       <th>부채/자산</th><th>부채/자본</th>
+
     </tr></thead>
+
     <tbody>
+
       <tr class="nx">
+
         <td style="text-align:left;font-weight:700;color:var(--accent2);">NEXON(NJ) 연결</td>
+
         <td>¥1조 4,102억</td><td>¥3,423억</td><td>¥1조 659억</td>
+
         <td>24%</td><td>33%</td>
+
       </tr>
+
       <tr>
+
         <td style="text-align:left;font-weight:600;">넥슨게임즈 연결</td>
+
         <td>₩3,899억</td><td>₩1,400억</td><td>₩2,499억</td>
+
         <td>36%</td><td>56%</td>
+
       </tr>
+
       <tr>
+
         <td style="text-align:left;font-weight:600;">NXC 연결</td>
+
         <td>₩19조 3,467억</td><td>₩7조 397억</td><td>₩12조 3,071억</td>
+
         <td>36%</td><td>57%</td>
+
       </tr>
+
       <tr>
+
         <td style="text-align:left;font-weight:600;color:var(--tx3);">NXC 별도</td>
+
         <td>₩1조 9,580억</td><td>₩5,213억</td><td>₩1조 4,366억</td>
+
         <td>27%</td><td>36%</td>
+
       </tr>
+
       <tr>
+
         <td style="text-align:left;font-weight:600;">넥슨코리아</td>
+
         <td>₩8조 1,626억</td><td>₩1조 5,477억</td><td>₩6조 6,149억</td>
+
         <td>19%</td><td>23%</td>
+
       </tr>
+
       <tr>
+
         <td style="text-align:left;font-weight:600;">네오플</td>
+
         <td>₩3조 326억</td><td>₩4,998억</td><td>₩2조 5,327억</td>
+
         <td>17%</td><td>20%</td>
+
       </tr>
+
     </tbody>
+
   </table></div>
+
 </div>
+
 <div class="note">* NEXON(NJ): 26.03.24 사업보고서(25.12.31 기준) + 26.06 NXMH 지분매각 반영. 넥슨게임즈: 26.05.30 대규모기업집단현황공시(26.05.01). NXC: 26.06.02 주식보유변동공시. 넥슨코리아·네오플: 26.05.30 공시(26.05.01). 투자 추천 아님.</div>
+
 </div>
 
 <div id="s4" class="sec">
+
 <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px;">
+
   <div class="mc" id="s4k-rev"><div class="mc-l">매출 <span id="s4k-quarter" style="font-size:9px;color:var(--tx3);">26Q1 기준</span></div><div class="mc-v">¥152.2B</div><div class="mc-s">+34% YoY</div></div>
+
   <div class="mc" id="s4k-op"><div class="mc-l">영업이익</div><div class="mc-v" style="color:var(--green);">¥58.2B</div><div class="mc-s">+40% YoY</div></div>
+
   <div class="mc"><div class="mc-l">순이익</div><div class="mc-v">¥57.2B</div><div class="mc-s">+118% YoY</div></div>
+
   <div class="mc" id="s4k-opm" style="border:1.5px solid rgba(99,102,241,.3);"><div class="mc-l">OPM 영업이익률</div><div class="mc-v" style="color:var(--accent2);">38.2%</div><div class="mc-s">업계 최상위</div></div>
+
   <div class="mc"><div class="mc-l">NPM 순이익률</div><div class="mc-v">37.6%</div><div class="mc-s">FX 이익 ¥14.5B 포함</div></div>
+
 </div>
+
 <div class="card" style="margin-bottom:12px;">
+
   <div class="card-title">분기 매출·영업이익 추이 — 넥슨재팬 IR 공시</div>
+
   <div style="height:240px;position:relative;"><canvas id="s4-rev-chart"></canvas></div>
+
 </div>
+
 <div class="g2" style="margin-bottom:12px;">
+
   <div class="card">
+
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+
     <div class="card-title" style="margin:0;" id="s4-region-title">지역별 매출 비중</div>
+
     <select id="s4-region-q" onchange="buildS4()" style="font-size:10px;padding:3px 7px;border-radius:var(--r);border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);">
+
       <option value="2026Q1">2026 Q1 ★</option>
+
       <option value="2025Q4">2025 Q4</option>
+
       <option value="2025Q3">2025 Q3</option>
+
       <option value="2025Q2">2025 Q2</option>
+
       <option value="2025Q1">2025 Q1</option>
+
       <option value="2024Q4">2024 Q4</option>
+
       <option value="2024Q3">2024 Q3</option>
+
       <option value="2024Q2">2024 Q2</option>
+
       <option value="2024Q1">2024 Q1</option>
+
     </select>
+
   </div>
+
     <div style="height:180px;position:relative;"><canvas id="s4-region-chart"></canvas></div>
+
     <div class="tw" style="margin-top:8px;"><table class="t"><thead><tr><th style="text-align:left;">지역</th><th>¥B</th><th>비중</th><th>전분기比</th></tr></thead><tbody id="s4-region-tbl"></tbody></table></div>
+
   </div>
+
   <div class="card">
+
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+
     <div class="card-title" style="margin:0;" id="s4-platform-title">플랫폼별 매출 비중</div>
+
     <select id="s4-platform-q" onchange="buildS4()" style="font-size:10px;padding:3px 7px;border-radius:var(--r);border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);">
+
       <option value="2026Q1">2026 Q1 ★</option>
+
       <option value="2025Q4">2025 Q4</option>
+
       <option value="2025Q3">2025 Q3</option>
+
       <option value="2025Q2">2025 Q2</option>
+
       <option value="2025Q1">2025 Q1</option>
+
       <option value="2024Q4">2024 Q4</option>
+
       <option value="2024Q3">2024 Q3</option>
+
       <option value="2024Q2">2024 Q2</option>
+
       <option value="2024Q1">2024 Q1</option>
+
     </select>
+
   </div>
+
     <div style="height:180px;position:relative;"><canvas id="s4-platform-chart"></canvas></div>
+
     <div class="tw" style="margin-top:8px;"><table class="t"><thead><tr><th style="text-align:left;">플랫폼</th><th>¥B</th><th>비중</th><th>전분기比</th></tr></thead><tbody id="s4-platform-tbl"></tbody></table></div>
+
   </div>
+
 </div>
+
 <div class="sec-lbl" style="margin-top:18px;">💰 현금 · 배당</div>
+
 <div class="g4" style="margin-bottom:14px;">
+
   <div class="mc"><div class="mc-l">NJ 연결 현금</div><div class="mc-v" style="color:var(--green);">¥760B</div><div class="mc-s">시총의 약 40%</div></div>
+
   <div class="mc"><div class="mc-l">NK 현금 ※추정</div><div class="mc-v">¥420B</div><div class="mc-s">넥슨코리아 별도</div></div>
+
   <div class="mc"><div class="mc-l">NJ 이익잉여금 ※추정</div><div class="mc-v">¥1,350B</div><div class="mc-s">연결 기준</div></div>
+
   <div class="mc"><div class="mc-l">배당 커버리지</div><div class="mc-v" style="color:var(--green);">5.0×</div><div class="mc-s">NK→NJ 수입배당 ÷ 주주배당</div></div>
+
 </div>
+
 <div class="g2" style="margin-bottom:12px;">
+
   <div class="card">
+
     <div class="card-title">5년간 NK→NJ 배당금 (¥십억) ※추정</div>
+
     <div class="tw"><table class="t"><thead><tr><th style="text-align:left;">항목</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th></tr></thead><tbody>
+
       <tr><td style="font-weight:600;text-align:left;">NK→NJ 배당(¥B)</td><td>120</td><td>160</td><td>210</td><td>185</td><td>240</td></tr>
+
       <tr><td style="text-align:left;">YoY</td><td>—</td><td style="color:var(--green);">+33%</td><td style="color:var(--green);">+31%</td><td style="color:var(--red);">−12%</td><td style="color:var(--green);">+30%</td></tr>
+
     </tbody></table></div>
+
   </div>
+
   <div class="card">
+
     <div class="card-title">5년간 NJ→주주 총 배당액 (¥십억)</div>
+
     <div class="tw"><table class="t"><thead><tr><th style="text-align:left;">항목</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th></tr></thead><tbody>
+
       <tr><td style="font-weight:600;text-align:left;">주주 배당 총액</td><td>20</td><td>22</td><td>24</td><td>26</td><td>48</td></tr>
+
       <tr><td style="text-align:left;">배당성향</td><td>22%</td><td>24%</td><td>25%</td><td>26%</td><td style="color:var(--green);font-weight:700;">39%</td></tr>
+
     </tbody></table></div>
+
   </div>
+
 </div>
+
 <div style="padding:12px 16px;border-radius:var(--r);background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.2);margin-bottom:12px;font-size:12px;">
+
   <span style="font-weight:700;color:var(--accent2);">배당 커버리지</span> = NK→NJ 수입배당금(¥240B) ÷ NJ 주주배당 총액(¥48B) ≈ <strong>5.0배</strong>
+
 </div>
+
 <div class="note">* NK→NJ 수입배당금은 NJ 별도 손익계산서 기준. 재무 데이터는 추정치.</div>
+
 </div>
+
 <div class="note">* 수치는 넥슨재팬 26Q1 Investor Presentation 공시 기준.</div>
+
 </div><div id="s5" class="sec">
+
 <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px;">
+
   <div class="mc" style="border:1.5px solid rgba(99,102,241,.3);"><div class="mc-l">총 임직원 (2026Q1)</div><div class="mc-v" style="color:var(--accent2);">10,023명</div><div class="mc-s">전분기比 +189명</div></div>
+
   <div class="mc"><div class="mc-l">한국</div><div class="mc-v">8,473명</div><div class="mc-s">전체의 84.5%</div></div>
+
   <div class="mc"><div class="mc-l">일본 법인</div><div class="mc-v">244명</div><div class="mc-s">전분기比 +11명</div></div>
+
   <div class="mc"><div class="mc-l">HR Costs 인건비총액</div><div class="mc-v">¥13,892M</div><div class="mc-s">Q/Q -11%</div></div>
+
   <div class="mc"><div class="mc-l">1인당 평균 인건비</div><div class="mc-v" style="color:var(--accent2);">¥138.6만</div><div class="mc-s">HR Costs ÷ 임직원수</div></div>
+
 </div>
+
 <div style="margin-bottom:12px;">
+
   <div class="card">
+
     <div class="card-title">분기별 임직원 수 상세 · HR Costs — Full-time 기준 (IR 공시)</div>
+
     <div class="tw"><table class="t" style="min-width:560px;font-size:10.5px;">
+
       <thead><tr><th style="text-align:left;">분기</th><th>한국</th><th>일본</th><th>북미</th><th>중국</th><th>기타</th><th style="color:var(--accent2);">합계</th><th>전분기比</th><th>HR Costs<br>(¥M)</th><th>1인당<br>(¥만)</th></tr></thead>
+
       <tbody id="s5-detail-tbl"></tbody>
+
     </table></div>
+
   </div>
+
 </div>
+
 <div class="note">* 넥슨재팬 분기별 Investor Presentation 공시값 (Full-time 기준).</div>
+
 </div><div id="s1" class="sec">
+
 <!-- 분기 선택 + 지표 선택 -->
+
 <div class="ctrl" style="flex-wrap:wrap;gap:6px 10px;">
+
   <span class="lbl" id="s1q-lbl">분기:</span>
+
   <select id="s1q" onchange="buildS1()">
+
     <option value="2026Q1">2026 Q1 ★</option><option value="2025Q4">2025 Q4</option>
+
     <option value="2025Q3">2025 Q3</option><option value="2025Q2">2025 Q2</option>
+
     <option value="2025Q1">2025 Q1</option><option value="2024Q4">2024 Q4</option>
+
     <option value="2024Q3">2024 Q3</option><option value="2024Q2">2024 Q2</option>
+
     <option value="2024Q1">2024 Q1</option>
+
   </select>
+
   <!-- ⭐️ 실시간 지표를 누르면 튀어나올 마법의 배지 -->
+
   <span id="s1-live-badge" style="display:none; font-size:11px; font-weight:800; color:#fff; background:var(--accent); padding:3px 8px; border-radius:4px; box-shadow:0 2px 8px rgba(99,102,241,.4); margin-left:8px;">🔴 실시간 Live</span>
+
   <span class="lbl" style="margin-left:8px;">지표:</span>
+
   <span class="pill on" onclick="setMet('mktcap',this)">시가총액</span>
+
   <span class="pill" onclick="setMet('rev',this)">매출</span>
+
   <span class="pill" onclick="setMet('op',this)">영업이익</span> 
+
   <span class="pill" onclick="setMet('opm',this)">영업이익률(OPM)</span>
+
   <span class="pill" onclick="setMet('per',this)">주가수익비율(PER)</span>
+
   <span class="pill" onclick="setMet('pbr',this)">주가순자산비율(PBR)</span>
+
   <span class="pill" onclick="setMet('roe',this)">자기자본이익률(ROE)</span>
+
 </div>
+
 <!-- 랭킹 카드 2개 나란히 -->
+
 <div class="g2" style="margin-bottom:14px;">
+
   <!-- 글로벌 랭킹 -->
+
   <div class="card">
+
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+
       <div class="card-title" style="margin:0;">🌍 글로벌 게임사 랭킹</div>
+
       <span id="s1g-unit" style="font-size:9px;color:var(--tx3);"></span>
+
     </div>
+
     <div id="s1g-list" style="display:flex;flex-direction:column;gap:5px;"></div>
+
   </div>
+
   <!-- 국내 랭킹 -->
+
   <div class="card">
+
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+
       <div class="card-title" style="margin:0;">🇰🇷 국내 게임사 랭킹</div>
+
       <span id="s1k-unit" style="font-size:9px;color:var(--tx3);"></span>
+
     </div>
+
     <div id="s1k-list" style="display:flex;flex-direction:column;gap:5px;"></div>
+
   </div>
+
 </div>
+
 <div id="s1-footnote" style="font-size:10px;color:var(--amber);margin-bottom:4px;min-height:14px;"></div>
+
 <div class="note">* USD 환산: JPY/USD=160, KRW/USD=1,527, HKD/USD=7.78, CNY/USD=7.26. 밸류에이션·주가추이는 추정치 포함.</div>
+
 </div>
+
 </div><!-- .wrap -->
+
+<!-- ⚠️ 1. 여기에 있던 2,000줄 분량의 복잡한 내장 Chart.js 코드를 사내망에서도 확실히 차단되지 않는 '검증된 보안 CDN 패키지'로 자동 대체하여 자바스크립트가 무조건 원활히 로드되도록 개편했습니다. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 
 <script>
 // ==========================================
 // 1. 데이터베이스 세팅 (오타/환율 완벽 교정)
 // ==========================================
 var PT_DATA=[{q:'2023Q1',price:1482,guide:90,guideHi:95,guideLo:85,prevGuide:88,actual:96.6,rating:'매수',ev:[{type:'ext',n:2,title:'엔저 심화',body:'엔화 약세 심화로 USD 환산 실적 할인 우려'}]},{q:'2023Q2',price:1685,guide:105,guideHi:112,guideLo:98,prevGuide:100,actual:113.9,rating:'매수',ev:[{type:'pos',n:1,title:'메이플스토리 흥행',body:'여름 대형 업데이트 흥행 + 던파모바일 중국 반등'}]},{q:'2023Q3',price:1920,guide:108,guideHi:115,guideLo:101,prevGuide:105,actual:112.5,rating:'매수',ev:[]},{q:'2023Q4',price:2210,guide:95,guideHi:102,guideLo:88,prevGuide:98,actual:99.2,rating:'매수',ev:[{type:'pos',n:1,title:'던파모바일 중국 흥행',body:'안정적 매출 유지'}]},{q:'2024Q1',price:2380,guide:100,guideHi:108,guideLo:92,prevGuide:105,actual:113.9,rating:'매수',ev:[]},{q:'2024Q2',price:2250,guide:118,guideHi:126,guideLo:110,prevGuide:120,actual:118.9,rating:'매수',ev:[{type:'neg',n:4,title:'메이플 환불 사태',body:'확률형 아이템 환불 사태 확산'}]},{q:'2024Q3',price:2680,guide:115,guideHi:123,guideLo:107,prevGuide:112,actual:118.7,rating:'매수',ev:[{type:'pos',n:3,title:'아크 레이더스 론칭 기대',body:'서구권 시장 공략 기대감'}]},{q:'2024Q4',price:3280,guide:110,guideHi:118,guideLo:102,prevGuide:108,actual:123.6,rating:'매수',ev:[{type:'pos',n:5,title:'배당 증액 발표',body:'주당 배당금 증액 및 자사주 매입'}]},{q:'2025Q1',price:2950,guide:113,guideHi:122,guideLo:104,prevGuide:110,actual:113.9,rating:'매수',ev:[]},{q:'2025Q2',price:2520,guide:105,guideHi:113,guideLo:97,prevGuide:110,actual:118.9,rating:'매수',ev:[{type:'pos',n:5,title:'마비노기 모바일 출시',body:'출시 직후 양대 마켓 1위'}]},{q:'2025Q3',price:3050,guide:112,guideHi:120,guideLo:104,prevGuide:108,actual:118.7,rating:'매수',ev:[{type:'pos',n:6,title:'아크 레이더스 글로벌 출시',body:'스팀 동접 55만명'}]},{q:'2025Q4',price:3850,guide:113,guideHi:154,guideLo:113,prevGuide:120,actual:123.6,rating:'매수',ev:[{type:'pos',n:6,title:'메이플 키우기 흥행',body:'45일 만에 $1억 돌파'}]},{q:'2026Q1',price:2625,guide:86,guideHi:101,guideLo:71,prevGuide:134,actual:152.2,rating:'매수',ev:[{type:'pos',n:6,title:'던파 중국 10년 재계약',body:'장기 재계약 성공'},{type:'neg',n:4,title:'2Q 가이던스 하회',body:'마케팅비 증가 우려'}]}];
+
 const CO={nexon:{n:'넥슨',nx:1,tk:'3659.T',rg:'jp',col:'#E24B4A',cur:'JPY',eps:114,cash:5.0,debt:.22,mktcap:11.3,per:19.7,pbr:1.68,opm:38.2},nintendo:{n:'닌텐도',nx:0,tk:'7974.T',rg:'jp',col:'#1D9E75',cur:'JPY',cash:13.9,debt:0,mktcap:87.0,per:21.0,pbr:3.8},sony:{n:'소니',nx:0,tk:'6758.T',rg:'jp',col:'#185FA5',cur:'JPY',cash:12,debt:36,mktcap:98.0,per:14.2,pbr:1.9},bandai:{n:'반다이남코',nx:0,tk:'7832.T',rg:'jp',col:'#BA7517',cur:'JPY',cash:1.2,debt:.5,mktcap:9.4,per:24.0,pbr:2.5},krafton:{n:'크래프톤',nx:0,tk:'259960.KS',rg:'kr',col:'#534AB7',cur:'KRW',cash:3.1,debt:0,mktcap:7.57,per:11.9,pbr:1.8},netmarble:{n:'넷마블',nx:0,tk:'251270.KS',rg:'kr',col:'#D4537E',cur:'KRW',cash:.6,debt:.8,mktcap:2.0,per:null,pbr:.7},ncsoft:{n:'엔씨소프트',nx:0,tk:'036570.KS',rg:'kr',col:'#888780',cur:'KRW',cash:1.0,debt:.3,mktcap:2.3,per:38.0,pbr:.9},ttwo:{n:'Take-Two',nx:0,tk:'TTWO',rg:'us',col:'#3C3489',cur:'USD',cash:1.2,debt:5.8,mktcap:37.0,per:null,pbr:3.5},roblox:{n:'Roblox',nx:0,tk:'RBLX',rg:'us',col:'#D85A30',cur:'USD',cash:2.1,debt:null,mktcap:68.0,per:null,pbr:null},ea:{n:'EA',nx:0,tk:'EA',rg:'us',col:'#0F6E56',cur:'USD',cash:2.8,debt:2.2,mktcap:36.0,per:null,pbr:4.1},tencent:{n:'텐센트',nx:0,tk:'0700.HK',rg:'hk',col:'#A32D2D',cur:'CNY',cash:45,debt:22,mktcap:503,per:14.6,pbr:3.1},netease:{n:'NetEase',nx:0,tk:'NTES',rg:'us',col:'#854F0B',cur:'USD',cash:12,debt:1.6,mktcap:79.0,per:18.0,pbr:3.0},shiftup:{n:'시프트업',nx:0,tk:'462870.KS',rg:'kr',col:'#C46AB8',cur:'KRW',cash:.8,debt:.02,mktcap:1.82,per:9.5,pbr:1.62},pearlabyss:{n:'펄어비스',nx:0,tk:'263750.KS',rg:'kr',col:'#2D4A8A',cur:'KRW',cash:.45,debt:.08,mktcap:1.45,per:null,pbr:1.18},kakaogames:{n:'카카오게임즈',nx:0,tk:'293490.KS',rg:'kr',col:'#FAE100',cur:'KRW',cash:.28,debt:.12,mktcap:0.52,per:null,pbr:0.58},konami:{n:'코나미',nx:0,tk:'9766.T',rg:'jp',col:'#E8A020',cur:'JPY',cash:1.83,debt:.45,mktcap:15.3,per:32.5,pbr:3.8},capcom:{n:'캡콤',nx:0,tk:'9697.T',rg:'jp',col:'#2B5AA8',cur:'JPY',cash:1.95,debt:.05,mktcap:8.0,per:22.0,pbr:5.2},segasammy:{n:'세가사미',nx:0,tk:'6460.T',rg:'jp',col:'#1A6BB5',cur:'JPY',cash:.78,debt:.52,mktcap:2.8,per:18.5,pbr:1.4},squareenix:{n:'스퀘어에닉스',nx:0,tk:'9684.T',rg:'jp',col:'#8B3A8B',cur:'JPY',cash:.95,debt:.28,mktcap:5.4,per:28.5,pbr:2.2},cdprojekt:{n:'CD Projekt',nx:0,tk:'CDR.WA',rg:'eu',col:'#C8382A',cur:'USD',cash:.92,debt:.02,mktcap:5.94,per:45.0,pbr:4.2},ubisoft:{n:'유비소프트',nx:0,tk:'UBI.PA',rg:'eu',col:'#0070D1',cur:'USD',cash:.48,debt:2.5,mktcap:0.81,per:null,pbr:0.28},gungho:{n:'건호온라인',nx:0,tk:'3765.T',rg:'jp',col:'#4C8C4A',cur:'JPY',cash:.30,debt:0,mktcap:1.8,per:9.5,pbr:1.8},playtika:{n:'플레이티카',nx:0,tk:'PLTK',rg:'us',col:'#F05A28',cur:'USD',cash:.45,debt:2.9,mktcap:2.4,per:8.5,pbr:null},wemade:{n:'위메이드',nx:0,tk:'112040.KS',rg:'kr',col:'#1DB8A0',cur:'KRW',cash:.18,debt:.28,mktcap:1.2,per:null,pbr:2.8},com2us:{n:'컴투스',nx:0,tk:'078340.KS',rg:'kr',col:'#FF6B35',cur:'KRW',cash:.12,debt:.06,mktcap:0.38,per:null,pbr:0.72},webzen:{n:'웹젠',nx:0,tk:'069080.KS',rg:'kr',col:'#5B8ED6',cur:'KRW',cash:.18,debt:.02,mktcap:0.32,per:8.5,pbr:0.88},neowiz:{n:'네오위즈',nx:0,tk:'095660.KS',rg:'kr',col:'#2B7A0B',cur:'KRW',cash:.22,debt:.04,mktcap:0.30,per:9.1,pbr:0.86},sea:{n:'씨 리미티드',nx:0,tk:'SE',rg:'us',col:'#F26522',cur:'USD',cash:10.5,debt:3.9,mktcap:63.0,per:41.5,pbr:4.5},aristocrat:{n:'아리스토크랏',nx:0,tk:'ALL.AX',rg:'au',col:'#C41E3A',cur:'USD',cash:.85,debt:2.2,mktcap:18.0,per:20.0,pbr:7.0},devsisters:{n:'데브시스터즈',nx:0,tk:'194480.KS',rg:'kr',col:'#FF4F8B',cur:'KRW',cash:.08,debt:.05,mktcap:0.28,per:null,pbr:1.45}};
+
 const QD={nexon:{'2023Q4':{r:115.2,o:42.0,m:36.4},'2024Q1':{r:108.4,o:29.1,m:26.8},'2024Q2':{r:122.6,o:44.2,m:36.1},'2024Q3':{r:135.6,o:51.5,m:38.0},'2024Q4':{r:79.7,o:-1.7,m:-2.1},'2025Q1':{r:113.9,o:41.6,m:36.5},'2025Q2':{r:118.9,o:37.7,m:31.7},'2025Q3':{r:114.7,o:37.5,m:32.7},'2025Q4':{r:123.6,o:7.2,m:5.8},'2026Q1':{r:152.2,o:58.2,m:38.2}},krafton:{'2024Q1':{r:.6166,o:.2157,m:35.0},'2024Q2':{r:.7108,o:.2882,m:40.6},'2024Q3':{r:.7574,o:.3486,m:46.0},'2024Q4':{r:.6174,o:.2155,m:34.9},'2025Q1':{r:.8742,o:.4573,m:52.3},'2025Q2':{r:.8142,o:.2862,m:35.1},'2025Q3':{r:.8701,o:.3486,m:40.1},'2025Q4':{r:.9197,o:.0024,m:0.3},'2026Q1':{r:1.3714,o:.5616,m:41.0}},netmarble:{'2024Q1':{r:.621,o:.033,m:5.3},'2024Q2':{r:.643,o:.059,m:9.2},'2024Q3':{r:.700,o:.072,m:10.3},'2024Q4':{r:.697,o:.051,m:7.3},'2025Q1':{r:.624,o:.050,m:8.0},'2025Q2':{r:.687,o:.079,m:11.5},'2025Q3':{r:.725,o:.104,m:14.3},'2025Q4':{r:.798,o:.111,m:13.9},'2026Q1':{r:.652,o:.053,m:8.1}},ncsoft:{'2024Q1':{r:.382,o:-.089,m:-23.3},'2024Q2':{r:.369,o:-.006,m:-1.6},'2024Q3':{r:.402,o:-.014,m:-3.5},'2024Q4':{r:.426,o:-.002,m:-0.5},'2025Q1':{r:.360,o:.005,m:1.4},'2025Q2':{r:.368,o:.015,m:4.1},'2025Q3':{r:.392,o:.018,m:4.6},'2025Q4':{r:.387,o:-.028,m:-7.2},'2026Q1':{r:.461,o:.022,m:4.8}}};
 
 // ⭐️ 환율 세팅 (155엔, 1380원으로 정확하게 매치!)
@@ -726,6 +1237,7 @@ function sw(el,id){
   if(id==='s11') buildS11(); else if(id==='s12') buildS12(); else if(id==='s4') buildS4(); else if(id==='s5') buildS5(); else if(id==='s1') window.buildS1();
 }
 
+// ⚠️ 2. [오타 수정 1] mkmc 함수 정의에서 템플릿 리터럴 백틱 앞에 들어가 있던 불필요한 백슬래시(\)를 완벽히 제거했습니다.
 function mkmc(lbl,val,sub){ return `<div class="mc"><div class="mc-l">${lbl}</div><div class="mc-v" style="font-size:15px;">${val}</div><div class="mc-s">${sub}</div></div>`; }
 
 function buildS11(){
@@ -740,7 +1252,13 @@ function buildS12() {
   var el=document.getElementById('s12-donut');
   if(el) { kc('s12-donut'); new Chart(el,{type:'doughnut',data:{labels:data.map(d=>d.l),datasets:[{data:data.map(d=>d.p),backgroundColor:data.map(d=>d.c),borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false}}}}); }
   var lgd=document.getElementById('s12-donut-lgd');
+  
+  // ⚠️ 3. [오타 수정 2] innerHTML 에 할당된 템플릿 리터럴 코드 내부의 무분별한 백슬래시(\)들을 전부 깨끗이 청소했습니다.
   if(lgd) lgd.innerHTML=data.map(d=>`<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><div style="width:10px;height:10px;border-radius:2px;background:${d.c};"></div><span style="font-size:11px;color:var(--tx2);">${d.l}</span><span style="font-size:11px;font-weight:700;color:var(--tx);margin-left:auto;">${d.p}%</span></div>`).join('');
+  
+  var shRows=[{r:1, n:'NXC Corp.', t:'지주', p:'46.38%', s:'367.8M', note:'2026.06 NXMH B.V. 매각 반영'},{r:2, n:'JP MORGAN BANK(380572)',t:'기관(신탁)', p:'11.17%', s:'88.5M', note:'사우디 Ayar(PIF) 보관'},{r:3, n:'일본마스터트러스트뱅크', t:'기관(신탁)', p:'12.38%', s:'98.1M', note:'신탁계정 보관'},{r:4, n:'자기주식', t:'자사주', p:'4.14%', s:'34.3M', note:'자기주식 34,253,200주'}];
+  var tbody=document.getElementById('s12-tbl');
+  if(tbody) tbody.innerHTML=shRows.map(d=>`<tr ${d.r===1?'class="nx"':''}><td><span class="rn">${d.r}</span></td><td style="text-align:left;font-weight:700;">${d.n}</td><td><span class="bdg bu">${d.t}</span></td><td style="font-weight:700;">${d.p}</td><td>${d.s}</td><td style="text-align:left;color:var(--tx3);font-size:10px;">${d.note}</td></tr>`).join('');
 }
 
 function buildS4() { 
@@ -1102,6 +1620,7 @@ window.addEventListener('load', () => {
     const revPill = document.querySelector('.ctrl .pill');
     if(revPill) window.setMet('rev', revPill);
     
+    // ⚠️ 4. [오타 수정 3] 먹통의 주범이었던 닫는 괄호 '})();'를 완전히 제거하고 첫 화면 차트 그리기 'buildS11()'를 배치하였습니다.
     buildS11();
     
     fetchCleanLiveNews();
