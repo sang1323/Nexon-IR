@@ -4,49 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEXON IR Dashboard - Valuation</title>
+    <!-- Chart.js 및 날짜 처리 어댑터 필수 포함 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <style>
-        /* 기본 스타일 (제공된 CSS 기반) */
         :root {
             --bg: #0a0e16; --surface: #141b28; --surface2: #1a2436; --line: #1e2836;
             --txt: #e8edf5; --txt2: #a9b8cd; --txt3: #7f92ad;
             --mint: #4dd6c1; --blue: #5b9dff; --gold: #ffc107; --red: #f06a6a; --green: #3fcf8e;
         }
-        body { background-color: var(--bg); color: var(--txt); font-family: sans-serif; padding: 10px; }
-        .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 14px; }
+        body { background-color: var(--bg); color: var(--txt); font-family: sans-serif; padding: 10px; margin: 0; }
+        .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 14px; margin-bottom: 14px; }
         .col { display: flex; flex-direction: column; }
-        .card { background-color: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 14px; flex-grow: 1; }
+        .card { background-color: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; flex-grow: 1; }
         .ct { font-size: 18px; font-weight: 900; color: var(--txt); border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 15px; }
         .ct .bar { display: inline-block; width: 4px; height: 18px; background-color: var(--mint); margin-right: 8px; vertical-align: -3px; border-radius: 2px; }
         .ct .r { float: right; font-size: 12px; font-weight: 600; color: var(--txt3); }
         .note { font-size: 11.5px; color: var(--txt3); line-height: 1.6; margin-top: 15px; }
-        .note b { color: var(--txt2); font-weight: 700; }
-        #footNote { display: block; text-align: center; margin-top: 20px; font-size: 12px; }
-
-        /* 기존 JS에서 생성하던 HTML 요소들을 위한 스타일 */
-        .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin-top:4px}
-        .statcard{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:12px 13px}
-        .statcard .sm{font-size:12.5px;color:#9fb0c8;font-weight:700;margin-bottom:5px}
-        .statcard .sv{font-size:20px;font-weight:900;color:#e8edf5;font-variant-numeric:tabular-nums;margin-bottom:7px}
-        .statcard .sc{display:flex;gap:5px;flex-wrap:wrap}
-        .schip{font-size:10.5px;font-weight:900;padding:2.5px 7px;border-radius:20px;white-space:nowrap}
-        .schip.good{background:rgba(63,207,142,.16);color:#3fcf8e}
-        .schip.bad{background:rgba(240,106,106,.16);color:#f06a6a}
-        .schip.mid{background:rgba(127,146,173,.14);color:#9fb0c8}
-        .anSec{margin-bottom:16px;padding:13px 15px;border-radius:10px;background:rgba(255,255,255,.03);border-left:3px solid var(--line2)}
-        .anSec.kr{border-left-color:#f4c151}
-        .anSec.ov{border-left-color:#5b9dff}
-        .anSec.sum{border-left-color:#4dd6c1;background:rgba(77,214,193,.06)}
-        .anH{font-size:14px;font-weight:900;color:#e8edf5;margin-bottom:8px}
-        .anSec.kr .anH{color:#f4c151}
-        .anSec.ov .anH{color:#5b9dff}
-        .anSec.sum .anH{color:#4dd6c1}
-        .anL{font-size:13px;color:#c8d3e0;line-height:1.7;margin-bottom:4px}
-        .anL b{color:#fff;font-weight:800}
-        .anL .up{color:#3fcf8e;font-weight:800}
-        .anL .dn{color:#f06a6a;font-weight:800}
-
+        .statgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(158px, 1fr)); gap: 10px; margin-top: 4px; }
+        .statcard { background: rgba(255,255,255,.03); border: 1px solid var(--line); border-radius: 10px; padding: 12px 13px; }
+        .statcard .sm { font-size: 12.5px; color: #9fb0c8; font-weight: 700; margin-bottom: 5px; }
+        .statcard .sv { font-size: 20px; font-weight: 900; color: #e8edf5; margin-bottom: 7px; }
+        .statcard .sc { display: flex; gap: 5px; flex-wrap: wrap; }
+        .schip { font-size: 10.5px; font-weight: 900; padding: 2.5px 7px; border-radius: 20px; white-space: nowrap; }
+        .schip.good { background: rgba(63,207,142,.16); color: #3fcf8e; }
+        .schip.bad { background: rgba(240,106,106,.16); color: #f06a6a; }
+        .schip.mid { background: rgba(127,146,173,.14); color: #9fb0c8; }
+        .anSec { margin-bottom: 16px; padding: 13px 15px; border-radius: 10px; background: rgba(255,255,255,.03); border-left: 3px solid var(--line); }
+        .anSec.kr { border-left-color: #f4c151; }
+        .anSec.ov { border-left-color: #5b9dff; }
+        .anSec.sum { border-left-color: #4dd6c1; background: rgba(77,214,193,.06); }
+        .anH { font-size: 14px; font-weight: 900; color: #e8edf5; margin-bottom: 8px; }
+        .anL { font-size: 13px; color: #c8d3e0; line-height: 1.7; margin-bottom: 4px; }
+        .anL b { color: #fff; font-weight: 800; }
+        .anL .up { color: #3fcf8e; font-weight: 800; }
+        .anL .dn { color: #f06a6a; font-weight: 800; }
     </style>
 </head>
 <body>
@@ -57,259 +49,137 @@
                 <div class="ct"><span class="bar"></span>P/E 밴드 차트
                     <span class="r">과거 5년 기준</span>
                 </div>
-                <canvas id="peBandChart" height="250"></canvas>
-                <div class="note">※ 넥슨의 과거 5년간 주당순이익(EPS)과 주가 데이터를 바탕으로 PER 밴드를 산출하여 현재 주가의 상대적 위치를 보여줍니다.</div>
+                <div style="height: 250px;"><canvas id="peBandChart"></canvas></div>
             </div>
         </div>
         <div class="col">
             <div class="card">
                 <div class="ct"><span class="bar"></span>피어 그룹 멀티플 비교
-                    <span class="r" id="vsMeta">Yahoo 실측 · 각 그룹 중앙값</span>
+                    <span class="r" id="vsMeta">Yahoo/DART 실측 중앙값</span>
                 </div>
-                <canvas id="peerMultiplesChart" height="250"></canvas>
-                 <div class="note">※ 넥슨과 국내/해외 경쟁사 그룹의 핵심 지표(PER, PBR, 영업이익률)를 비교하여 상대적 밸류에이션 수준을 보여줍니다.</div>
+                <div style="height: 250px;"><canvas id="peerMultiplesChart"></canvas></div>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col">
             <div class="card">
-                <div class="ct"><span class="bar"></span>각 지표 현재 상태 진단
-                    <span class="r">국내 10사 / 해외 14사 중앙값 대비</span>
-                </div>
+                <div class="ct"><span class="bar"></span>각 지표 현재 상태 진단</div>
                 <div class="statgrid" id="diagGrid"></div>
-                <div class="note" id="diagNote"></div>
             </div>
         </div>
         <div class="col">
             <div class="card">
-                <div class="ct"><span class="bar"></span>넥슨 주가 종합 평가
-                    <span class="r">Yahoo 실측 기반 · 투자 추천 아님</span>
-                </div>
+                <div class="ct"><span class="bar"></span>넥슨 주가 종합 평가</div>
                 <div id="anBody"></div>
             </div>
         </div>
     </div>
 
-    <div class="note"><span id="footNote">※ 데이터 연결 중…</span></div>
+    <!-- 💡 하단 안내 및 실시간 업데이트 뱃지 -->
+    <div class="note" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+        <span id="footNote">※ 실시간 데이터 연결 중…</span>
+        <span id="updateTimeBadge" style="background: rgba(77,214,193,0.1); color: var(--mint); padding: 5px 10px; border-radius: 15px; font-weight: 700; display: none;">
+            업데이트 기준: 로딩 중...
+        </span>
+    </div>
 
 <script>
-/* ══════════════════════════════════════════════════════════════════════
-   데이터 모의 제공 (Mock Data)
-   실제 환경에서는 이 부분을 제거하고 기존의 fetch 로직을 사용하세요.
-   P/E 밴드 차트에 필요한 `historicalData`는 API 응답에 추가되어야 합니다.
-   ══════════════════════════════════════════════════════════════════════ */
-window.__ready = new Promise((resolve) => {
-    setTimeout(() => {
-        resolve({
-            peers: [{ sym: '3659.T', per: 18.5, pbr: 1.5, opm: 25.5, roe: 8.2, roa: 6.5, pfcf: 16.8 }],
-            peerStats: {
-                kr: { per: 22.1, pbr: 2.1, opm: 15.2, roe: 9.8, roa: 7.1, pfcf: 25.4, n: 10, nPer: 8, nPbr: 10, nOpm: 10, nRoe: 9, nRoa: 9, nPfcf: 7 },
-                ov: { per: 25.8, pbr: 3.5, opm: 22.1, roe: 13.5, roa: 9.2, pfcf: 28.9, n: 14, nPer: 13, nPbr: 14, nOpm: 14, nRoe: 14, nRoa: 14, nPfcf: 12 }
-            },
-            price: { current: 2850, w52low: 2450, w52high: 3550 },
-            // P/E 밴드 차트를 위한 모의 데이터 (날짜, 주가, 주당순이익)
-            historicalData: [
-                { date: "2019-07-01", price: 1700, eps: 85 },
-                { date: "2020-01-01", price: 2000, eps: 100 },
-                { date: "2020-07-01", price: 2400, eps: 110 },
-                { date: "2021-01-01", price: 3400, eps: 120 },
-                { date: "2021-07-01", price: 3000, eps: 125 },
-                { date: "2022-01-01", price: 2600, eps: 140 },
-                { date: "2022-07-01", price: 2800, eps: 150 },
-                { date: "2023-01-01", price: 3100, eps: 160 },
-                { date: "2023-07-01", price: 2900, eps: 155 },
-                { date: "2024-01-01", price: 2700, eps: 165 },
-                { date: "2024-07-01", price: 2850, eps: 168 }
-            ]
-        });
-        document.getElementById('footNote').textContent = "※ 본 자료는 투자 추천이 아니며 모든 수치는 참고용입니다.";
-    }, 500);
-});
+// 🚨 필수 수정: 아래 URL을 방금 만드신 Cloudflare Worker 주소로 변경하세요!
+const API_ENDPOINT = 'https://nexon-valuation-api.YOUR-ACCOUNT.workers.dev'; 
 
+const CHART_DEFAULTS = { fontColor: '#e8edf5', gridColor: 'rgba(255, 255, 255, 0.1)', nexon: '#4dd6c1', kr: '#f4c151', ov: '#5b9dff' };
 
-/* ══════════════════════════════════════════════════════════════════════
-   ① 신규 차트 생성 (P/E Band, Peer Multiples)
-   ══════════════════════════════════════════════════════════════════════ */
-(function(){
-    function $(i) { return document.getElementById(i); }
-
-    const CHART_DEFAULTS = {
-        fontColor: 'rgba(232, 237, 245, 0.8)',
-        gridColor: 'rgba(255, 255, 255, 0.1)',
-        nexonColor: '#4dd6c1',
-        krColor: '#f4c151',
-        ovColor: '#5b9dff',
-    };
-
-    function drawPeBandChart(data) {
-        const ctx = $('peBandChart')?.getContext('2d');
-        if (!ctx || !data || data.length === 0) return;
-
-        // PER 밴드 계산 (저점 10x, 평균 20x, 고점 30x) - 실제 데이터 기반으로 조정 필요
-        const perLowBand = 10, perAvgBand = 20, perHighBand = 30;
-
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                datasets: [
-                    {
-                        label: '현재 주가',
-                        data: data.map(d => ({ x: d.date, y: d.price })),
-                        borderColor: CHART_DEFAULTS.nexonColor,
-                        backgroundColor: CHART_DEFAULTS.nexonColor,
-                        borderWidth: 3,
-                        tension: 0.1,
-                    },
-                    {
-                        label: `PER High (${perHighBand}x)`,
-                        data: data.map(d => ({ x: d.date, y: d.eps * perHighBand })),
-                        borderColor: 'rgba(240, 106, 106, 0.5)',
-                        borderWidth: 1.5, borderDash: [5, 5], pointRadius: 0, tension: 0.1,
-                    },
-                    {
-                        label: `PER Avg (${perAvgBand}x)`,
-                        data: data.map(d => ({ x: d.date, y: d.eps * perAvgBand })),
-                        borderColor: 'rgba(255, 255, 255, 0.4)',
-                        borderWidth: 1.5, pointRadius: 0, tension: 0.1,
-                    },
-                    {
-                        label: `PER Low (${perLowBand}x)`,
-                        data: data.map(d => ({ x: d.date, y: d.eps * perLowBand })),
-                        borderColor: 'rgba(91, 157, 255, 0.5)',
-                        borderWidth: 1.5, borderDash: [5, 5], pointRadius: 0, tension: 0.1,
-                        fill: { target: 'end', above: 'rgba(91, 157, 255, 0.05)' },
-                    }
-                ]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { labels: { color: CHART_DEFAULTS.fontColor } } },
-                scales: {
-                    x: {
-                        type: 'time', time: { unit: 'year' },
-                        grid: { color: CHART_DEFAULTS.gridColor }, ticks: { color: CHART_DEFAULTS.fontColor }
-                    },
-                    y: {
-                        grid: { color: CHART_DEFAULTS.gridColor }, ticks: { color: CHART_DEFAULTS.fontColor }
-                    }
-                }
-            }
-        });
-    }
-
-    function drawPeerMultiplesChart(me, kr, ov) {
-        const ctx = $('peerMultiplesChart')?.getContext('2d');
-        if (!ctx || !me || !kr || !ov) return;
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['PER (x)', 'PBR (x)', '영업이익률 (%)'],
-                datasets: [
-                    { label: '넥슨', data: [me.per, me.pbr, me.opm], backgroundColor: CHART_DEFAULTS.nexonColor },
-                    { label: '국내 피어', data: [kr.per, kr.pbr, kr.opm], backgroundColor: CHART_DEFAULTS.krColor },
-                    { label: '해외 피어', data: [ov.per, ov.pbr, ov.opm], backgroundColor: CHART_DEFAULTS.ovColor }
-                ]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { labels: { color: CHART_DEFAULTS.fontColor } } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: CHART_DEFAULTS.gridColor }, ticks: { color: CHART_DEFAULTS.fontColor } },
-                    x: { grid: { display: false }, ticks: { color: CHART_DEFAULTS.fontColor } }
-                }
-            }
-        });
-    }
-
-    window.__ready.then(function(j) {
-        const me = (j.peers || []).find(x => x.sym === '3659.T') || {};
-        const kr = j.peerStats?.kr || {};
-        const ov = j.peerStats?.ov || {};
-
-        drawPeerMultiplesChart(me, kr, ov);
-        drawPeBandChart(j.historicalData);
-        
-        $('vsMeta').textContent = 'Yahoo 실측 · 국내 ' + (kr.n || 0) + '사 / 해외 ' + (ov.n || 0) + '사 중앙값';
-    }).catch(console.error);
-})();
-
-
-/* ══════════════════════════════════════════════════════════════════════
-   ② 기존 코드: 진단 그리드 + 종합 평가 (원본 유지)
-   ══════════════════════════════════════════════════════════════════════ */
-(function(){
-  function $(i){ return document.getElementById(i); }
-
-  window.__ready.then(function(j){
-    var me = (j.peers||[]).filter(function(x){return x.sym==='3659.T';})[0] || {};
-    var ps = j.peerStats || {};
-    var kr = ps.kr || {}, ov = ps.ov || {};
-
-    var M = [
-      { k:'per',  n:'PER',      u:'x', lo:true  }, { k:'pbr',  n:'PBR',      u:'x', lo:true  },
-      { k:'opm',  n:'영업이익률', u:'%', lo:false }, { k:'roe',  n:'ROE',      u:'%', lo:false },
-      { k:'roa',  n:'ROA',      u:'%', lo:false }, { k:'pfcf', n:'P/FCF',    u:'x', lo:true  }
-    ];
-
-    var g = '';
-    M.forEach(function(m){
-      var v = me[m.k];
-      if (v == null) return;
-      var gk = kr[m.k] ? (v/kr[m.k] - 1)*100 : null;
-      var go = ov[m.k] ? (v/ov[m.k] - 1)*100 : null;
-      var chip = function(gap, lower, label){
-        if (gap == null) return '<span class="schip mid">' + label + ' —</span>';
-        var good = lower ? (gap < -5) : (gap > 5);
-        var bad  = lower ? (gap > 5)  : (gap < -5);
-        var c = good ? 'good' : (bad ? 'bad' : 'mid');
-        var t = good ? '우위' : (bad ? '열위' : '유사');
-        return '<span class="schip ' + c + '">' + label + ' ' + t + '</span>';
-      };
-      g += '<div class="statcard">'
-        + '<div class="sm">' + m.n + '</div>'
-        + '<div class="sv">' + v + m.u + '</div>'
-        + '<div class="sc">' + chip(gk, m.lo, '국내') + chip(go, m.lo, '해외') + '</div>'
-        + '</div>';
+// 1. API 데이터 호출 (프라미스 할당)
+window.__ready = fetch(API_ENDPOINT)
+    .then(res => {
+        if (!res.ok) throw new Error('서버 응답 오류');
+        return res.json();
+    })
+    .then(data => {
+        // 업데이트 타임스탬프 뱃지 렌더링
+        if (data.meta && data.meta.updatedAt) {
+            const ut = new Date(data.meta.updatedAt);
+            const formatted = ut.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+            const badge = document.getElementById('updateTimeBadge');
+            badge.style.display = 'inline-block';
+            badge.textContent = `기준 시점: ${formatted}`;
+        }
+        document.getElementById('footNote').innerHTML = "※ 본 자료는 참고용이며, 출처는 Yahoo Finance 및 DART입니다.";
+        return data;
+    })
+    .catch(err => {
+        console.error(err);
+        document.getElementById('footNote').innerHTML = "<span style='color:#f06a6a'>※ 데이터 연동 실패. 주소(URL)를 확인하거나 F12 개발자 도구를 확인하세요.</span>";
+        throw err;
     });
-    $('diagGrid').innerHTML = g || '<div style="color:var(--txt3)">데이터 연결 중…</div>';
-    $('diagNote').innerHTML = '<span style="color:var(--txt3);font-size:11.5px">'
-      + '※ 각 그룹 중앙값 대비 <b>±5% 이내</b>는 「유사」로 판정. '
-      + 'PER·PBR·P/FCF는 낮을수록, 영업이익률·ROE·ROA는 높을수록 우위입니다.</span>';
 
-    var html = '';
-    var section = function(grp, cls, title, label){
-      var lines = [], win = 0, lose = 0;
-      M.forEach(function(m){
-        var cmp = function(m, grp){
-          var v = me[m.k], p = grp[m.k];
-          if (v == null || !p) return null;
-          var gap = (v/p - 1)*100;
-          var good = m.lo ? (gap < -5) : (gap > 5);
-          var bad  = m.lo ? (gap > 5)  : (gap < -5);
-          return { gap:gap, good:good, bad:bad, v:v, p:p };
+// 2. 차트 렌더링 함수
+function drawPeBandChart(data) {
+    const ctx = document.getElementById('peBandChart');
+    if (!ctx || !data || data.length === 0) return;
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [
+                { label: '현재 주가', data: data.map(d => ({ x: d.date, y: d.price })), borderColor: CHART_DEFAULTS.nexon, borderWidth: 2, tension: 0.1, pointRadius: 0 },
+                { label: 'PER High (30x)', data: data.map(d => ({ x: d.date, y: d.eps * 30 })), borderColor: 'rgba(240, 106, 106, 0.5)', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 },
+                { label: 'PER Avg (20x)', data: data.map(d => ({ x: d.date, y: d.eps * 20 })), borderColor: 'rgba(255, 255, 255, 0.4)', borderWidth: 1, pointRadius: 0 },
+                { label: 'PER Low (10x)', data: data.map(d => ({ x: d.date, y: d.eps * 10 })), borderColor: 'rgba(91, 157, 255, 0.5)', borderWidth: 1, borderDash: [5, 5], pointRadius: 0, fill: { target: 'end', above: 'rgba(91, 157, 255, 0.05)' } }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: CHART_DEFAULTS.fontColor, boxWidth: 12 } } }, scales: { x: { type: 'time', time: { unit: 'year' }, grid: { color: CHART_DEFAULTS.gridColor }, ticks: { color: CHART_DEFAULTS.fontColor } }, y: { grid: { color: CHART_DEFAULTS.gridColor }, ticks: { color: CHART_DEFAULTS.fontColor } } } }
+    });
+}
+
+function drawPeerChart(me, kr, ov) {
+    const ctx = document.getElementById('peerMultiplesChart');
+    if (!ctx || !me) return;
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['PER (x)', 'PBR (x)', '영업이익률 (%)'],
+            datasets: [
+                { label: '넥슨', data: [me.per, me.pbr, me.opm], backgroundColor: CHART_DEFAULTS.nexon },
+                { label: '국내 피어', data: [kr.per, kr.pbr, kr.opm], backgroundColor: CHART_DEFAULTS.kr },
+                { label: '해외 피어', data: [ov.per, ov.pbr, ov.opm], backgroundColor: CHART_DEFAULTS.ov }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: CHART_DEFAULTS.fontColor } } }, scales: { y: { grid: { color: CHART_DEFAULTS.gridColor }, ticks: { color: CHART_DEFAULTS.fontColor } }, x: { grid: { display: false }, ticks: { color: CHART_DEFAULTS.fontColor } } } }
+    });
+}
+
+// 3. 메인 로직 실행
+window.__ready.then(j => {
+    const me = (j.peers || []).find(x => x.sym === '3659.T') || {};
+    const kr = j.peerStats?.kr || {};
+    const ov = j.peerStats?.ov || {};
+
+    // 차트 그리기
+    drawPeBandChart(j.historicalData);
+    drawPeerChart(me, kr, ov);
+
+    // 진단 그리드 그리기
+    const M = [
+      { k:'per', n:'PER', u:'x', lo:true }, { k:'pbr', n:'PBR', u:'x', lo:true },
+      { k:'opm', n:'영업이익률', u:'%', lo:false }, { k:'roe', n:'ROE', u:'%', lo:false }
+    ];
+    let g = '';
+    M.forEach(m => {
+        let v = me[m.k]; if(v==null) return;
+        let gk = kr[m.k] ? (v/kr[m.k]-1)*100 : null, go = ov[m.k] ? (v/ov[m.k]-1)*100 : null;
+        const chip = (gap, lo) => {
+            if(gap==null) return '<span class="schip mid"> — </span>';
+            let good = lo ? gap < -5 : gap > 5, bad = lo ? gap > 5 : gap < -5;
+            return `<span class="schip ${good?'good':bad?'bad':'mid'}">${good?'우위':bad?'열위':'유사'}</span>`;
         };
-        var c = cmp(m, grp);
-        if (!c) return;
-        if (c.good) win++; if (c.bad) lose++;
-        var sign = c.gap >= 0 ? '+' : '';
-        var tag = c.good ? '<span class="up">우위</span>' : c.bad  ? '<span class="dn">열위</span>' : '유사';
-        lines.push('<div class="anL">· <b>' + m.n + '</b> 넥슨 ' + c.v + m.u + ' vs ' + label + ' ' + c.p + m.u + ' (' + sign + c.gap.toFixed(0) + '%) → ' + tag + '</div>');
-      });
-      if (!lines.length) return '';
-      var verdict = win > lose ? '<span class="up">전반적 우위</span>' : lose > win ? '<span class="dn">전반적 열위</span>' : '<span>혼재</span>';
-      return '<div class="anSec ' + cls + '">'
-        + '<div class="anH">' + title + '</div>' + lines.join('')
-        + '<div class="anL" style="margin-top:7px;padding-top:7px;border-top:1px solid var(--line)">'
-        + '6개 지표 중 <b>우위 ' + win + '</b> · <b>열위 ' + lose + '</b> → ' + verdict + '</div></div>';
-    };
-    html += section(kr, 'kr', '국내 게임사 ' + (kr.n||10) + '사 대비', '국내');
-    html += section(ov, 'ov', '해외 게임사 ' + (ov.n||14) + '사 대비', '해외');
-    $('anBody').innerHTML = html;
-    
-  }).catch(console.error);
-})();
+        g += `<div class="statcard"><div class="sm">${m.n}</div><div class="sv">${v}${m.u}</div><div class="sc">국내 ${chip(gk, m.lo)} 해외 ${chip(go, m.lo)}</div></div>`;
+    });
+    document.getElementById('diagGrid').innerHTML = g;
+
+    // 종합 평가 텍스트
+    document.getElementById('anBody').innerHTML = `<div class="anSec sum"><div class="anH">종합 요약</div><div class="anL">현재 넥슨의 실시간 주가는 <b>${j.price.current.toLocaleString()}엔</b> 입니다. 차트에서 보듯 밸류에이션 및 피어 그룹 대비 수익성을 모니터링 중입니다.</div></div>`;
+}).catch(e => console.log('렌더링 에러:', e));
 </script>
 </body>
 </html>
