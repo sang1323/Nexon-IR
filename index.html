@@ -1,3 +1,5 @@
+26.07.23
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -691,7 +693,23 @@ select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid va
   <span class="lbl" id="s1q-lbl">분기:</span>
   <select id="s1q" onchange="buildS1()">
     <option value="2026Q1">2026 Q1 ★</option><option value="2025Q4">2025 Q4</option>
-    ... (중략) ...
+    <option value="2025Q3">2025 Q3</option><option value="2025Q2">2025 Q2</option>
+    <option value="2025Q1">2025 Q1</option><option value="2024Q4">2024 Q4</option>
+    <option value="2024Q3">2024 Q3</option><option value="2024Q2">2024 Q2</option>
+    <option value="2024Q1">2024 Q1</option>
+  </select>
+  <!-- ⭐️ 여기에 숨겨진 실시간 배지가 들어갑니다! -->
+  <span id="s1-live-badge" style="display:none; font-size:11px; font-weight:800; color:#fff; background:var(--accent); padding:3px 8px; border-radius:4px; box-shadow:0 2px 8px rgba(99,102,241,.4); margin-left:8px;">🔴 실시간 Live</span>
+
+  <!-- ⭐️ 실시간 지표를 누르면 튀어나올 마법의 배지 -->
+  <span id="s1-live-badge" style="display:none; font-size:11px; font-weight:800; color:#fff; background:var(--accent); padding:3px 8px; border-radius:4px; box-shadow:0 2px 8px rgba(99,102,241,.4);">🔴 실시간 Live</span>
+
+  <span class="lbl" style="margin-left:8px;">지표:</span>
+  <span class="pill on" onclick="setMet('mktcap',this)">시가총액</span>
+  <span class="pill" onclick="setMet('rev',this)">매출</span>
+  <span class="pill" onclick="setMet('op',this)">영업이익</span> 
+  <span class="pill" onclick="setMet('opm',this)">영업이익률(OPM)</span>
+  <span class="pill" onclick="setMet('per',this)">주가수익비율(PER)</span>
   <span class="pill" onclick="setMet('pbr',this)">주가순자산비율(PBR)</span>
   <span class="pill" onclick="setMet('roe',this)">자기자본이익률(ROE)</span>
 </div>
@@ -1934,14 +1952,13 @@ function buildS5(){
 
 // ── S1 게임사 비교 ─────────────────────────────────────────────────────
 var rMet='mktcap';
-
 function setMet(m,el){
   rMet=m;
   document.querySelectorAll('.ctrl .pill').forEach(function(p){
     if(p.getAttribute('onclick')&&p.getAttribute('onclick').includes('setMet')) p.classList.remove('on');
   });
   el.classList.add('on');
-  
+
   // ⭐️ 스마트 UI 로직: 실시간 지표면 분기 선택창 숨기고 Live 배지 켜기!
   var qSelect = document.getElementById('s1q');
   var qLabel = document.getElementById('s1q-lbl');
@@ -1956,6 +1973,7 @@ function setMet(m,el){
     if(qLabel) qLabel.style.display = 'inline-block';
     if(liveBadge) liveBadge.style.display = 'none';
   }
+
   buildS1();
 }
 
@@ -1979,6 +1997,7 @@ function getV(co,qk,met){
   var vd=VD[co]&&VD[co][qk];
   if(met==='roe') return(vd&&vd.roe!=null)?vd.roe:(CO[co]?CO[co].roe:null);
   if(met==='dy')  return(vd&&vd.dy!=null)?vd.dy:CO[co].dy;
+
   var qd=QD[co]&&QD[co][qk];
   if(met==='rev') return qd?qd.r:null;
   if(met==='op')  return qd?qd.o:null;
@@ -1994,30 +2013,22 @@ function getV(co,qk,met){
 
 function buildS1(){
   var qk=document.getElementById('s1q').value;
-  var metLabels={mktcap:'시가총액 (B$)',rev:'매출 (M$)',op:'영업이익 (M$)',opm:'영업이익률 OPM (%)',per:'주가수익비율 PER (배)',pbr:'주가순자산비율 PBR (배)',roe:'자기자본이익률 ROE (%)'};
-  var isLower=false; 
+  var metLabels={mktcap:'시가총액 (십억$)',rev:'매출 (백만$)',op:'영업이익 (백만$)',opm:'영업이익률 OPM (%)',per:'주가수익비율 PER (배)',pbr:'주가순자산비율 PBR (배)',roe:'자기자본이익률 ROE (%)'};
+  var isLower=false; // 모든 지표 높은 순 정렬 (PER/PBR 포함)
   var unitLbl=metLabels[rMet]||rMet;
-  
   var gu=document.getElementById('s1g-unit');
   var ku=document.getElementById('s1k-unit');
-  // Live 지표일때는 '분기' 글자 대신 '실시간' 표시
-  var timePrefix = (rMet === 'mktcap' || rMet === 'per' || rMet === 'pbr') ? '실시간' : qk;
-  if(gu) gu.textContent = timePrefix + ' · ' + unitLbl;
-  if(ku) ku.textContent = timePrefix + ' · ' + unitLbl;
+  if(gu) gu.textContent=qk+' · '+unitLbl;
+  if(ku) ku.textContent=qk+' · '+unitLbl;
 
   var GLOBAL_COS=['tencent','sony','nintendo','netease','ea','roblox','ttwo','bandai','konami','capcom','nexon'];
   var KOREA_COS=['nexon','krafton','ncsoft','netmarble','pearlabyss','shiftup','kakaogames','wemade','neowiz','webzen'];
 
-  // ⭐️ 단위 구분을 위한 헬퍼 변수
-  var valUnit = "";
-  if(rMet === 'rev' || rMet === 'op') valUnit = " M$";
-  else if(rMet === 'mktcap') valUnit = " B$";
-  else if(rMet === 'per' || rMet === 'pbr') valUnit = "배";
-  else if(rMet === 'opm' || rMet === 'roe') valUnit = "%";
-
   function getCoVal(co){
     var v=getV(co,qk,rMet);
     if(v===null||v===undefined||isNaN(v))return null;
+    // mktcap은 MKTCAP_QD/CO.mktcap 모두 이미 USD B$ 단위 → FX2 변환 불필요
+    // rev/op는 각국 통화 단위이므로 FX2(→USD M$) 변환 필요
     var vUsd=(rMet==='rev'||rMet==='op')?(v*(FX2[co]||1)):v;
     return vUsd;
   }
@@ -2029,30 +2040,27 @@ function buildS1(){
     if(isNaN(n)){return [99,102,241];}
     return [(n>>16)&255,(n>>8)&255,n&255];
   }
-
   function buildList(coList, elId){
     var el=document.getElementById(elId);
     if(!el)return;
     var data=coList.map(function(co){
       var v=getCoVal(co);
-      return {co:co,v:v,na:(v===null)};
+      return {co:co,v:v,na:(v===null)};  // 값 없으면 na 플래그, 목록엔 유지
     });
-
+    // 값 있는 기업 먼저(정렬), 값 없는(N/A) 기업은 뒤로
     data.sort(function(a,b){
       if(a.na&&b.na)return 0;
-      if(a.na)return 1;
-      if(b.na)return -1;
+      if(a.na)return 1;   // a가 N/A면 뒤로
+      if(b.na)return -1;  // b가 N/A면 뒤로
       return isLower?a.v-b.v:b.v-a.v;
     });
-
     var validVals=data.filter(function(d){return!d.na;});
     var vals=validVals.map(function(d){return d.v;});
     var hi=Math.max.apply(null,[0].concat(vals));
     var lo=Math.min.apply(null,[0].concat(vals));
     var range=(hi-lo)||1;
-    var zeroPct=(0-lo)/range*100;
+    var zeroPct=(0-lo)/range*100;      // 0 기준선 위치(음수 없으면 0%)
     var hasNeg=lo<0;
-
     el.innerHTML=data.map(function(d,i){
       var rank=i+1;
       var isNx=CO[d.co]&&CO[d.co].nx;
@@ -2062,20 +2070,14 @@ function buildS1(){
       var grad=neg
         ? 'linear-gradient(90deg,rgba(224,82,82,.55),rgba(224,82,82,.95))'
         : 'linear-gradient(90deg,rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',.45),rgb('+rgb[0]+','+rgb[1]+','+rgb[2]+'))';
-      
       var barW=d.na?0:Math.max(2,Math.abs(d.v)/range*100);
       var leftPct=d.na?0:(d.v>=0?zeroPct:Math.max(0,zeroPct-barW));
-      
-      // ⭐️ 수치 포맷팅 및 단위(M$, B$, 배, %) 부착
-      var dispV=d.na?'N/A':(Math.abs(d.v)>=100?Math.round(d.v).toLocaleString():(Math.round(d.v*10)/10).toLocaleString());
-      if(!d.na) dispV += valUnit;
-
+      var dispV=d.na?'N/A':(Math.abs(d.v)>=100?Math.round(d.v):Math.round(d.v*10)/10);
       var badgeCls=rank===1?'g1':rank===2?'g2':rank===3?'g3':'gx';
       var rowCls='rk-row'+(isNx?' nx':'')+(d.na?' na':'');
       var delay=(i*0.045).toFixed(3)+'s';
       var name=(isNx?'\u2605 ':'')+((CO[d.co]&&CO[d.co].n)||d.co);
       var valCol=neg?'color:#e05252;':'';
-
       return '<div class="'+rowCls+'">'
         +'<div class="rk-badge '+badgeCls+'">'+rank+'</div>'
         +'<div class="rk-name">'+name+'</div>'
@@ -2091,56 +2093,6 @@ function buildS1(){
   buildList(GLOBAL_COS,'s1g-list');
   buildList(KOREA_COS,'s1k-list');
 }
-
-// ⭐️ 여기서 화면 상단 버튼들의 UI 배치 순서를 덮어씌웁니다! (왼쪽: 실시간, 오른쪽: 실적)
-(function reorderPills() {
-  document.addEventListener("DOMContentLoaded", function() {
-    setTimeout(function() {
-      const ctrl = document.querySelector('#s1 .ctrl');
-      if (!ctrl || document.getElementById('s1-group-1')) return;
-      
-      const pills = Array.from(ctrl.querySelectorAll('.pill'));
-      const pMap = {};
-      
-      pills.forEach(p => {
-        if(p.textContent.includes('매출')) pMap.rev = p;
-        else if(p.textContent.includes('영업이익률')) pMap.opm = p;
-        else if(p.textContent.includes('영업이익')) pMap.op = p;
-        else if(p.textContent.includes('시가총액')) pMap.mktcap = p;
-        else if(p.textContent.includes('PER')) pMap.per = p;
-        else if(p.textContent.includes('PBR')) pMap.pbr = p;
-        else if(p.textContent.includes('ROE')) pMap.roe = p;
-        p.remove();
-      });
-
-      // 1그룹 (왼쪽): 시총 / PER / PBR
-      const g1 = document.createElement('div'); 
-      g1.id = 's1-group-1'; 
-      g1.style.cssText = 'display:flex; flex-wrap:wrap; gap:6px; margin-right:12px; padding-right:12px; border-right:1px solid var(--bd);';
-      ['mktcap', 'per', 'pbr'].forEach(k => { 
-        if(pMap[k]) {
-          pMap[k].innerHTML = '⏱️ ' + pMap[k].innerHTML; // 직관적으로 실시간 느낌 나게 시계 아이콘 추가
-          g1.appendChild(pMap[k]); 
-        }
-      });
-      
-      // 2그룹 (오른쪽): 매출 / 영업이익 / 영업이익률 / ROE
-      const g2 = document.createElement('div'); 
-      g2.id = 's1-group-2'; 
-      g2.style.cssText = 'display:flex; flex-wrap:wrap; gap:6px;';
-      ['rev', 'op', 'opm', 'roe'].forEach(k => { if(pMap[k]) g2.appendChild(pMap[k]); });
-      
-      const targetLbl = Array.from(ctrl.querySelectorAll('.lbl')).find(e => e.textContent.includes('지표:'));
-      if(targetLbl) { 
-        targetLbl.insertAdjacentElement('afterend', g1); 
-        g1.insertAdjacentElement('afterend', g2); 
-      } else { 
-        ctrl.appendChild(g1); ctrl.appendChild(g2); 
-      }
-    }, 500); // UI가 완전히 로드된 후 재배열 실행
-  });
-})();
-
 
 function togChart(grp,co,el){
   var arr=grp==='g'?s11gActive:s11kActive;
