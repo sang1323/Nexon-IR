@@ -1,638 +1,315 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>넥슨 기업가치 분석</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg:#0d0d0f;--bg2:#14141a;--bg3:#1c1c24;
-  --bd:rgba(255,255,255,.08);--bd2:rgba(255,255,255,.14);
-  --tx:#f0f0f4;--tx2:#a0a0b0;--tx3:#606070;
-  --red:#e05252;--green:#18a974;--amber:#f59e0b;--blue:#3b82f6;
-  --accent:#6366f1;--accent2:#818cf8;
-  --r:6px;--rl:10px;
-}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;
-  background:var(--bg);color:var(--tx);font-size:13px;line-height:1.5;}
-.wrap{max-width:1160px;margin:0 auto;padding:0 20px 48px;}
-/* 헤더 */
-.hd{padding:16px 0 0;margin-bottom:20px;}
-.hd-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
-  padding:14px 20px;background:linear-gradient(135deg,#1e1b4b,#312e81,#1e1b4b);
-  border:1px solid rgba(99,102,241,.3);border-radius:var(--rl);}
-.hd-left{display:flex;align-items:center;gap:14px;}
-.hd-logo{width:38px;height:38px;border-radius:10px;background:rgba(99,102,241,.3);
-  border:1px solid rgba(99,102,241,.5);display:flex;align-items:center;justify-content:center;
-  font-size:15px;font-weight:800;color:#818cf8;}
-.hd-title{font-size:15px;font-weight:700;color:#e0e0f0;}
-.hd-sub{font-size:10px;color:rgba(160,160,200,.7);margin-top:2px;}
-.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-/* 탭 */
-.tab-row{display:flex;flex-wrap:wrap;gap:2px;background:var(--bg2);border:1px solid var(--bd);
-  border-radius:var(--rl);padding:4px;margin-bottom:20px;}
-.tab{background:transparent;border:none;border-radius:8px;padding:7px 14px;
-  font-size:11.5px;font-weight:500;color:var(--tx3);cursor:pointer;white-space:nowrap;}
-.tab:hover{color:var(--tx2);background:var(--bg3);}
-.tab.on{background:var(--bg3);color:var(--accent2);font-weight:700;border:1px solid rgba(99,102,241,.3);}
-/* 섹션 */
-.sec{display:none;}.sec.on{display:block;}
-/* 컨트롤 */
-.ctrl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:12px;
-  padding:10px 14px;background:var(--bg2);border-radius:var(--r);border:1px solid var(--bd);}
-.lbl{font-size:10.5px;font-weight:600;color:var(--tx3);}
-select{font-size:11px;padding:4px 8px;border-radius:var(--r);border:1px solid var(--bd2);background:var(--bg3);color:var(--tx);}
-/* pill */
-.pill{background:var(--bg3);border:1px solid var(--bd2);border-radius:5px;padding:3px 9px;
-  font-size:11px;font-weight:500;color:var(--tx2);cursor:pointer;}
-.pill.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;}
-/* 카드 */
-.card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rl);padding:16px 18px;}
-.card-title{font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:10px;}
-/* 그리드 */
-.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-@media(max-width:700px){.g4{grid-template-columns:repeat(2,1fr);}.g2{grid-template-columns:1fr;}}
-/* KPI */
-.mc{background:var(--bg3);border-radius:var(--rl);padding:12px 14px;border:1px solid var(--bd);}
-.mc-l{font-size:9.5px;font-weight:600;color:var(--tx3);margin-bottom:4px;text-transform:uppercase;}
-.mc-v{font-size:20px;font-weight:700;color:var(--tx);line-height:1.2;}
-.mc-s{font-size:10px;color:var(--tx3);margin-top:3px;}
-/* 테이블 */
-.tw{overflow-x:auto;}
-.t{width:100%;border-collapse:collapse;font-size:11.5px;}
-.t th{background:var(--bg3);padding:8px 10px;text-align:center;font-size:10px;font-weight:600;color:var(--tx3);border-bottom:1px solid var(--bd2);white-space:nowrap;}
-.t td{padding:8px 10px;text-align:center;border-bottom:1px solid var(--bd);color:var(--tx);}
-.t tr:last-child td{border-bottom:none;}
-.t tr.nx{background:rgba(99,102,241,.06);}
-.t tr:hover td{background:var(--bg3);}
-/* 배지·랭크 */
-.bdg{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600;display:inline-block;}
-.bu{background:rgba(24,169,116,.15);color:#34d399;}
-.bk{background:rgba(59,130,246,.15);color:#60a5fa;}
-.bh{background:rgba(245,158,11,.15);color:#fbbf24;}
-.bj{background:rgba(224,82,82,.15);color:#f87171;}
-.rn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:700;background:var(--bg3);}
-.r1{background:linear-gradient(135deg,#ffd700,#ffb800);color:#4a3800;}
-.r2{background:linear-gradient(135deg,#c0c0c0,#a0a0a0);color:#333;}
-.r3{background:linear-gradient(135deg,#cd7f32,#a0522d);color:#fff;}
-/* 기타 */
-.up{color:var(--red);font-weight:600;}
-.dn{color:#3b82f6;font-weight:600;}
-.nx-n{color:var(--accent2);font-weight:700;}
-.note{font-size:10px;color:var(--tx3);margin-top:8px;padding:6px 10px;background:var(--bg3);border-radius:var(--r);}
-.sec-lbl{font-size:10.5px;font-weight:700;color:var(--tx3);text-transform:uppercase;margin:16px 0 10px;display:flex;align-items:center;gap:6px;}
-.sec-lbl::after{content:'';flex:1;height:1px;background:var(--bd);}
-.pgb{display:inline-flex;align-items:center;font-size:10px;font-weight:700;color:var(--tx3);background:var(--bg3);border:1px solid var(--bd);border-radius:20px;padding:3px 10px;margin-bottom:12px;}
-/* 게임사 비교 랭킹 막대 */
-.rk-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;background:transparent;border:1px solid transparent;transition:transform .18s ease, background .18s ease, box-shadow .18s ease, border-color .18s ease;}
-.rk-row:hover{transform:translateX(4px);background:rgba(255,255,255,.03);}
-.rk-row.nx{background:linear-gradient(90deg,rgba(99,102,241,.18),rgba(99,102,241,.05));border:1px solid rgba(129,140,248,.45);box-shadow:0 0 0 1px rgba(99,102,241,.22),0 0 14px rgba(99,102,241,.32);}
-.rk-row.nx:hover{box-shadow:0 0 0 1px rgba(99,102,241,.35),0 0 20px rgba(99,102,241,.5);}
-.rk-row.na{opacity:.4;}
-.rk-badge{width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;}
-.rk-badge.g1{background:linear-gradient(135deg,#fde68a,#f59e0b);color:#3a2600;box-shadow:0 1px 4px rgba(245,158,11,.5);}
-.rk-badge.g2{background:linear-gradient(135deg,#eef2f6,#94a3b8);color:#1f2937;box-shadow:0 1px 4px rgba(148,163,184,.4);}
-.rk-badge.g3{background:linear-gradient(135deg,#e8a878,#cd7c3a);color:#2b1400;box-shadow:0 1px 4px rgba(205,124,58,.4);}
-.rk-badge.gx{background:rgba(255,255,255,.08);color:var(--tx3);}
-.rk-name{min-width:72px;max-width:72px;font-size:10px;font-weight:500;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.rk-row.nx .rk-name{font-weight:800;color:var(--accent2);}
-.rk-track{flex:1;height:10px;background:rgba(255,255,255,.05);border-radius:5px;overflow:hidden;position:relative;}
-.rk-fill{position:absolute;top:0;height:100%;border-radius:5px;width:0;left:var(--rk-left,0%);background:var(--rk-grad);box-shadow:inset 0 1px 0 rgba(255,255,255,.18);transition:width 0.7s cubic-bezier(.22,.61,.36,1);}
-.rk-zero{position:absolute;top:-1px;bottom:-1px;width:1px;background:rgba(255,255,255,.28);z-index:1;}
-.rk-val{min-width:44px;text-align:right;font-size:10px;font-weight:400;color:var(--tx2);}
-.rk-row.nx .rk-val{font-weight:700;color:var(--accent2);}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXON IR Dashboard - Valuation</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <style>
+        /* 기본 스타일 (제공된 CSS 기반) */
+        :root {
+            --bg: #0a0e16; --surface: #141b28; --surface2: #1a2436; --line: #1e2836;
+            --txt: #e8edf5; --txt2: #a9b8cd; --txt3: #7f92ad;
+            --mint: #4dd6c1; --blue: #5b9dff; --gold: #ffc107; --red: #f06a6a; --green: #3fcf8e;
+        }
+        body { background-color: var(--bg); color: var(--txt); font-family: sans-serif; padding: 10px; }
+        .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 14px; }
+        .col { display: flex; flex-direction: column; }
+        .card { background-color: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 14px; flex-grow: 1; }
+        .ct { font-size: 18px; font-weight: 900; color: var(--txt); border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 15px; }
+        .ct .bar { display: inline-block; width: 4px; height: 18px; background-color: var(--mint); margin-right: 8px; vertical-align: -3px; border-radius: 2px; }
+        .ct .r { float: right; font-size: 12px; font-weight: 600; color: var(--txt3); }
+        .note { font-size: 11.5px; color: var(--txt3); line-height: 1.6; margin-top: 15px; }
+        .note b { color: var(--txt2); font-weight: 700; }
+        #footNote { display: block; text-align: center; margin-top: 20px; font-size: 12px; }
+
+        /* 기존 JS에서 생성하던 HTML 요소들을 위한 스타일 */
+        .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin-top:4px}
+        .statcard{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:12px 13px}
+        .statcard .sm{font-size:12.5px;color:#9fb0c8;font-weight:700;margin-bottom:5px}
+        .statcard .sv{font-size:20px;font-weight:900;color:#e8edf5;font-variant-numeric:tabular-nums;margin-bottom:7px}
+        .statcard .sc{display:flex;gap:5px;flex-wrap:wrap}
+        .schip{font-size:10.5px;font-weight:900;padding:2.5px 7px;border-radius:20px;white-space:nowrap}
+        .schip.good{background:rgba(63,207,142,.16);color:#3fcf8e}
+        .schip.bad{background:rgba(240,106,106,.16);color:#f06a6a}
+        .schip.mid{background:rgba(127,146,173,.14);color:#9fb0c8}
+        .anSec{margin-bottom:16px;padding:13px 15px;border-radius:10px;background:rgba(255,255,255,.03);border-left:3px solid var(--line2)}
+        .anSec.kr{border-left-color:#f4c151}
+        .anSec.ov{border-left-color:#5b9dff}
+        .anSec.sum{border-left-color:#4dd6c1;background:rgba(77,214,193,.06)}
+        .anH{font-size:14px;font-weight:900;color:#e8edf5;margin-bottom:8px}
+        .anSec.kr .anH{color:#f4c151}
+        .anSec.ov .anH{color:#5b9dff}
+        .anSec.sum .anH{color:#4dd6c1}
+        .anL{font-size:13px;color:#c8d3e0;line-height:1.7;margin-bottom:4px}
+        .anL b{color:#fff;font-weight:800}
+        .anL .up{color:#3fcf8e;font-weight:800}
+        .anL .dn{color:#f06a6a;font-weight:800}
+
+    </style>
 </head>
 <body>
-<div id="build-banner" style="position:fixed;top:0;right:0;z-index:99999;background:#6366f1;color:#fff;font-size:10px;padding:2px 8px;border-radius:0 0 0 6px;font-family:monospace;opacity:0.85;">BUILD-0715-FIXED</div>
-<div class="wrap">
-<div class="hd"><div class="hd-inner">
-  <div class="hd-left">
-    <div class="hd-logo">NX</div>
-    <div>
-      <div class="hd-title">넥슨 일본법인 기업가치 현황</div>
-      <div class="hd-sub">NEXON Co., Ltd. (3659.T) · 사내 IR 모니터링 · <span class="dot"></span> 2026년 6월 기준</div>
+
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="ct"><span class="bar"></span>P/E 밴드 차트
+                    <span class="r">과거 5년 기준</span>
+                </div>
+                <canvas id="peBandChart" height="250"></canvas>
+                <div class="note">※ 넥슨의 과거 5년간 주당순이익(EPS)과 주가 데이터를 바탕으로 PER 밴드를 산출하여 현재 주가의 상대적 위치를 보여줍니다.</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="ct"><span class="bar"></span>피어 그룹 멀티플 비교
+                    <span class="r" id="vsMeta">Yahoo 실측 · 각 그룹 중앙값</span>
+                </div>
+                <canvas id="peerMultiplesChart" height="250"></canvas>
+                 <div class="note">※ 넥슨과 국내/해외 경쟁사 그룹의 핵심 지표(PER, PBR, 영업이익률)를 비교하여 상대적 밸류에이션 수준을 보여줍니다.</div>
+            </div>
+        </div>
     </div>
-  </div>
-</div></div>
-<div class="tab-row">
-  <button class="tab on" onclick="sw(this,'s11')">기업가치</button>
-  <button class="tab"    onclick="sw(this,'s12')">주주구성</button>
-  <button class="tab"    onclick="sw(this,'s4')">수익성 · 재무</button>
-  <button class="tab"    onclick="sw(this,'s5')">임직원</button>
-  <button class="tab"    onclick="sw(this,'s1')">게임사 비교</button>
-</div>
-
-<!-- S11 기업가치 -->
-<div id="s11" class="sec on">
-  <div class="pgb">📊 1 · 기업가치 개요</div>
-  <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-bottom:14px;">
-    <div class="mc" style="border:1.5px solid rgba(99,102,241,.4);position:relative;">
-      <div style="position:absolute;top:6px;right:6px;font-size:8px;color:var(--tx3);" id="kpi-live-label">로딩중...</div>
-      <div class="mc-l">실시간 주가 <span style="font-size:7px;">15분 지연</span></div>
-      <div class="mc-v" id="kpi-price" style="font-size:22px;color:var(--accent2);">¥2,625</div>
-      <div class="mc-s" id="kpi-chg">—</div>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="ct"><span class="bar"></span>각 지표 현재 상태 진단
+                    <span class="r">국내 10사 / 해외 14사 중앙값 대비</span>
+                </div>
+                <div class="statgrid" id="diagGrid"></div>
+                <div class="note" id="diagNote"></div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="ct"><span class="bar"></span>넥슨 주가 종합 평가
+                    <span class="r">Yahoo 실측 기반 · 투자 추천 아님</span>
+                </div>
+                <div id="anBody"></div>
+            </div>
+        </div>
     </div>
-    <div class="mc"><div class="mc-l">시가총액 Market Cap</div><div class="mc-v" id="kpi-mktcap" style="font-size:16px;">¥2.08조</div><div class="mc-s" id="kpi-usd">≈ $13.0B</div></div>
-    <div class="mc" style="border:1.5px solid rgba(24,169,116,.3);"><div class="mc-l">12M 목표가 컨센서스</div><div class="mc-v" style="font-size:16px;color:var(--green);">¥3,300</div><div class="mc-s">+45.4% 업사이드</div></div>
-    <div class="mc"><div class="mc-l">투자의견 Buy/Hold/Sell</div><div class="mc-v" style="font-size:13px;">매수 8/9</div><div class="mc-s">9개 브로커</div></div>
-    <div class="mc"><div class="mc-l">PER 주가수익비율</div><div class="mc-v" style="font-size:16px;">19.7x</div><div class="mc-s" id="kpi-per-cmp">동종평균 19.3x 대비</div></div>
-    <div class="mc"><div class="mc-l">PBR 주가순자산비율</div><div class="mc-v" style="font-size:16px;">1.68x</div><div class="mc-s"><span style="color:#2dd4a0;">▼23.6% 저평가</span></div></div>
-    <div class="mc"><div class="mc-l">OPM 영업이익률</div><div class="mc-v" style="font-size:16px;color:var(--green);">38.2%</div><div class="mc-s">업계 최상위</div></div>
-  </div>
-  <div class="card" style="margin-bottom:14px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
-      <div>
-        <div class="card-title" style="margin:0;">넥슨(3659) 실제주가 vs 넥슨 자체 분기 가이던스 추이</div>
-        <div style="font-size:10px;color:var(--tx3);margin-top:2px;">분기말 실제 주가 · 가이던스 대비 실제 매출 · 전분기 매출가이던스 (전분기 IR 공시값)</div>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px;" id="pt-kpi"></div>
-    <div style="font-size:10px;font-weight:600;color:var(--tx3);margin-bottom:4px;">📈 주가 추이 (¥) </div>
-    <div style="height:200px;position:relative;margin-bottom:12px;"><canvas id="pt-chart-price"></canvas></div>
-    <div style="height:1px;background:var(--bd);margin-bottom:10px;"></div>
-    <div style="font-size:10px;font-weight:600;color:var(--tx3);margin-bottom:4px;">📊 가이던스 vs 실제 매출 (¥B) </div>
-    <div style="height:160px;position:relative;"><canvas id="pt-chart"></canvas></div>
-    <div id="pt-ev-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px;margin-top:10px;"></div>
-    <div class="tw"><table class="t" style="min-width:500px;">
-      <thead><tr><th style="text-align:left;">분기</th><th>실제주가(¥)</th><th>실제매출(¥B)</th><th>전분기 매출가이던스</th><th>Beat/Miss</th></tr></thead>
-      <tbody id="pt-body"></tbody>
-    </table></div>
-  </div>
-</div>
 
-<!-- S12 주주구성 -->
-<div id="s12" class="sec">
-  <div class="pgb">🏢 2 · 주식 및 주주구성</div>
-  <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:14px;">
-    <div class="mc" style="border:1.5px solid rgba(224,82,82,.4);"><div class="mc-l">총주식수</div><div class="mc-v" style="font-size:13px;">827,160,972주</div><div class="mc-s">자기주식 34,253,200주 포함</div></div>
-    <div class="mc"><div class="mc-l">대주주 보유</div><div class="mc-v" style="font-size:13px;color:var(--red);">94.14%</div><div class="mc-s">746,428,471주</div></div>
-    <div class="mc"><div class="mc-l">유통주식 Float</div><div class="mc-v" style="font-size:13px;color:var(--amber);">5.86%</div><div class="mc-s">46,479,301주</div></div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1.9fr;gap:12px;margin-bottom:14px;">
-    <div class="card"><div class="card-title" style="margin-bottom:10px;">주주 구성 (4대 그룹)</div><div style="height:220px;position:relative;"><canvas id="s12-donut"></canvas></div><div id="s12-donut-lgd" style="display:flex;flex-direction:column;gap:4px;margin-top:10px;"></div></div>
-    <div class="card"><div class="card-title" style="margin-bottom:6px;">주요 주주 현황</div><div class="tw"><table class="t" style="min-width:500px;"><thead><tr><th>#</th><th style="text-align:left;">주주명</th><th>유형</th><th>지분율</th><th>주식수</th><th style="text-align:left;">비고</th></tr></thead><tbody id="s12-tbl"></tbody></table></div></div>
-  </div>
-</div>
+    <div class="note"><span id="footNote">※ 데이터 연결 중…</span></div>
 
-<!-- S4 수익성 및 재무 -->
-<div id="s4" class="sec">
-  <div class="pgb">💰 3 · 수익성 및 재무</div>
-  <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px;">
-    <div class="mc" id="s4k-rev"><div class="mc-l">매출 <span id="s4k-quarter" style="font-size:9px;color:var(--tx3);">26Q1 기준</span></div><div class="mc-v">¥152.2B</div><div class="mc-s">+34% YoY</div></div>
-    <div class="mc" id="s4k-op"><div class="mc-l">영업이익</div><div class="mc-v" style="color:var(--green);">¥58.2B</div><div class="mc-s">+40% YoY</div></div>
-    <div class="mc"><div class="mc-l">순이익</div><div class="mc-v">¥57.2B</div><div class="mc-s">+118% YoY</div></div>
-    <div class="mc" id="s4k-opm" style="border:1.5px solid rgba(99,102,241,.3);"><div class="mc-l">OPM 영업이익률</div><div class="mc-v" style="color:var(--accent2);">38.2%</div><div class="mc-s">업계 최상위</div></div>
-  </div>
-  <div class="card" style="margin-bottom:12px;"><div class="card-title">분기 매출·영업이익 추이 — 넥슨재팬 IR 공시</div><div style="height:240px;position:relative;"><canvas id="s4-rev-chart"></canvas></div></div>
-</div>
-
-<!-- S5 임직원 -->
-<div id="s5" class="sec">
-  <div class="pgb">👥 4 · 임직원 현황</div>
-  <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px;">
-    <div class="mc" style="border:1.5px solid rgba(99,102,241,.3);"><div class="mc-l">총 임직원 (2026Q1)</div><div class="mc-v" style="color:var(--accent2);">10,023명</div><div class="mc-s">전분기比 +189명</div></div>
-    <div class="mc"><div class="mc-l">한국</div><div class="mc-v">8,473명</div><div class="mc-s">전체의 84.5%</div></div>
-  </div>
-  <div class="card"><div class="card-title">분기별 임직원 수 상세</div><div class="tw"><table class="t" style="min-width:560px;font-size:10.5px;"><thead><tr><th style="text-align:left;">분기</th><th>한국</th><th>일본</th><th>북미</th><th>중국</th><th>기타</th><th style="color:var(--accent2);">합계</th><th>HR Costs<br>(¥M)</th><th>1인당<br>(¥만)</th></tr></thead><tbody id="s5-detail-tbl"></tbody></table></div></div>
-</div>
-
-<!-- S1 게임사 비교 -->
-<div id="s1" class="sec">
-  <div class="ctrl" style="flex-wrap:wrap;gap:6px 10px;">
-    <span class="lbl" id="s1q-lbl">분기:</span>
-    <select id="s1q" onchange="buildS1()">
-      <option value="2026Q1">2026 Q1 ★</option>
-      <option value="2025Q4">2025 Q4</option>
-    </select>
-    <span id="s1-live-badge" style="display:none; font-size:11px; font-weight:800; color:#fff; background:var(--accent); padding:3px 8px; border-radius:4px; box-shadow:0 2px 8px rgba(99,102,241,.4); margin-left:8px;">🔴 실시간 Live</span>
-    <span class="lbl" style="margin-left:8px;">지표:</span>
-    
-    <!-- 실시간/실적 필터 그룹 분리 배치 -->
-    <div style="display:inline-flex; flex-wrap:wrap; gap:6px; margin-right:8px; padding-right:12px; border-right:1px solid var(--bd);">
-      <span class="pill on" onclick="setMet('mktcap',this)">⏱️ 시가총액</span>
-      <span class="pill" onclick="setMet('per',this)">⏱️ PER</span>
-      <span class="pill" onclick="setMet('pbr',this)">⏱️ PBR</span>
-    </div>
-    <div style="display:inline-flex; flex-wrap:wrap; gap:6px;">
-      <span class="pill" onclick="setMet('rev',this)">매출</span>
-      <span class="pill" onclick="setMet('op',this)">영업이익</span> 
-      <span class="pill" onclick="setMet('opm',this)">영업이익률(OPM)</span>
-      <span class="pill" onclick="setMet('roe',this)">자기자본이익률(ROE)</span>
-    </div>
-  </div>
-
-  <div class="g2" style="margin-bottom:14px;">
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div class="card-title" style="margin:0;">🌍 글로벌 게임사 랭킹</div>
-        <span id="s1g-unit" style="font-size:9px;color:var(--tx3);"></span>
-      </div>
-      <div id="s1g-list" style="display:flex;flex-direction:column;gap:5px;"></div>
-    </div>
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div class="card-title" style="margin:0;">🇰🇷 국내 게임사 랭킹</div>
-        <span id="s1k-unit" style="font-size:9px;color:var(--tx3);"></span>
-      </div>
-      <div id="s1k-list" style="display:flex;flex-direction:column;gap:5px;"></div>
-    </div>
-  </div>
-</div>
-</div><!-- .wrap -->
-
-<!-- Chart.js CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
-
-<!-- 데이터 및 메인 로직 스크립트 (통합 및 CORS 버그 해결 버전) -->
 <script>
-// [1] CORS 해결을 위한 신뢰성 있는 공개 프록시 리스트 설정
-const PROXY_URLS = [
-  "https://corsproxy.io/?url=",
-  "https://api.allorigins.win/raw?url="
-];
-let currentProxyIndex = 0;
-
-function getProxyUrl(targetUrl) {
-  return PROXY_URLS[currentProxyIndex] + encodeURIComponent(targetUrl);
-}
-
-// [2] DART Open API 설정
-const DART_API_KEY = "5dc27d8d420eaa1f4d21d013454d2850741fee9e";
-const DART_MAP = {
-  'ncsoft':'00126131', 'netmarble':'01201170', 'krafton':'00659616', 'shiftup':'01615846', 
-  'pearlabyss':'01202258', 'kakaogames':'00994998', 'wemade':'00332884', 'com2us':'00288404', 
-  'webzen':'00404981', 'neowiz':'00547071', 'devsisters':'01004121'
-};
-const TARGET_YEARS = ['2025', '2026'];
-
-// [3] 정적 기업 데이터베이스
-var PT_DATA = [
-  {q:'2023Q4', price:2210, guide:95, guideHi:102, guideLo:88, prevGuide:98, actual:99.2},
-  {q:'2024Q1', price:2380, guide:100, guideHi:108, guideLo:92, prevGuide:105, actual:113.9},
-  {q:'2024Q2', price:2250, guide:118, guideHi:126, guideLo:110, prevGuide:120, actual:118.9},
-  {q:'2024Q3', price:2680, guide:115, guideHi:123, guideLo:107, prevGuide:112, actual:118.7},
-  {q:'2024Q4', price:3280, guide:110, guideHi:118, guideLo:102, prevGuide:108, actual:123.6},
-  {q:'2025Q1', price:2950, guide:113, guideHi:122, guideLo:104, prevGuide:110, actual:113.9},
-  {q:'2025Q2', price:2520, guide:105, guideHi:113, guideLo:97, prevGuide:110, actual:118.9},
-  {q:'2025Q3', price:3050, guide:112, guideHi:120, guideLo:104, prevGuide:108, actual:118.7},
-  {q:'2025Q4', price:3850, guide:113, guideHi:154, guideLo:113, prevGuide:120, actual:123.6},
-  {q:'2026Q1', price:2625, guide:86,  guideHi:101, guideLo:71,  prevGuide:134, actual:152.2}
-];
-
-const CO = {
-  nexon: {n:'넥슨', nx:1, tk:'3659.T', rg:'jp', col:'#E24B4A', cur:'JPY', mktcap:11.3, per:19.7, pbr:1.68, roe:10.9},
-  nintendo: {n:'닌텐도', nx:0, tk:'7974.T', rg:'jp', col:'#1D9E75', cur:'JPY', mktcap:87.0, per:21.0, pbr:3.8, roe:14.9},
-  sony: {n:'소니', nx:0, tk:'6758.T', rg:'jp', col:'#185FA5', cur:'JPY', mktcap:98.0, per:14.2, pbr:1.9, roe:13.0},
-  bandai: {n:'반다이남코', nx:0, tk:'7832.T', rg:'jp', col:'#BA7517', cur:'JPY', mktcap:9.4, per:24.0, pbr:2.5, roe:10.5},
-  krafton: {n:'크래프톤', nx:0, tk:'259960.KS', rg:'kr', col:'#534AB7', cur:'KRW', mktcap:7.57, per:11.9, pbr:1.8, roe:15.2},
-  netmarble: {n:'넷마블', nx:0, tk:'251270.KS', rg:'kr', col:'#D4537E', cur:'KRW', mktcap:2.0, per:null, pbr:.7, roe:-1.8},
-  ncsoft: {n:'엔씨소프트', nx:0, tk:'036570.KS', rg:'kr', col:'#888780', cur:'KRW', mktcap:2.3, per:38.0, pbr:.9, roe:2.3},
-  shiftup: {n:'시프트업', nx:0, tk:'462870.KS', rg:'kr', col:'#C46AB8', cur:'KRW', mktcap:1.82, per:9.5, pbr:1.62, roe:15.2},
-  ttwo: {n:'Take-Two', nx:0, tk:'TTWO', rg:'us', col:'#3C3489', cur:'USD', mktcap:37.0, per:null, pbr:3.5, roe:null},
-  roblox: {n:'Roblox', nx:0, tk:'RBLX', rg:'us', col:'#D85A30', cur:'USD', mktcap:68.0, per:null, pbr:null, roe:null},
-  ea: {n:'EA', nx:0, tk:'EA', rg:'us', col:'#0F6E56', cur:'USD', mktcap:36.0, per:null, pbr:4.1, roe:12.0},
-  tencent: {n:'텐센트', nx:0, tk:'0700.HK', rg:'hk', col:'#A32D2D', cur:'CNY', mktcap:503, per:14.6, pbr:3.1, roe:21.7},
-  netease: {n:'NetEase', nx:0, tk:'NTES', rg:'us', col:'#854F0B', cur:'USD', mktcap:79.0, per:18.0, pbr:3.0, roe:18.0},
-  pearlabyss: {n:'펄어비스', nx:0, tk:'263750.KS', rg:'kr', col:'#2D4A8A', cur:'KRW', mktcap:1.45, per:null, pbr:1.18, roe:null},
-  kakaogames: {n:'카카오게임즈', nx:0, tk:'293490.KS', rg:'kr', col:'#FAE100', cur:'KRW', mktcap:0.52, per:null, pbr:0.58, roe:null},
-  konami: {n:'코나미', nx:0, tk:'9766.T', rg:'jp', col:'#E8A020', cur:'JPY', mktcap:15.3, per:32.5, pbr:3.8, roe:17.0},
-  capcom: {n:'캡콤', nx:0, tk:'9697.T', rg:'jp', col:'#2B5AA8', cur:'JPY', mktcap:8.0, per:22.0, pbr:5.2, roe:22.0},
-  segasammy: {n:'세가사미', nx:0, tk:'6460.T', rg:'jp', col:'#1A6BB5', cur:'JPY', mktcap:2.8, per:18.5, pbr:1.4, roe:9.8},
-  squareenix: {n:'스퀘어에닉스', nx:0, tk:'9684.T', rg:'jp', col:'#8B3A8B', cur:'JPY', mktcap:5.4, per:28.5, pbr:2.2, roe:7.2},
-  cdprojekt: {n:'CD Projekt', nx:0, tk:'CDR.WA', rg:'eu', col:'#C8382A', cur:'USD', mktcap:5.94, per:45.0, pbr:4.2, roe:9.5},
-  ubisoft: {n:'유비소프트', nx:0, tk:'UBI.PA', rg:'eu', col:'#0070D1', cur:'USD', mktcap:0.81, per:null, pbr:0.28, roe:null},
-  gungho: {n:'건호온라인', nx:0, tk:'3765.T', rg:'jp', col:'#4C8C4A', cur:'JPY', mktcap:1.8, per:9.5, pbr:1.8, roe:17.5},
-  playtika: {n:'플레이티카', nx:0, tk:'PLTK', rg:'us', col:'#F05A28', cur:'USD', mktcap:2.4, per:8.5, pbr:null, roe:null},
-  wemade: {n:'위메이드', nx:0, tk:'112040.KS', rg:'kr', col:'#1DB8A0', cur:'KRW', mktcap:1.2, per:null, pbr:2.8, roe:null},
-  com2us: {n:'컴투스', nx:0, tk:'078340.KS', rg:'kr', col:'#FF6B35', cur:'KRW', mktcap:0.38, per:null, pbr:0.72, roe:null},
-  webzen: {n:'웹젠', nx:0, tk:'069080.KS', rg:'kr', col:'#5B8ED6', cur:'KRW', mktcap:0.32, per:8.5, pbr:0.88, roe:10.2},
-  neowiz: {n:'네오위즈', nx:0, tk:'095660.KS', rg:'kr', col:'#2B7A0B', cur:'KRW', mktcap:0.30, per:9.1, pbr:0.86, roe:9.4},
-  sea: {n:'씨 리미티드', nx:0, tk:'SE', rg:'us', col:'#F26522', cur:'USD', mktcap:63.0, per:41.5, pbr:4.5, roe:11.2},
-  aristocrat: {n:'아리스토크랏', nx:0, tk:'ALL.AX', rg:'au', col:'#C41E3A', cur:'USD', mktcap:18.0, per:20.0, pbr:7.0, roe:35.0},
-  devsisters: {n:'데브시스터즈', nx:0, tk:'194480.KS', rg:'kr', col:'#FF4F8B', cur:'KRW', mktcap:0.28, per:null, pbr:1.45, roe:null}
-};
-
-const QD = {
-  nexon: {'2026Q1':{r:152.2,o:58.2,m:38.2}},
-  krafton: {'2026Q1':{r:1.3714,o:.5616,m:41.0}},
-  netmarble: {'2026Q1':{r:.652,o:.053,m:8.1}},
-  ncsoft: {'2026Q1':{r:.461,o:.022,m:4.8}}
-};
-
-var FX2 = { nexon:1000/160, krafton:1e6/1527, tencent:1000/7.26, ea:1000 };
-window.REALTIME_VAL = {};
-
-// ── 유틸리티 및 탭전환 ──────────────────────────────────────────────────
-function kc(id){var c=Chart.getChart(id);if(c)c.destroy();}
-function sw(el,id){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on')); el.classList.add('on');
-  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
-  var sec=document.getElementById(id); if(sec)sec.classList.add('on');
-  if(id==='s11') buildPTChart();
-}
-
-function buildPTChart() {
-  var labels=PT_DATA.map(d => d.q);
-  var prices=PT_DATA.map(d => d.price);
-  var targets=PT_DATA.map(d => d.guide);
-  var actuals=PT_DATA.map(d => d.actual||null);
-  
-  var pe=document.getElementById('pt-chart-price');
-  if(pe){ kc('pt-chart-price'); new Chart(pe,{type:'line',data:{labels:labels,datasets:[{label:'실제주가(¥)',data:prices,borderColor:'#e05252',backgroundColor:'rgba(224,82,82,.08)',borderWidth:2.5,tension:.3,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}}); }
-
-  var ge=document.getElementById('pt-chart');
-  if(ge){ kc('pt-chart'); new Chart(ge,{type:'line',data:{labels:labels,datasets:[{label:'가이던스',data:targets,borderColor:'#18a974',borderWidth:2,borderDash:[5,4],tension:.3},{label:'실제매출',data:actuals,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.08)',borderWidth:2.5,fill:true,tension:.3}]},options:{responsive:true,maintainAspectRatio:false}}); }
-}
-
-// ── S1 게임사 비교 ─────────────────────────────────────────────────────
-var rMet='mktcap';
-window.setMet = function(m,el){
-  rMet=m;
-  document.querySelectorAll('.ctrl .pill').forEach(p=>p.classList.remove('on'));
-  el.classList.add('on');
-  
-  var qSelect = document.getElementById('s1q');
-  var qLabel = document.getElementById('s1q-lbl');
-  var liveBadge = document.getElementById('s1-live-badge');
-  
-  if(m === 'mktcap' || m === 'per' || m === 'pbr') {
-    if(qSelect) qSelect.style.display = 'none';
-    if(qLabel) qLabel.style.display = 'none';
-    if(liveBadge) liveBadge.style.display = 'inline-block';
-  } else {
-    if(qSelect) qSelect.style.display = 'inline-block';
-    if(qLabel) qLabel.style.display = 'inline-block';
-    if(liveBadge) liveBadge.style.display = 'none';
-  }
-  buildS1();
-}
-
-window.getV = function(co,qk,met){
-  if(met==='mktcap' && window.REALTIME_VAL[co]?.mktcap) return window.REALTIME_VAL[co].mktcap;
-  if(met==='per' && window.REALTIME_VAL[co]?.per) return window.REALTIME_VAL[co].per;
-  if(met==='pbr' && window.REALTIME_VAL[co]?.pbr) return window.REALTIME_VAL[co].pbr;
-  
-  var cObj = CO[co];
-  var qd = QD[co] && QD[co][qk];
-  
-  if(met==='mktcap') return cObj?.mktcap ?? null;
-  if(met==='per') return cObj?.per ?? null;
-  if(met==='pbr') return cObj?.pbr ?? null;
-  if(met==='roe') return cObj?.roe ?? null;
-  
-  var fx = FX2[co] || 1;
-  if(met==='rev') return qd ? qd.r * fx : null;
-  if(met==='op') return qd ? qd.o * fx : null;
-  if(met==='opm') return qd ? qd.m : null;
-  return null;
-}
-
-window.buildS1 = function() {
-  var qk = document.getElementById('s1q') ? document.getElementById('s1q').value : '2026Q1';
-  var metLabels={mktcap:'시가총액 (B$)',rev:'매출 (M$)',op:'영업이익 (M$)',opm:'영업이익률 OPM (%)',per:'주가수익비율 PER (배)',pbr:'주가순자산비율 PBR (배)',roe:'자기자본이익률 ROE (%)'};
-  var isLower=false; 
-  var unitLbl=metLabels[rMet]||rMet;
-  var timePrefix = (rMet === 'mktcap' || rMet === 'per' || rMet === 'pbr') ? '실시간' : qk;
-  
-  var gu=document.getElementById('s1g-unit'); if(gu) gu.textContent = timePrefix + ' · ' + unitLbl;
-  var ku=document.getElementById('s1k-unit'); if(ku) ku.textContent = timePrefix + ' · ' + unitLbl;
-
-  var valUnit = "";
-  if(rMet === 'rev' || rMet === 'op') valUnit = " M$";
-  else if(rMet === 'mktcap') valUnit = " B$";
-  else if(rMet === 'per' || rMet === 'pbr') valUnit = "배";
-  else if(rMet === 'opm' || rMet === 'roe') valUnit = "%";
-
-  var GLOBAL_COS=['tencent','sony','nintendo','netease','ea','roblox','ttwo','bandai','konami','capcom','nexon'];
-  var KOREA_COS=['nexon','krafton','ncsoft','netmarble','pearlabyss','shiftup','kakaogames','wemade','neowiz','webzen'];
-
-  function rkHex2rgb(hex){
-    var h=String(hex||'#6366f1').replace('#','');
-    if(h.length===3) h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
-    var n=parseInt(h,16);
-    return isNaN(n) ? [99,102,241] : [(n>>16)&255, (n>>8)&255, n&255];
-  }
-
-  function buildList(coList, elId){
-    var el=document.getElementById(elId);
-    if(!el)return;
-    var data=coList.map(function(co){
-      var v=getV(co,qk,rMet); return {co:co,v:v,na:(v===null)};
-    });
-    data.sort(function(a,b){
-      if(a.na&&b.na)return 0; if(a.na)return 1; if(b.na)return -1;
-      return isLower?a.v-b.v:b.v-a.v;
-    });
-
-    var validVals=data.filter(function(d){return!d.na;}).map(function(d){return d.v;});
-    var hi=Math.max.apply(null,[0].concat(validVals));
-    var lo=Math.min.apply(null,[0].concat(validVals));
-    var range=(hi-lo)||1;
-    var zeroPct=(0-lo)/range*100;
-    var hasNeg=lo<0;
-
-    el.innerHTML=data.map(function(d,i){
-      var rank=i+1; var isNx=CO[d.co]&&CO[d.co].nx; var col=(CO[d.co]&&CO[d.co].col)||'#6366f1';
-      var rgb=rkHex2rgb(col); var neg=(!d.na)&&d.v<0;
-      var grad=neg ? 'linear-gradient(90deg,rgba(224,82,82,.55),rgba(224,82,82,.95))' : `linear-gradient(90deg,rgba(${rgb[0]},${rgb[1]},${rgb[2]},.45),rgb(${rgb[0]},${rgb[1]},${rgb[2]}))`;
-      var barW=d.na?0:Math.max(2,Math.abs(d.v)/range*100);
-      var leftPct=d.na?0:(d.v>=0?zeroPct:Math.max(0,zeroPct-barW));
-      
-      var dispV=d.na?'N/A':(Math.abs(d.v)>=100?Math.round(d.v).toLocaleString():(Math.round(d.v*10)/10).toLocaleString());
-      if(!d.na) dispV += valUnit;
-
-      var badgeCls=rank===1?'g1':rank===2?'g2':rank===3?'g3':'gx';
-      var rowCls='rk-row'+(isNx?' nx':'')+(d.na?' na':'');
-      var name=(isNx?'★ ':'')+((CO[d.co]&&CO[d.co].n)||d.co);
-      var valCol=neg?'color:#e05252;':'';
-
-      // ⭐️ 데이터 출처 및 눈에 바로 보이는 전용 뱃지 로직
-      var sourceText = "";
-      var sourceBadge = "";
-      if (rMet === 'mktcap' || rMet === 'per' || rMet === 'pbr') {
-        sourceText = "데이터 출처: 야후 파이낸스 API (실시간)";
-        sourceBadge = '<span style="font-size:8px; color:var(--blue); background:rgba(59,130,246,0.15); padding:1px 4px; border-radius:3px; margin-right:4px;">YF</span>';
-      }
-      else if (rMet === 'rev' || rMet === 'op' || rMet === 'opm') {
-        if (CO[d.co] && CO[d.co].rg === 'kr') {
-          sourceText = "데이터 출처: DART Open API (실시간 연동)";
-          sourceBadge = '<span style="font-size:8px; color:var(--green); background:rgba(24,169,116,0.15); padding:1px 4px; border-radius:3px; margin-right:4px;">DART</span>';
-        } else {
-          sourceText = "데이터 출처: 야후 파이낸스 API 및 각사 IR";
-          sourceBadge = '<span style="font-size:8px; color:var(--amber); background:rgba(245,158,11,0.15); padding:1px 4px; border-radius:3px; margin-right:4px;">YF/IR</span>';
-        }
-      } else {
-        sourceText = "데이터 출처: 각사 IR 분기보고서 및 컨센서스";
-        sourceBadge = '<span style="font-size:8px; color:var(--tx3); background:rgba(255,255,255,0.05); padding:1px 4px; border-radius:3px; margin-right:4px;">IR</span>';
-      }
-
-      return `<div class="${rowCls}" title="${sourceText}" style="cursor:help;"><div class="rk-badge ${badgeCls}">${rank}</div><div class="rk-name">${name}</div><div class="rk-track">${hasNeg?`<div class="rk-zero" style="left:${zeroPct}%;"></div>`:''}<div class="rk-fill" style="width:${barW}%;left:${leftPct}%;background:${grad};"></div></div><div class="rk-val" style="${valCol}">${sourceBadge}${dispV}</div></div>`;
-    }).join('');
-  }
-  buildList(GLOBAL_COS,'s1g-list');
-  buildList(KOREA_COS,'s1k-list');
-}
-
-// ── 데이터 수집 및 비동기 동기화 모듈 ──────────────────────────────────────────
-async function fetchWithProxy(targetUrl) {
-  // 프록시 자동 교체 및 재시도 엔진
-  for (let i = 0; i < PROXY_URLS.length; i++) {
-    try {
-      const proxyUrl = getProxyUrl(targetUrl);
-      const res = await fetch(proxyUrl);
-      if (res.ok) {
-        // allorigins 프록시는 json 래핑 처리가 필요할 수 있으므로 분기 처리
-        if (PROXY_URLS[currentProxyIndex].includes("allorigins")) {
-          const json = await res.json();
-          return JSON.parse(json.contents);
-        }
-        return await res.json();
-      }
-    } catch (e) {
-      // 실패 시 다음 프록시 서버로 변경해 재시도
-      currentProxyIndex = (currentProxyIndex + 1) % PROXY_URLS.length;
-    }
-  }
-  throw new Error("모든 우회 프록시 서버 연결 실패");
-}
-
-async function fetchLiveNews() {
-  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent("넥슨 (실적 OR 신작 OR 주가)")}&hl=ko&gl=KR&ceid=KR:ko`;
-  try {
-    const res = await fetch(getProxyUrl(rssUrl));
-    const text = await res.text();
-    // allorigins 래핑 대응
-    let cleanXml = text;
-    if (text.startsWith("{")) {
-      cleanXml = JSON.parse(text).contents;
-    }
-    const items = new DOMParser().parseFromString(cleanXml, "text/xml").querySelectorAll("item");
-    let nHtml = `<div style="margin-top:12px; padding:12px; background:rgba(99,102,241,0.08); border-radius:8px; border:1px solid rgba(99,102,241,0.3);"><div style="font-size:11px; font-weight:800; color:var(--accent2); margin-bottom:8px;">📡 실시간 AI 뉴스 브리핑 <span style="font-size:9px; font-weight:normal; color:var(--tx3);">(Google News 자동 수집)</span></div>`;
-    for(let i=0; i<3; i++) {
-      if(!items[i]) break;
-      const t = items[i].querySelector("title").textContent;
-      const l = items[i].querySelector("link").textContent;
-      const d = new Date(items[i].querySelector("pubDate").textContent).toLocaleDateString('ko-KR', {month:'short', day:'numeric'});
-      nHtml += `<div style="font-size:10px; margin-bottom:6px;"><span style="color:#18a974; font-weight:bold;">[${d}]</span> <a href="${l}" target="_blank" style="color:var(--tx); text-decoration:none;">${t}</a></div>`;
-    }
-    nHtml += `</div>`;
-    let evList = document.getElementById('pt-ev-list');
-    if(evList) {
-      let oldBox = document.getElementById('live-news-box');
-      if(oldBox) oldBox.remove();
-      let nb = document.createElement('div');
-      nb.id = 'live-news-box';
-      nb.innerHTML = nHtml;
-      evList.parentNode.insertBefore(nb, evList.nextSibling);
-    }
-  } catch(e) {
-    console.error("뉴스 로딩 실패:", e);
-  }
-}
-
-async function fetchExchangeRates() {
-  try {
-    const res = await fetch("https://open.er-api.com/v6/latest/USD");
-    const data = await res.json();
-    const rates = data.rates;
-    if(rates.JPY && rates.KRW && rates.CNY) {
-      ['nexon','nintendo','sony','bandai','konami','capcom','segasammy','squareenix','gungho'].forEach(co => FX2[co] = 1000 / rates.JPY);
-      ['krafton','netmarble','ncsoft','shiftup','pearlabyss','kakaogames','wemade','com2us','webzen','neowiz','devsisters'].forEach(co => FX2[co] = 1e6 / rates.KRW);
-      ['tencent'].forEach(co => FX2[co] = 1000 / rates.CNY);
-    }
-  } catch(e) {
-    console.error("환율 수집 실패 기본값 사용:", e);
-  }
-}
-
-async function runAutoSync() {
-  await fetchExchangeRates();
-  const allKeys = Object.keys(CO);
-  await Promise.all(allKeys.map(async (key) => {
-    const cObj = CO[key];
-    if(!cObj.tk) return;
-    
-    // 야후 파이낸스 실시간 주가/지표 통신
-    try {
-      const u = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${cObj.tk}?modules=summaryDetail,defaultKeyStatistics,price,incomeStatementHistoryQuarterly`;
-      const data = await fetchWithProxy(u);
-      const res0 = data.quoteSummary.result[0];
-      const per = res0?.summaryDetail?.trailingPE?.raw || res0?.defaultKeyStatistics?.forwardPE?.raw;
-      const pbr = res0?.defaultKeyStatistics?.priceToBook?.raw;
-      const mktcap = res0?.summaryDetail?.marketCap?.raw;
-      const price = res0?.price?.regularMarketPrice?.raw;
-
-      window.REALTIME_VAL[key] = {
-        per: per ? Number(per.toFixed(2)) : null,
-        pbr: pbr ? Number(pbr.toFixed(2)) : null,
-        mktcap: mktcap ? Number((mktcap / 1e9).toFixed(2)) : null,
-        price: price ? price : null
-      };
-      
-      if(cObj.rg !== 'kr') {
-        const hq = res0?.incomeStatementHistoryQuarterly?.incomeStatementHistory;
-        if(hq) {
-          hq.forEach(h => {
-            const ds = h.endDate.fmt; const y = ds.substring(0,4); const m = parseInt(ds.substring(5,7));
-            let q = m<=3?'Q1':m<=6?'Q2':m<=9?'Q3':'Q4';
-            if(TARGET_YEARS.includes(y)) {
-              if(!QD[key]) QD[key] = {};
-              QD[key][y+q] = { r: h.totalRevenue.raw/1e9, o: h.operatingIncome.raw/1e9, m: (h.operatingIncome.raw/h.totalRevenue.raw)*100 };
-            }
-          });
-        }
-      }
-    } catch(e) {
-      console.warn(`${key} 야후 파이낸스 갱신 지연`, e);
-    }
-
-    // 국내 기업 DART Open API 통신
-    if(cObj.rg === 'kr' && DART_MAP[key]) {
-      for(let y of TARGET_YEARS) {
-        for(let rep of [{c:'11013',q:'Q1'},{c:'11012',q:'Q2'},{c:'11014',q:'Q3'},{c:'11011',q:'Q4'}]) {
-          try {
-            const dUrl = `https://opendart.fss.or.kr/api/fnlttSinglAcnt.json?crtfc_key=${DART_API_KEY}&corp_code=${DART_MAP[key]}&bsns_year=${y}&reprt_code=${rep.c}&fs_div=CFS`;
-            const dData = await fetchWithProxy(dUrl);
-            if(dData.status === "000") {
-              let ar=0, ap=0;
-              dData.list.forEach(i => {
-                if(i.account_nm.includes('매출')||i.account_nm.includes('영업수익')) ar = Number(i.thstrm_amount.replace(/,/g, ''));
-                if(i.account_nm.includes('영업이익')) ap = Number(i.thstrm_amount.replace(/,/g, ''));
-              });
-              if(ar > 0) {
-                if(!QD[key]) QD[key] = {};
-                QD[key][`${y}${rep.q}`] = { r: ar/1e12, o: ap/1e12, m: (ap/ar)*100 };
-              }
-            }
-          } catch(e) {
-            console.warn(`${key} DART 갱신 실패`, e);
-          }
-        }
-      }
-    }
-  }));
-  
-  // 넥슨 실시간 주가 동기화
-  const pe = document.getElementById('kpi-price');
-  if(pe && window.REALTIME_VAL['nexon']?.price) {
-     pe.textContent = '¥' + window.REALTIME_VAL['nexon'].price.toLocaleString();
-  }
-
-  buildS1();
-}
-
-// ── 이벤트 리스너 가동 ──────────────────────────────────────────────────
-window.addEventListener('load', function() {
-  buildPTChart();
-  buildS1();
-  setTimeout(runAutoSync, 1000);
-  setTimeout(fetchLiveNews, 2000);
+/* ══════════════════════════════════════════════════════════════════════
+   데이터 모의 제공 (Mock Data)
+   실제 환경에서는 이 부분을 제거하고 기존의 fetch 로직을 사용하세요.
+   P/E 밴드 차트에 필요한 `historicalData`는 API 응답에 추가되어야 합니다.
+   ══════════════════════════════════════════════════════════════════════ */
+window.__ready = new Promise((resolve) => {
+    setTimeout(() => {
+        resolve({
+            peers: [{ sym: '3659.T', per: 18.5, pbr: 1.5, opm: 25.5, roe: 8.2, roa: 6.5, pfcf: 16.8 }],
+            peerStats: {
+                kr: { per: 22.1, pbr: 2.1, opm: 15.2, roe: 9.8, roa: 7.1, pfcf: 25.4, n: 10, nPer: 8, nPbr: 10, nOpm: 10, nRoe: 9, nRoa: 9, nPfcf: 7 },
+                ov: { per: 25.8, pbr: 3.5, opm: 22.1, roe: 13.5, roa: 9.2, pfcf: 28.9, n: 14, nPer: 13, nPbr: 14, nOpm: 14, nRoe: 14, nRoa: 14, nPfcf: 12 }
+            },
+            price: { current: 2850, w52low: 2450, w52high: 3550 },
+            // P/E 밴드 차트를 위한 모의 데이터 (날짜, 주가, 주당순이익)
+            historicalData: [
+                { date: "2019-07-01", price: 1700, eps: 85 },
+                { date: "2020-01-01", price: 2000, eps: 100 },
+                { date: "2020-07-01", price: 2400, eps: 110 },
+                { date: "2021-01-01", price: 3400, eps: 120 },
+                { date: "2021-07-01", price: 3000, eps: 125 },
+                { date: "2022-01-01", price: 2600, eps: 140 },
+                { date: "2022-07-01", price: 2800, eps: 150 },
+                { date: "2023-01-01", price: 3100, eps: 160 },
+                { date: "2023-07-01", price: 2900, eps: 155 },
+                { date: "2024-01-01", price: 2700, eps: 165 },
+                { date: "2024-07-01", price: 2850, eps: 168 }
+            ]
+        });
+        document.getElementById('footNote').textContent = "※ 본 자료는 투자 추천이 아니며 모든 수치는 참고용입니다.";
+    }, 500);
 });
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   ① 신규 차트 생성 (P/E Band, Peer Multiples)
+   ══════════════════════════════════════════════════════════════════════ */
+(function(){
+    function $(i) { return document.getElementById(i); }
+
+    const CHART_DEFAULTS = {
+        fontColor: 'rgba(232, 237, 245, 0.8)',
+        gridColor: 'rgba(255, 255, 255, 0.1)',
+        nexonColor: '#4dd6c1',
+        krColor: '#f4c151',
+        ovColor: '#5b9dff',
+    };
+
+    function drawPeBandChart(data) {
+        const ctx = $('peBandChart')?.getContext('2d');
+        if (!ctx || !data || data.length === 0) return;
+
+        // PER 밴드 계산 (저점 10x, 평균 20x, 고점 30x) - 실제 데이터 기반으로 조정 필요
+        const perLowBand = 10, perAvgBand = 20, perHighBand = 30;
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [
+                    {
+                        label: '현재 주가',
+                        data: data.map(d => ({ x: d.date, y: d.price })),
+                        borderColor: CHART_DEFAULTS.nexonColor,
+                        backgroundColor: CHART_DEFAULTS.nexonColor,
+                        borderWidth: 3,
+                        tension: 0.1,
+                    },
+                    {
+                        label: `PER High (${perHighBand}x)`,
+                        data: data.map(d => ({ x: d.date, y: d.eps * perHighBand })),
+                        borderColor: 'rgba(240, 106, 106, 0.5)',
+                        borderWidth: 1.5, borderDash: [5, 5], pointRadius: 0, tension: 0.1,
+                    },
+                    {
+                        label: `PER Avg (${perAvgBand}x)`,
+                        data: data.map(d => ({ x: d.date, y: d.eps * perAvgBand })),
+                        borderColor: 'rgba(255, 255, 255, 0.4)',
+                        borderWidth: 1.5, pointRadius: 0, tension: 0.1,
+                    },
+                    {
+                        label: `PER Low (${perLowBand}x)`,
+                        data: data.map(d => ({ x: d.date, y: d.eps * perLowBand })),
+                        borderColor: 'rgba(91, 157, 255, 0.5)',
+                        borderWidth: 1.5, borderDash: [5, 5], pointRadius: 0, tension: 0.1,
+                        fill: { target: 'end', above: 'rgba(91, 157, 255, 0.05)' },
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: CHART_DEFAULTS.fontColor } } },
+                scales: {
+                    x: {
+                        type: 'time', time: { unit: 'year' },
+                        grid: { color: CHART_DEFAULTS.gridColor }, ticks: { color: CHART_DEFAULTS.fontColor }
+                    },
+                    y: {
+                        grid: { color: CHART_DEFAULTS.gridColor }, ticks: { color: CHART_DEFAULTS.fontColor }
+                    }
+                }
+            }
+        });
+    }
+
+    function drawPeerMultiplesChart(me, kr, ov) {
+        const ctx = $('peerMultiplesChart')?.getContext('2d');
+        if (!ctx || !me || !kr || !ov) return;
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['PER (x)', 'PBR (x)', '영업이익률 (%)'],
+                datasets: [
+                    { label: '넥슨', data: [me.per, me.pbr, me.opm], backgroundColor: CHART_DEFAULTS.nexonColor },
+                    { label: '국내 피어', data: [kr.per, kr.pbr, kr.opm], backgroundColor: CHART_DEFAULTS.krColor },
+                    { label: '해외 피어', data: [ov.per, ov.pbr, ov.opm], backgroundColor: CHART_DEFAULTS.ovColor }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: CHART_DEFAULTS.fontColor } } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: CHART_DEFAULTS.gridColor }, ticks: { color: CHART_DEFAULTS.fontColor } },
+                    x: { grid: { display: false }, ticks: { color: CHART_DEFAULTS.fontColor } }
+                }
+            }
+        });
+    }
+
+    window.__ready.then(function(j) {
+        const me = (j.peers || []).find(x => x.sym === '3659.T') || {};
+        const kr = j.peerStats?.kr || {};
+        const ov = j.peerStats?.ov || {};
+
+        drawPeerMultiplesChart(me, kr, ov);
+        drawPeBandChart(j.historicalData);
+        
+        $('vsMeta').textContent = 'Yahoo 실측 · 국내 ' + (kr.n || 0) + '사 / 해외 ' + (ov.n || 0) + '사 중앙값';
+    }).catch(console.error);
+})();
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   ② 기존 코드: 진단 그리드 + 종합 평가 (원본 유지)
+   ══════════════════════════════════════════════════════════════════════ */
+(function(){
+  function $(i){ return document.getElementById(i); }
+
+  window.__ready.then(function(j){
+    var me = (j.peers||[]).filter(function(x){return x.sym==='3659.T';})[0] || {};
+    var ps = j.peerStats || {};
+    var kr = ps.kr || {}, ov = ps.ov || {};
+
+    var M = [
+      { k:'per',  n:'PER',      u:'x', lo:true  }, { k:'pbr',  n:'PBR',      u:'x', lo:true  },
+      { k:'opm',  n:'영업이익률', u:'%', lo:false }, { k:'roe',  n:'ROE',      u:'%', lo:false },
+      { k:'roa',  n:'ROA',      u:'%', lo:false }, { k:'pfcf', n:'P/FCF',    u:'x', lo:true  }
+    ];
+
+    var g = '';
+    M.forEach(function(m){
+      var v = me[m.k];
+      if (v == null) return;
+      var gk = kr[m.k] ? (v/kr[m.k] - 1)*100 : null;
+      var go = ov[m.k] ? (v/ov[m.k] - 1)*100 : null;
+      var chip = function(gap, lower, label){
+        if (gap == null) return '<span class="schip mid">' + label + ' —</span>';
+        var good = lower ? (gap < -5) : (gap > 5);
+        var bad  = lower ? (gap > 5)  : (gap < -5);
+        var c = good ? 'good' : (bad ? 'bad' : 'mid');
+        var t = good ? '우위' : (bad ? '열위' : '유사');
+        return '<span class="schip ' + c + '">' + label + ' ' + t + '</span>';
+      };
+      g += '<div class="statcard">'
+        + '<div class="sm">' + m.n + '</div>'
+        + '<div class="sv">' + v + m.u + '</div>'
+        + '<div class="sc">' + chip(gk, m.lo, '국내') + chip(go, m.lo, '해외') + '</div>'
+        + '</div>';
+    });
+    $('diagGrid').innerHTML = g || '<div style="color:var(--txt3)">데이터 연결 중…</div>';
+    $('diagNote').innerHTML = '<span style="color:var(--txt3);font-size:11.5px">'
+      + '※ 각 그룹 중앙값 대비 <b>±5% 이내</b>는 「유사」로 판정. '
+      + 'PER·PBR·P/FCF는 낮을수록, 영업이익률·ROE·ROA는 높을수록 우위입니다.</span>';
+
+    var html = '';
+    var section = function(grp, cls, title, label){
+      var lines = [], win = 0, lose = 0;
+      M.forEach(function(m){
+        var cmp = function(m, grp){
+          var v = me[m.k], p = grp[m.k];
+          if (v == null || !p) return null;
+          var gap = (v/p - 1)*100;
+          var good = m.lo ? (gap < -5) : (gap > 5);
+          var bad  = m.lo ? (gap > 5)  : (gap < -5);
+          return { gap:gap, good:good, bad:bad, v:v, p:p };
+        };
+        var c = cmp(m, grp);
+        if (!c) return;
+        if (c.good) win++; if (c.bad) lose++;
+        var sign = c.gap >= 0 ? '+' : '';
+        var tag = c.good ? '<span class="up">우위</span>' : c.bad  ? '<span class="dn">열위</span>' : '유사';
+        lines.push('<div class="anL">· <b>' + m.n + '</b> 넥슨 ' + c.v + m.u + ' vs ' + label + ' ' + c.p + m.u + ' (' + sign + c.gap.toFixed(0) + '%) → ' + tag + '</div>');
+      });
+      if (!lines.length) return '';
+      var verdict = win > lose ? '<span class="up">전반적 우위</span>' : lose > win ? '<span class="dn">전반적 열위</span>' : '<span>혼재</span>';
+      return '<div class="anSec ' + cls + '">'
+        + '<div class="anH">' + title + '</div>' + lines.join('')
+        + '<div class="anL" style="margin-top:7px;padding-top:7px;border-top:1px solid var(--line)">'
+        + '6개 지표 중 <b>우위 ' + win + '</b> · <b>열위 ' + lose + '</b> → ' + verdict + '</div></div>';
+    };
+    html += section(kr, 'kr', '국내 게임사 ' + (kr.n||10) + '사 대비', '국내');
+    html += section(ov, 'ov', '해외 게임사 ' + (ov.n||14) + '사 대비', '해외');
+    $('anBody').innerHTML = html;
+    
+  }).catch(console.error);
+})();
 </script>
 </body>
 </html>
